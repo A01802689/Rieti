@@ -19,10 +19,16 @@ fun AuthTabsBar(navController: NavHostController, modifier: Modifier = Modifier)
     val pilaNavegacion by navController.currentBackStackEntryAsState()
     val pantallaActual = pilaNavegacion?.destination
 
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .padding(top = 60.dp)) {
-        Pantalla.listaPantallas.forEach { pantalla ->
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 60.dp)
+    ) {
+        val AuthScreens =
+            Pantalla.listaPantallas.filter {
+                it.ruta == Pantalla.RUTA_LOGIN || it.ruta ==p Pantalla.RUTA_REGISTER
+            }
+        AuthScreens.forEach { pantalla ->
             val seleccionada = pantallaActual?.route == pantalla.ruta
 
             TextButton(

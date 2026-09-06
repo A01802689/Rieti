@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import mx.itesm.myapplication.view.MainVIew.MainView
 
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -15,10 +16,13 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         modifier = modifier.fillMaxSize()
     ) {
         composable(Pantalla.RUTA_LOGIN) {
-            LoginForm()
+            LoginForm(navController)
         }
         composable(Pantalla.RUTA_REGISTER) {
-            RegisterForm()
+            RegisterForm(navController)
+        }
+        composable(Pantalla.RUTA_MAIN) {
+            MainView(navController, modifier)
         }
     }
 }
