@@ -1,4 +1,4 @@
-package mx.itesm.myapplication.model
+package mx.itesm.myapplication.view
 
 sealed class Pantalla(
     val ruta: String,

@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import mx.itesm.myapplication.model.Pantalla
 
 @Composable
 fun AuthTabsBar(navController: NavHostController, modifier: Modifier = Modifier) {
