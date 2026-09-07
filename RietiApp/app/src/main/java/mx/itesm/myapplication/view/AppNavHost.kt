@@ -28,5 +28,8 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(Pantalla.RUTA_SEGUIMIENTO) {
             ReporteSeguimiento(navController)
         }
+        composable(Pantalla.RUTA_REPORT2) {
+            MainView(navController, modifier)
+        }
     }
 }

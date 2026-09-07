@@ -10,10 +10,14 @@ sealed class Pantalla(
         const val RUTA_REGISTER = "register"
         const val RUTA_MAIN = "main-view"
         const val RUTA_SEGUIMIENTO = "Seguimiento"
+        const val RUTA_REPORT2 = "report-route-2"
+        const val RUTA_REPORT3 = "report-route-3"
     }
 
     data object Login : Pantalla(RUTA_LOGIN, "Iniciar sesión")
     data object Register : Pantalla(RUTA_REGISTER, "Crear cuenta")
     data object MainView: Pantalla(RUTA_MAIN,"Menú Principal" )
     data object ReporteSeguimiento : Pantalla(RUTA_SEGUIMIENTO,"Reporte de Seguimiento")
+    data object ReportView2: Pantalla(RUTA_REPORT2, "Continuar Reporte")
+    data object ReportView3: Pantalla(RUTA_REPORT3, "Continuar Reporte")
 }
