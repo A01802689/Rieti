@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import mx.itesm.myapplication.view.MainVIew.MainView
+import mx.itesm.myapplication.view.seguimiento.ReporteSeguimiento
 
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -23,6 +24,9 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         }
         composable(Pantalla.RUTA_MAIN) {
             MainView(navController, modifier)
+        }
+        composable(Pantalla.RUTA_SEGUIMIENTO) {
+            ReporteSeguimiento(navController)
         }
     }
 }

@@ -26,7 +26,7 @@ fun AuthTabsBar(navController: NavHostController, modifier: Modifier = Modifier)
     ) {
         val AuthScreens =
             Pantalla.listaPantallas.filter {
-                it.ruta == Pantalla.RUTA_LOGIN || it.ruta ==p Pantalla.RUTA_REGISTER
+                it.ruta == Pantalla.RUTA_LOGIN || it.ruta == Pantalla.RUTA_REGISTER
             }
         AuthScreens.forEach { pantalla ->
             val seleccionada = pantallaActual?.route == pantalla.ruta
