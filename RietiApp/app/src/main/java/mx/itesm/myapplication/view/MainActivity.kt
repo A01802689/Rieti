@@ -5,8 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.ui.theme.MyApplicationTheme
 
@@ -25,5 +30,16 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppPrincipal(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    AppNavHost(navController = navController, modifier = modifier.fillMaxSize())
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        AppNavHost(
+            navController = navController,
+            modifier = modifier
+                .statusBarsPadding()
+                .fillMaxSize()
+        )
+
+    }
 }
