@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -16,28 +17,30 @@ import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun reportePantallaB(navController: NavHostController){
     var contadorMenores by remember { mutableStateOf(" ") }
+    var description by remember { mutableStateOf("") }
     var menuDownState by remember { mutableStateOf(false) }
     var selectedActivity by remember { mutableStateOf("Seleccione una actividad a reportar") }
-    val actividad = listOf("Venta de insumos, Venta de estupefacientes, venta de periodicos, limpiaparabrizas")
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    val actividad = listOf("Venta de insumos", "Venta de estupefacientes", "venta de periodicos", "limpiaparabrizas")
+    Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
         Button(
             onClick = { navController.navigate("main-view")},
             modifier = Modifier.height(40.dp)
-        ) { Text(text = "<-Regresar", fontSize = 25.sp)}
+        ) { Text(text = "Regresar", fontSize = 20.sp)}
         Spacer(modifier = Modifier.height(15.dp))
         Text(text = "Parte 2 del reporte", fontSize = 12.sp)
         Spacer(modifier = Modifier.height(20.dp))
         Text(text = "¿Cuantos menores se observaron?", fontSize = 20.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Escribe la cantidad:")
-        Spacer(modifier = Modifier.height(8.dp).padding(16.dp))
+        Spacer(modifier = Modifier.height(8.dp).padding(20.dp))
         TextField(
             value = contadorMenores,
             onValueChange = {contadorMenores = it},
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(20.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Selecciona la actividad que se observo:", fontSize = 20.sp)
@@ -50,7 +53,7 @@ fun reportePantallaB(navController: NavHostController){
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuDownState) },
-                modifier = Modifier.menuAnchor().fillMaxWidth()
+                modifier = Modifier.menuAnchor().fillMaxWidth().padding(20.dp)
             )
             ExposedDropdownMenu(
                 expanded = menuDownState,
@@ -66,6 +69,19 @@ fun reportePantallaB(navController: NavHostController){
                 }
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "Describe las acciones que presenciaste", fontSize = 20.sp)
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(text = "Se lo mas claro posible, esto sera analizado por una autoridad ", fontSize = 15.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        TextField(
+            value = description,
+            onValueChange = { description = it },
+            modifier = Modifier.fillMaxWidth().height(150.dp).padding(20.dp),
+            maxLines = 6
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+
         Spacer(modifier = Modifier.weight(1f))
         Button(
             onClick = { navController.navigate("report-route-2")},
@@ -77,27 +93,18 @@ fun reportePantallaB(navController: NavHostController){
 
 @Composable
 fun ReportePantallaC(navController: NavHostController){
-    var description by remember { mutableStateOf("") }
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Button(
             onClick = { navController.navigate("main-view")},
             modifier = Modifier.height(40.dp)
-        ) { Text(text = "<-Regresar", fontSize = 25.sp)}
-        Spacer(modifier = Modifier.height(15.dp))
-        Text(text = "Describe las acciones que presenciaste", fontSize = 20.sp)
-        Text(text = "Se lo mas claro posible, esto sera analizado por una autoridad ", fontSize = 15.sp)
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = description,
-            onValueChange = { description = it },
-            modifier = Modifier.fillMaxWidth().height(150.dp),
-            maxLines = 6
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+        ) { Text(text = "Regresar", fontSize = 20.sp)}
+        Spacer(modifier = Modifier.height(30.dp))
         Button(
             onClick = { /* TODO: Implement CameraX or ActivityResultLauncher to capture an image */ },
             modifier = Modifier.fillMaxWidth().height(70.dp)
         ) { Text("Tomar fotografía del lugar", fontSize = 20.sp)}
+        Spacer(modifier = Modifier.height(30.dp))
+        Text(text = "Se lo mas claro posible, esto sera analizado por una autoridad ", fontSize = 15.sp, modifier = Modifier.padding(20.dp))
         Spacer(modifier = Modifier.weight(1f))
         Button(
             onClick = { navController.navigate("main-view")},
