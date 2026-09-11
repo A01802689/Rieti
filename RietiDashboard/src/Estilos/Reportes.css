@@ -1,0 +1,47 @@
+.reportes-pagina {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.reportes-header-principal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.reportes-header-principal h2 {
+  margin-bottom: 0.2rem;
+}
+
+.reportes-header-principal p {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.reportes-filtros {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.reportes-filtros button {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.reportes-filtros button.filtro-activo {
+  background: #2563eb;
+  color: white;
+}
+
+.reportes-contenido {
+  padding: 1.5rem;
+}

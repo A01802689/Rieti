@@ -1,0 +1,41 @@
+.usuarios-pagina {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.usuarios-header-principal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.usuarios-header-principal h2 {
+  margin-bottom: 0.2rem;
+}
+
+.usuarios-header-principal p {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.btn-dar-alta {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.btn-dar-alta:hover {
+  background: #1d4ed8;
+}
+
+.usuarios-contenido {
+  padding: 1.5rem;
+}

@@ -1,0 +1,4 @@
+.panel-izquierdo {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e3a8a 100%);
+  min-height: 100vh;
+}

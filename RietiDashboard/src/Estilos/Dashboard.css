@@ -1,0 +1,139 @@
+.dashboard {
+  background-color: #f5f6f8;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.dashboard-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.logo-icono {
+  background: #2563eb;
+  color: white;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  font-weight: 700;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navbar-links a {
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.navbar-links a.activo {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.navbar-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: right;
+}
+
+.avatar {
+  background: #e5e7eb;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  border-top: 3px solid #d1d5db;
+}
+
+.borde-naranja { border-top-color: #f97316; }
+.borde-azul { border-top-color: #3b82f6; }
+.borde-verde { border-top-color: #22c55e; }
+
+.stat-numero { font-size: 1.8rem; font-weight: 700; }
+.stat-numero.naranja { color: #f97316; }
+.stat-numero.azul { color: #3b82f6; }
+.stat-numero.verde { color: #22c55e; }
+
+.stat-titulo { font-weight: 600; margin-top: 0.4rem; }
+.stat-sub { color: #9ca3af; font-size: 0.85rem; }
+
+.dashboard-graficas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel-grafica, .panel-mapa {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.2rem;
+}
+
+.panel-grafica p, .panel-mapa p {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.mapa-imagen {
+  width: 100%;
+  border-radius: 0.4rem;
+  object-fit: cover;
+}
+
+.panel-reportes-recientes {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.2rem;
+}
+
+.reportes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge-registros {
+  background: #f3f4f6;
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}

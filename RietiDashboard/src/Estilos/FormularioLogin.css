@@ -1,0 +1,47 @@
+.formulario-login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  height: 100vh;
+}
+
+.formulario-login h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.formulario-login p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.formulario-login label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.formulario-login input {
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.formulario-login button {
+  padding: 0.8rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.formulario-login button:hover {
+  background-color: #1d4ed8;
+}
