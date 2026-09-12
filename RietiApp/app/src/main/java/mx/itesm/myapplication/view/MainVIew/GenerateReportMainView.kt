@@ -76,7 +76,7 @@ fun ReportCard(anonymous: Boolean, navController: NavController, modifier: Modif
 
 //    TODO: Los que hagan los reportes, pongan aqui sus rutas a sus formularios
     val routeToGo = if (anonymous) {
-        "report-anonymous"
+        Pantalla.RUTA_REPORT2
     } else {
         Pantalla.RUTA_SEGUIMIENTO
     }
