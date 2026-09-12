@@ -114,7 +114,7 @@ fun SeguimientoUbicacion(navController: NavController) {
 
         Button(
             onClick = {
-                //Conectar con la siguiente pantalla
+                navController.navigate("SegEnviar")
             }, modifier = Modifier.fillMaxWidth()
         ) {Text("Continuar") }
     }
