@@ -1,7 +1,6 @@
 package mx.itesm.myapplication.view.seguimiento
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,12 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import mx.itesm.myapplication.R
 
 @Composable
 fun SeguimientoUbicacion(navController: NavController) {
@@ -66,10 +67,25 @@ fun SeguimientoUbicacion(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(15.dp))
 
-        Box(
-            modifier = Modifier.fillMaxWidth().height(220.dp).background(Color.LightGray),
-            contentAlignment = Alignment.Center
-        ) {Text("Mapa de ubicacion actual*") }
+        Text(
+            text = "¿Dónde viste la situación?"
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Image(
+            painter = painterResource(
+                id = R.drawable.mapa_ejemplo
+            ),
+            contentDescription = "Mapa",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        Text("O escribe la ubicación",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center)
+
         Spacer(modifier = Modifier.height(15.dp))
 
         OutlinedTextField(

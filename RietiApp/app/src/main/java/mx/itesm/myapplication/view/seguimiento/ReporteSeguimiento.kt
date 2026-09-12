@@ -109,7 +109,9 @@ fun ReporteSeguimiento(navController: NavController)
 
         Spacer(modifier = Modifier.weight(1f))
         Button(
-            onClick = {},
+            onClick = {
+                navController.navigate(route = "SegUbicacion")
+            },
             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(15.dp    )
         ) {Text("Continuar") }
     }

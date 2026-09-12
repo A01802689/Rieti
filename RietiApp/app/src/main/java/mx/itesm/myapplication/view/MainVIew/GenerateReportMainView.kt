@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import mx.itesm.myapplication.view.Pantalla
 
 @Composable
 fun GenerateReportMainView(navController: NavController, modifier: Modifier = Modifier) {
@@ -77,7 +78,7 @@ fun ReportCard(anonymous: Boolean, navController: NavController, modifier: Modif
     val routeToGo = if (anonymous) {
         "report-anonymous"
     } else {
-        "report-following"
+        Pantalla.RUTA_SEGUIMIENTO
     }
     Card(
         modifier = modifier
