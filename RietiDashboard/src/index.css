@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+
+@theme{
+  --color-gren: #483843;
+}
+
+
+/* for the entire project marks as h1 or p */
+@layer base{
+  h1 {
+    @apply text-3xl font-medium tracking-wide font-sans p-1.5 text-gray-950 dark:text-gray-200;
+  }
+  h2 {
+    @apply text-xl font-medium p-1.5 text-gray-950 dark:text-gray-200;
+  }
+  p {
+    @apply text-sm font-sans p-1.5 text-gray-950 dark:text-gray-200;
+  }
+  input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400;
+  }
+}
+/*
+for common components (they work as classes)
+@layer components{
+  .card{
+    @apply m-10 rounded-lg bg-white px-1 py-2
+  }
+}*/
+
+/* for individuals (create keyqwords */
+@utility flex-center{
+@apply flex justify-center items-center;
+}
+
+@utility font-sight{
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+@utility text-clear {
+  @apply text-gray-900 dark:text-gray-300 font-medium p-2;
+}
+
+@utility input-tag{
+  @apply text-xs text-[#999] pt-3;
+}
