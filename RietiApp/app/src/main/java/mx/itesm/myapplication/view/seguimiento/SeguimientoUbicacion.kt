@@ -54,7 +54,7 @@ fun SeguimientoUbicacion(navController: NavController) {
                     contentDescription = "Volver"
                 )
             }
-            Text(text = "Volver")
+            Text(text = "Inicio")
         }
         Spacer(modifier = Modifier.height(10.dp))
 

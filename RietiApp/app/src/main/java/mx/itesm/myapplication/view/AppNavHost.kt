@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import mx.itesm.myapplication.view.MainVIew.MainView
 import mx.itesm.myapplication.view.seguimiento.ReporteSeguimiento
 import mx.itesm.myapplication.view.seguimiento.SeguimientoEnviar
+import mx.itesm.myapplication.view.seguimiento.SeguimientoFormulario
 import mx.itesm.myapplication.view.seguimiento.SeguimientoUbicacion
 
 @Composable
@@ -35,6 +36,9 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         }
         composable(Pantalla.RUTA_SEGENVIAR) {
             SeguimientoEnviar(navController)
+        }
+        composable(Pantalla.RUTA_SEGFORM){
+            SeguimientoFormulario(navController)
         }
         composable(Pantalla.RUTA_REPORT2) {
             reportePantallaB(navController)
