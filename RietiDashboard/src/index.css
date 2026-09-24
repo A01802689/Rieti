@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+/* @custom-variant dark (&:where(@media (prefers-color-scheme: dark), @media (prefers-color-scheme: dark) *)); */
+
 @theme{
   --color-gren: #483843;
 }
