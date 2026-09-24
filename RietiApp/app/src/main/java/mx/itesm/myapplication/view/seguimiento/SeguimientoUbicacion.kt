@@ -72,15 +72,8 @@ fun SeguimientoUbicacion(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(10.dp))
 
-        Image(
-            painter = painterResource(
-                id = R.drawable.mapa_ejemplo
-            ),
-            contentDescription = "Mapa",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp)
-        )
+        MapaInteractivo()
+
         Spacer(modifier = Modifier.height(15.dp))
         Text("O escribe la ubicación",
             modifier = Modifier.fillMaxWidth(),

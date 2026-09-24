@@ -1,3 +1,11 @@
+import java.util.Properties
+
+val envFile = rootProject.file(".env")
+val envProperties = Properties()
+if (envFile.exists()) {
+    envFile.inputStream().use { envProperties.load(it) }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -17,6 +25,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val publicToken = envProperties.getProperty("MAPBOX_PUBLIC_TOKEN") ?: ""
+        resValue("string", "mapbox_access_token", publicToken)
+        buildConfigField("String", "MAPBOX_PUBLIC_TOKEN", "\"$publicToken\"")
     }
 
     buildTypes {
@@ -32,6 +44,8 @@ android {
     }
     buildFeatures {
         compose = true
+        resValues = true
+        buildConfig = true
     }
 }
 
@@ -47,6 +61,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.mapbox.sdk)
+    implementation(libs.mapbox.compose)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

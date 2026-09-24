@@ -1,3 +1,11 @@
+import java.util.Properties
+
+val envFile = settingsDir.resolve(".env")
+val envProperties = Properties()
+if (envFile.exists()) {
+    envFile.inputStream().use { envProperties.load(it) }
+}
+
 pluginManagement {
     repositories {
         google {
@@ -19,6 +27,16 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+            credentials {
+                username = "mapbox"
+                password = envProperties.getProperty("MAPBOX_DOWNLOADS_TOKEN") ?: ""
+            }
+        }
     }
 }
 
