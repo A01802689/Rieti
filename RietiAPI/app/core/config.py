@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
     DB_NAME: str
+    SECRET_KEY: str
     model_config = {"env_file": ".env"}
 
 # settings con minuscula es una instancia de la clase Settings

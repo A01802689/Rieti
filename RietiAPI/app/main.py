@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.api.routes import usuario as usuario_routes
+from app.api.routes import admin as admin_routes
 from app.models import municipio, usuario
 
 app = FastAPI(
@@ -8,6 +9,7 @@ app = FastAPI(
 )
 
 app.include_router(usuario_routes.router)
+app.include_router(admin_routes.router)
 
 @app.get("/")
 def read_root():
