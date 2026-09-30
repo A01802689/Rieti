@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+""" from fastapi import APIRouter, Depends, HTTPException, Response
 #la razon de  Response es modifciar la respuesta http directamente y agregrarle una cookioe
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
@@ -41,4 +41,4 @@ def crear_usuario_admin(
 ):
     if usuario_actual.rol != "Administrador":
         raise HTTPException(status_code=403, detail="Solo un Administrador puede crear nuevos Administradores o Alimentadores")
-    return usuario_service.create_usuario_admin(db, datos)
+    return usuario_service.create_usuario_admin(db, datos) """

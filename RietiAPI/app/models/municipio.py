@@ -3,6 +3,6 @@ from app.db.base import Base #Base que creamos en app/db/base.py
 
 
 class Municipio(Base):
-    __tablename__ = "municipio"
+    __tablename__ = "municipio"    #si debe llamarse  de forma tal cual 
     id_municipio = Column(Integer, primary_key=True)
-    nombre = Column(String(100))
+    nombre = Column(String(100), nullable= False)

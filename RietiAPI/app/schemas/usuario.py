@@ -34,7 +34,6 @@ class UsuarioLogin(BaseModel):
     correo: str
     contrasena: str
 
-
 class UsuarioCreateAdmin(BaseModel):
     nombre: str
     apellido: str
