@@ -27,6 +27,7 @@ class EdadAproximada(str, Enum):
     CERO_A_CINCO = "0-5"
     SEIS_A_ONCE = "6-11"
     DOCE_A_CATORCE = "12-14"
+    QUINCE_A_DIECISIETE = "15-17"
     NO_SE = "No sé"
 
 class EstatusSeguimiento(str, Enum):
@@ -47,11 +48,11 @@ class CantidadNNA(str, Enum):
 class Reporte(Base):
     __tablename__ = "reportes"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id_reporte = Column(Integer, primary_key=True, index=True)
     id_usuario = Column(Integer, ForeignKey("usuario.id_usuario"), nullable=True)
-    id_caso = Column(Integer, ForeignKey("caso.id"), nullable=True)
-    id_ubicacion = Column(Integer, ForeignKey("ubicacion.id"), nullable=False)
-    folio_reporte = Column(String(25), nullable=False)
+    id_caso = Column(Integer, ForeignKey("caso.id_caso"), nullable=True)
+    id_ubicacion = Column(Integer, ForeignKey("ubicacion.id_ubicacion"), nullable=False)
+    folio_reporte = Column(String(25), nullable=False, unique = True, index = True)
     estatus_seguimiento = Column(
         SQLEnum(
             EstatusSeguimiento,
@@ -60,7 +61,7 @@ class Reporte(Base):
                 item.value for item in enum_class
             ],
         ),
-        nullable = False,
+        nullable = True,
         default=EstatusSeguimiento.RECIBIDO
     )
     cantidad_nna = Column(
@@ -102,6 +103,10 @@ class Reporte(Base):
         nullable = False,
         server_default = func.now()
     )
+    imagen = Column (
+        String(50),
+        nullable = True
+    )
     riesgo = Column (
         SQLEnum(
             Riesgo,
@@ -111,5 +116,5 @@ class Reporte(Base):
             ]
         ),
         default = Riesgo.BAJO,
-        nullable = False
+        nullable = True
     )

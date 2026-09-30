@@ -4,11 +4,13 @@ anyio==4.15.1
 cached-property==2.0.1
 click==8.5.0
 fastapi==0.141.1
+GeoAlchemy2==0.20.0
 h11==0.16.0
 httptools==0.8.0
 idna==3.20
 inflection==0.5.1
 mypy_extensions==1.1.0
+packaging==26.3
 psycopg==3.3.6
 psycopg-binary==3.3.6
 pydantic==2.13.5
