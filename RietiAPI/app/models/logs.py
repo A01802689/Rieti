@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, Text, DateTime, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import Enum as SQLEnum
 from app.db.base import Base
 from enum import Enum
@@ -40,6 +41,14 @@ class logs(Base):
     )
     id_registro_afectado = Column(
         Integer,
-        
+        nullable=False
+    )
+    before_data = Column(
+        JSONB,
+        nullable=False
+    )
+    after_data = Column(
+        JSONB,
+        nullable=False
     )
 
