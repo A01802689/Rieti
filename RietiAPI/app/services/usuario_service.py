@@ -21,22 +21,17 @@ def create_usuario(db: Session, datos: UsuarioCreate):
     return usuario_repository.create(db, nuevo_usuario)
 
 
-
 def create_usuario_admin(db: Session, datos: UsuarioCreateAdmin):
     contrasena_hash = pwd_context.hash(datos.contrasena)
-    nuevo_usuarioAdmin = Usuario (
+    nuevo_usuario_admin = Usuario(
         nombre=datos.nombre,
         apellido=datos.apellido,
         correo=datos.correo,
         rol=datos.rol,
         id_municipio=datos.id_municipio,
-        contrasena_hash=contrasena_hash,
-        
+        contrasena_hash=contrasena_hash
     )
-    return usuario_repository.create(db, nuevo_usuarioAdmin)
-
-
-
+    return usuario_repository.create(db, nuevo_usuario_admin)
 
 def login(db: Session, correo: str, contrasena: str):
     usuario = usuario_repository.get_by_email(db, correo)
