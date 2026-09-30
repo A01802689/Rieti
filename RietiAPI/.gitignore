@@ -26,6 +26,10 @@ dist-ssr
 # Python
 .venv/
 __pycache__/
+*.pyc
+*.pyo
+**/__pycache__/
+
 *.py[cod]
 .pytest_cache/
 .env
