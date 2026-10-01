@@ -4,11 +4,6 @@ from sqlalchemy import Enum as SQLEnum
 from app.db.base import Base
 from enum import Enum
 
-class Riesgo(str, Enum):
-    BAJO = "Bajo"
-    MEDIO = "Medio"
-    ALTO = "Alto"
-
 class TipoTrabajo(str, Enum):
     VENTA_AMBULANTE = "Venta ambulante"
     LIMPIEZA_DE_PARABRISAS = "Limpieza de parabrisas"
@@ -105,16 +100,5 @@ class Reporte(Base):
     )
     imagen = Column (
         String(50),
-        nullable = True
-    )
-    riesgo = Column (
-        SQLEnum(
-            Riesgo,
-            name = "riesgo",
-            values_callable = lambda enum_class: [
-                item.value for item in enum_class
-            ]
-        ),
-        default = Riesgo.BAJO,
         nullable = True
     )
