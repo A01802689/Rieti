@@ -10,6 +10,8 @@ kotlin = "2.2.10"
 composeBom = "2026.02.01"
 mapbox = "11.9.0"
 
+androidx-test = "1.7.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -30,6 +32,10 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 
 mapbox-sdk = { group = "com.mapbox.maps", name = "android", version.ref = "mapbox" }
 mapbox-compose = { group = "com.mapbox.extension", name = "maps-compose", version.ref = "mapbox" }
+
+androidx-espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espressoCore" }
+androidx-test-runner      = { module = "androidx.test:runner", version.ref = "androidx-test" }
+androidx-test-rules       = { module = "androidx.test:rules", version.ref = "androidx-test" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
