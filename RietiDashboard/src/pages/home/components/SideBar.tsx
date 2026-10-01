@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SideBar(){
     const [isDashOpen, setIsDashOpen] = useState(false);
-    const [isEcomOpen, setIsEcomOpen] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const navigate = useNavigate();
     
@@ -44,11 +43,11 @@ export default function SideBar(){
                     <div className="block w-full py-1 font-sans text-sm antialiased font-light leading-normal text-gray-900 dark:text-white">
                     <nav className="flex min-w-0 flex-col gap-1 p-0 font-sans text-base font-normal text-blue-gray-700">
                         <div role="button"
-                        onClick={() =>navigate('/estadisticas')}
+                        onClick={() =>navigate('/mapa')}
                         className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
                         <div className="grid mr-4 place-items-center">
                         </div>
-                        Estadisticas
+                        Mapa de Calor
                         </div>
                         <div role="button"
                         onClick={() =>navigate('/reportes')}
@@ -70,55 +69,20 @@ export default function SideBar(){
                 </div>
                 <div className="relative block w-full">
                 <div role="button"
-                    className="flex items-center w-full p-0 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900">
+                    className="flex items-center w-full p-0 leading-tight transition-all rounded-lg outline-none text-start duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900">
                     <button type="button"
-                    onClick={() => setIsEcomOpen(!isEcomOpen)}
+                        onClick={()=>navigate('/casos')}
                     className="flex items-center justify-between w-full p-3 font-sans text-xl antialiased font-semibold leading-snug text-left transition-colors border-b-0 select-none border-b-blue-gray-100 text-blue-gray-700 hover:text-blue-gray-900">
                     <div className="grid mr-4 place-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-                        className="w-5 h-5">
-                        <path fill-rule="evenodd"
-                            d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z"
-                            clip-rule="evenodd"></path>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5">
+                            <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-15a3 3 0 00-3 3V18a3 3 0 003 3h15zM1.5 10.146V6a3 3 0 013-3h5.379a2.25 2.25 0 011.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 013 3v1.146A4.483 4.483 0 0019.5 9h-15a4.483 4.483 0 00-3 1.146z" />
                         </svg>
                     </div>
                     <p className="block mr-auto font-sans text-base antialiased font-normal leading-relaxed text-gray-900 dark:text-white">
-                        Usuarios
+                        Casos
                     </p>
-                    <span className="ml-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke="currentColor" aria-hidden="true" 
-                        className={`w-4 h-4 mx-auto transition-transform ${isEcomOpen ? "rotate-180" : ""}`}>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-                        </svg>
-                    </span>
+                    <span className="ml-4"></span>
                     </button>
-                </div>
-                <div className={`overflow-hidden transition-all duration-300 ${isEcomOpen ? "max-h-96 opacity-100" : "max-h-0" }`}>
-                    <div className="block w-full py-1 font-sans text-sm antialiased font-light leading-normal text-gray-900 dark:text-white">
-                    <nav className="flex min-w-0 flex-col gap-1 p-0 font-sans text-base font-normal text-blue-gray-700">
-                        <div role="button"
-                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
-                        <div className="grid mr-4 place-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                            stroke="currentColor" aria-hidden="true" name="w-5 h-3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"></path>
-                            </svg>
-                        </div>
-                        Contactar con administrador
-                        </div>
-                        <div role="button"
-                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50  dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
-                        <div className="grid mr-4 place-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                            stroke="currentColor" aria-hidden="true" className="w-5 h-3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"></path>
-                            </svg>
-                        </div>
-                        Delegar caso
-                        </div>
-                    </nav>
-                    </div>
                 </div>
                 </div>
                 <div role="button"
@@ -141,7 +105,7 @@ export default function SideBar(){
                 </div>
                 </div>
                 <div role="button"
-                onClick={()=>navigate('/profiles')}
+                onClick={()=>navigate('/usuarios')}
                 className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
                 <div className="grid mr-4 place-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
@@ -151,7 +115,7 @@ export default function SideBar(){
                         clip-rule="evenodd"></path>
                     </svg>
                 </div>
-                Profile
+                Usuarios
                 </div>
                 <div role="button"
                 onClick={() =>navigate('/')}

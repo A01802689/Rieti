@@ -5,9 +5,7 @@ interface InfoKpiProp{
     tone: string;
 }
 
-const InfoKpis =({
-    label, value, note,  tone,
-}: InfoKpiProp) =>{
+const InfoKpis =({label, value, note,  tone,}: InfoKpiProp) =>{
     return (
         <div className="flex overflow-hidden rounded-xl bg-white shadow-sm dark:bg-slate-900 shadow-sm transition-colors duration-300">
             <div className={`w-1.5 ${tone}`}/>

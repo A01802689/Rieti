@@ -18,6 +18,7 @@ interface LineGraphProps {
 }
 
 const LineGraph = ({ data }: LineGraphProps) => {
+
     return (
         <div className="w-full rounded-xl bg-white dark:bg-slate-900 p-6 shadow-sm">
             <h2 className="mb-6 text-xl font-semibold text-slate-800 dark:text-slate-900">

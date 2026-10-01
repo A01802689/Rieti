@@ -1,6 +1,6 @@
 import SideBar from './components/SideBar';
-import InfoKpis from './components/InfoKpi';
-import LineGraph from './components/Graph';
+import InfoKpis from './components/KpiHome/InfoKpi';
+import LineGraph from './components/Graph/Graph';
 
 const graphData = [
     { name: 'Enero', value: 20 },
@@ -18,12 +18,6 @@ const stats =
     { label: 'Casos cerrados', value: '85', note: 'Con restitución de derechos', tone: 'bg-emerald-600', }, 
 ];
 
-// const notifications = 
-// [ 
-//     { title: 'Seguimiento vence mañana', detail: 'Caso #0138 requiere visita.', dot: 'bg-amber-500', },
-//      { title: 'Caso derivado a tu municipio', detail: 'Revisa la información recibida.', dot: 'bg-blue-600', },
-//       { title: 'Reporte mensual disponible', detail: 'Ya puedes descargarlo.', dot: 'bg-emerald-600', }, 
-// ];
 
 const HomePage = () => {
     return(
