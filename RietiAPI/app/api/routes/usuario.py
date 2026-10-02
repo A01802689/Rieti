@@ -8,6 +8,14 @@ from app.core.security import create_access_token
 
 router = APIRouter()
 
+
+@router.post("/usuarios/logout")
+def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"message": "Sesión cerrada"}
+
+
+
 @router.post("/usuarios", response_model=UsuarioResponse)
 def crear_usuario(datos: UsuarioCreate, db: Session = Depends(get_db)):
     return usuario_service.create_usuario(db, datos)
