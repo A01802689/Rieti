@@ -10,3 +10,11 @@ captures
 *.apk
 
 .env
+
+.terraform/
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
+*DE.md
+*ns.md
+terraform/
