@@ -1,4 +1,5 @@
-/* JSON de Reporte
+/* 
+* JSON de Reporte, endpoint (/dashboard/reportes/{id})
 {
   "id_reporte": "number",
   "id_usuario": "number | null",
@@ -20,6 +21,25 @@
   "imagen": "string | null",
   "riesgo": "'Bajo' | 'Medio' | 'Alto' | null"
 }
+* JSON de Reporte, endpoint (/dashboard/reportes)
+[{
+  "id_reporte": "number",
+  "id_caso": "number | null",
+  "ubicacion": {
+    "municipio": "string",
+    "colonia": "string",
+    "calle": "string",
+    "lat": "number",
+    "lng": "number"
+  },
+  "folio_reporte": "string",
+  "estatus_seguimiento": "'Recibido' | 'En revisión' | 'Canalizado' | 'En atención' | 'Concluido' | null",
+  "cantidad_nna": "1 | 2 | 3 | 4 | '5 o más' | 'No sé'",
+  "edad_aproximada": "'0-5' | '6-11' | '12-14' | '15-17' | 'No sé' | null",
+  "tipo_trabajo": "'Venta ambulante' | 'Limpieza de parabrisas' | 'Mendicidad' | 'Carga y descarga' | 'Trabajo en comercio' | 'Campo' | 'Construcción' | 'Trabajo doméstico' | 'Recolección de residuos' | 'Otra actividad' | 'No sé'",
+  "fecha_reporte": "string (ISO 8601 TIMESTAMP)",
+  "riesgo": "'Bajo' | 'Medio' | 'Alto' | null"
+}, ...]
 */
 
 import type { FeatureCollection, Point } from "geojson";

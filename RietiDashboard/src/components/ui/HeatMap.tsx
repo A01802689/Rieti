@@ -21,15 +21,17 @@ import Map, { Source, Layer, type MapLayerMouseEvent } from "react-map-gl/maplib
 import "maplibre-gl/dist/maplibre-gl.css"
 import { reports2GeoJSON, type Reporte } from "@/lib/types/Report"
 import {  reports } from "@/lib/api/reports"
+import { type Case } from "@/lib/types/Case"
+import { type Zone } from "@/lib/types/Zone"
 
 interface HeatMapProps {
   reportsArr?: Reporte[] 
-  // casesArr?: Caso[]
-  // zonesArr?: Zone[]
+  casesArr?: Case[]
+  zonesArr?: Zone[]
 }
 
 
-const HeatMap = ({ reportsArr = reports }: HeatMapProps) => {
+const HeatMap = ({ reportsArr = reports, casesArr, zonesArr }: HeatMapProps) => {
   const [cursor, setCursor] = useState<string>('grab')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const datosMapa = useMemo(() => reports2GeoJSON(reportsArr), [])
