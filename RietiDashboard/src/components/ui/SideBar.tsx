@@ -50,7 +50,7 @@ export default function SideBar(){
                         Mapa de Calor
                         </div>
                         <div role="button"
-                        onClick={() =>navigate('/reportes')}
+                        onClick={() =>navigate('/reports')}
                         className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50  dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
                         <div className="grid mr-4 place-items-center">
                         </div>

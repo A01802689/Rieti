@@ -2,7 +2,7 @@ import SideBar from '../../components/ui/SideBar';
 import InfoKpis from './components/KpiHome/InfoKpi';
 import LineGraph from './components/Graph/Graph';
 import HeatMap from '@/components/ui/HeatMap';
-
+import { useNavigate } from 'react-router-dom';
 const graphData = [
     { name: 'Enero', value: 20 },
     { name: 'Febrero', value: 35 },
@@ -21,6 +21,7 @@ const stats =
 
 
 const HomePage = () => {
+    const navigate = useNavigate();
     return(
             <div className="min-h-screen bg-slate-200 dark:bg-slate-950 transition-colors duration-300">
 
@@ -79,9 +80,12 @@ const HomePage = () => {
                                                     <span className='h-2.5 w-2.5 rounded-full bg-red-600'/>
                                                     <span className='text-xs text-slate-600 dark:text-slate-300 p-1'> Nivel alto de indice de reportes </span>
                                                 </div>
-                                                <button className='px-4 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 transition-all rounded-lg outline-none bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'>
-                                                    Ir al mapa
-                                                </button>
+                                                <div>
+                                                    <button className='px-4 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 transition-all rounded-lg outline-none bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
+                                                     onClick={() => navigate('/mapa')}>
+                                                        Ir al mapa
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
