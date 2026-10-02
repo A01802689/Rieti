@@ -4,7 +4,7 @@ import {  } from "./useHeatMap"
 
 const HeatMapPage = () => {
   return(
-    <div>
+    <div className="h-screen v-screen">
       <HeatMap />
     </div>
   )

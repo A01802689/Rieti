@@ -32,6 +32,8 @@ interface HeatMapProps {
 
 
 const HeatMap = ({ reportsArr = reports, casesArr, zonesArr }: HeatMapProps) => {
+  // to default reports 
+  // if (reportsArr === undefined || casesArr === undefined || zonesArr === undefined ) reportsArr = fetchReports()
   const [cursor, setCursor] = useState<string>('grab')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const datosMapa = useMemo(() => reports2GeoJSON(reportsArr), [])
@@ -62,7 +64,8 @@ const HeatMap = ({ reportsArr = reports, casesArr, zonesArr }: HeatMapProps) => 
 
 
   return (
-    <div className="w-full h-[400px] rounded-xl overflow-hidden">
+    // no cambies el estilo, si necesitas que se vea diferente, cambialo en el contenedor que contenga a HeatMap
+    <>
       <Map
         initialViewState={{ longitude: -99.6559, latitude: 19.4969, zoom: 8 }}
         mapStyle="https://tiles.openfreemap.org/styles/liberty"
@@ -91,7 +94,7 @@ const HeatMap = ({ reportsArr = reports, casesArr, zonesArr }: HeatMapProps) => 
       {/* {selectedId && (
         <PanelCaso id={selectedId} onClose={() => setSelectedId(null)} />
       )} */}
-    </div>
+    </>
   );
 }
 
