@@ -60,7 +60,7 @@ const HeatMap = ({ reportsArr = reports }: HeatMapProps) => {
 
 
   return (
-    <div className="w-screen h-screen">
+    <div className="w-full h-[400px] rounded-xl overflow-hidden">
       <Map
         initialViewState={{ longitude: -99.6559, latitude: 19.4969, zoom: 8 }}
         mapStyle="https://tiles.openfreemap.org/styles/liberty"

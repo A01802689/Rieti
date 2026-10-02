@@ -1,6 +1,7 @@
-import SideBar from './components/SideBar';
+import SideBar from '../../components/ui/SideBar';
 import InfoKpis from './components/KpiHome/InfoKpi';
 import LineGraph from './components/Graph/Graph';
+import HeatMap from '@/components/ui/HeatMap';
 
 const graphData = [
     { name: 'Enero', value: 20 },
@@ -34,6 +35,7 @@ const HomePage = () => {
                     </header>
 
                     <main className='mt-6 rounded-xl bg-blue-50 dark:bg-slate-800 p-8 transition-colors duration-300'>
+
                         <div className='flex flex-col gap-8'>
                             <section aria-label='Resumen'>
                                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
@@ -51,8 +53,44 @@ const HomePage = () => {
                             <section aria-label='Graph'>
                                 <LineGraph data={graphData} />
                             </section>
+                            <div className='w-full rounded-xl bg-white dark:bg-slate-900 p-6 shadow-sm transition-colors duration-300'>
+                                <section aria-label='Map'>
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                                        <div className=''>
+                                            <h2 className='text-lg font-semibold text-slate-800 dark:text-slate-100'>
+                                                Mapa de calor
+                                            </h2>
+                                            <p className='text-s font-medium text-slate-600 dark:text-slate-300'>
+                                                Distribucion geografica por cantidad de casos
+                                            </p>
+                                            <div className='flex items-center gap-3 bg-slate-100 dark:bg-slate-800/80 px-3.5 py-1.5 rounded-lg'>
+                                                <span className='text-xs font-medium text-slate-600 dark:text-slate-300'>
+                                                    Nivel de Riesgo:
+                                                </span>
+                                                <div className='flex items-center gap-1.5 '>
+                                                    <span className='h-2.5 w-2.5 rounded-full bg-green-600'/>
+                                                    <span className='text-xs text-slate-600 dark:text-slate-300 p-1'> Nivel bajo de indices de reportes </span>
+                                                </div>
+                                                <div className='flex items-center gap-1.5 '>
+                                                    <span className='h-2.5 w-2.5 rounded-full bg-orange-400'/>
+                                                    <span className='text-xs text-slate-600 dark:text-slate-300 p-1'>Nivel medio de indice de reportes </span>
+                                                </div>
+                                                <div className='flex items-center gap-1.5 '>
+                                                    <span className='h-2.5 w-2.5 rounded-full bg-red-600'/>
+                                                    <span className='text-xs text-slate-600 dark:text-slate-300 p-1'> Nivel alto de indice de reportes </span>
+                                                </div>
+                                                <button className='px-4 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 transition-all rounded-lg outline-none bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'>
+                                                    Ir al mapa
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <HeatMap/>
+                                </section>
+                            </div>
                         </div>
                     </main>
+
                 </div>
             </div>
     )
