@@ -89,7 +89,9 @@ const HomePage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <HeatMap/>
+                                    <div className='h-[500px] w-full overflow-hidden rounded-lg p-5'>
+                                        <HeatMap/>
+                                    </div>
                                 </section>
                             </div>
                         </div>
