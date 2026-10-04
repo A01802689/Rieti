@@ -74,7 +74,7 @@ export const LoginCard = () => {
   }
 
 return (
-  <div className="flex-col rounded-2xl p-5 bg-white dark:bg-gray-700 m-5 block w-auto shadow-2xl h-fit md:w-md justify-self-center">
+  <div className="flex-col rounded-2xl p-5 bg-card m-5 block w-auto shadow-2xl h-fit md:w-md justify-self-center">
     <h1>Iniciar sesión</h1>
     <p className="font-sight">Ingresa tus credenciales para acceder al sistema</p>
 
@@ -88,7 +88,7 @@ return (
           id="email"
           type="email"
           placeholder="ejemplo@mail.com"
-          className='text-clear px-2'
+          className='input-field px-2 font-medium'
           {...register('email', {
             required: 'El email es obligatorio',
             pattern: { value: /\S+@\S+\.\S+/, message: 'Formato de correo inválido' },
@@ -111,7 +111,7 @@ return (
             id="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Tu contraseña"
-            className='text-clear px-2'
+            className='input-field px-2 font-medium'
             {...register('password', { required: 'La contraseña es obligatoria' })}
           />
           <button

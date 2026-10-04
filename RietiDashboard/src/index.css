@@ -46,3 +46,62 @@ for common components (they work as classes)
 @utility input-tag{
   @apply text-xs text-[#999] pt-3;
 }
+
+/* Surfaces (light / dark) */
+
+/* page background */
+@utility bg-page{
+  @apply bg-slate-200 dark:bg-slate-950;
+}
+
+/* big container over the page (login right side, main of home and reports) */
+@utility bg-panel{
+  @apply bg-blue-50 dark:bg-slate-800;
+}
+
+/* cards over a panel or the page (login card, header, kpis, report cards) */
+@utility bg-card{
+  @apply bg-white dark:bg-slate-900;
+}
+
+/* small pieces inside a card: chips, legends, hovers */
+@utility bg-component{
+  @apply bg-slate-100 dark:bg-slate-800/80;
+}
+
+@utility border-card{
+  @apply border-slate-200 dark:border-slate-700;
+}
+
+/* ---------- Text colors. They do not set size, so they combine with text-xs, text-lg... ---------- */
+
+/* main text, for elements that are not h1/h2/p (those already get it from the base layer) */
+@utility font-clear{
+  @apply text-gray-950 dark:text-gray-200;
+}
+
+/* secondary text (same colors as font-sight, without the size) */
+@utility font-diffuse{
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+/* highlighted text (folio, links) */
+@utility font-accent{
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+/* ---------- Buttons: colors only, set the radius and padding in the component ---------- */
+
+/* same blue as the login button */
+@utility btn-primary{
+  @apply cursor-pointer bg-[#2563eb] text-white hover:bg-[#1d4ed8];
+}
+
+@utility btn-secondary{
+  @apply cursor-pointer border border-slate-300 bg-white text-gray-900 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-gray-200 dark:hover:bg-slate-800;
+}
+
+/* background and text of an input in dark mode (the size and radius come from the base input) */
+@utility input-field{
+  @apply border-slate-200 bg-white text-gray-900 placeholder-gray-500 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:placeholder-gray-400;
+}

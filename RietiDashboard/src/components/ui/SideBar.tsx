@@ -9,15 +9,15 @@ export default function SideBar(){
     return (
         
         <div
-            className="relative flex h-[calc(100vh-2rem)] w-full flex-col rounded-xl dark:bg-slate-900 bg-white  bg-clip-border p-4 text-gray-700 dark:text-gray-200 shadow-xl shadow-blue-gray-900/5">
+            className="relative flex h-[calc(100vh-2rem)] w-full flex-col rounded-xl bg-card bg-clip-border p-4 font-clear shadow-xl">
                 <div className="p-4 mb-2">
-                <h5 className="block font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-gray-900 dark:text-white">
+                <h5 className="block font-sans text-xl antialiased font-semibold leading-snug tracking-normal font-clear">
                 Menu
                 </h5>
             </div>
-            <nav className="flex min-w-0 flex-col gap-1 p-2 font-sans text-base font-normal text-gray-900 dark:text-white">
+            <nav className="flex min-w-0 flex-col gap-1 p-2 font-sans text-base font-normal font-clear">
                 <div className="relative block w-full">
-                <div role="button" onClick={() => setIsDashOpen(!isDashOpen)} className="flex items-center w-full p-0 leading-tight transition-all rounded-lg outline-none bg-blue-gray-50/50 text-start text-blue-gray-700 hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900">
+                <div role="button" onClick={() => setIsDashOpen(!isDashOpen)} className="flex items-center w-full p-0 leading-tight transition-all rounded-lg outline-none bg-blue-gray-50/50 text-start text-blue-gray-700 hover:bg-component hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900">
                     <button type="button"
                         className="flex items-center justify-between w-full p-3 font-sans text-xl antialiased font-semibold leading-snug text-left transition-colors border-b-0 select-none border-b-blue-gray-100 text-blue-gray-900 hover:text-blue-gray-900">
                     <div className="grid mr-4 place-items-center">
@@ -28,7 +28,7 @@ export default function SideBar(){
                             clip-rule="evenodd"></path>
                         </svg>
                     </div>
-                    <p className="block mr-auto font-sans text-base antialiased font-normal leading-relaxed text-gray-900 dark:text-white">
+                    <p className="block mr-auto font-sans text-base antialiased font-normal leading-relaxed font-clear">
                         Dashboard
                     </p>
                     <span className="ml-4">
@@ -40,25 +40,25 @@ export default function SideBar(){
                     </button>
                 </div>
                 <div className={`overflow-hidden transition-all duration-300 ${isDashOpen ? "max-h-96 opacity-100" : "max-h-0" }`}>
-                    <div className="block w-full py-1 font-sans text-sm antialiased font-light leading-normal text-gray-900 dark:text-white">
+                    <div className="block w-full py-1 font-sans text-sm antialiased font-light leading-normal font-clear">
                     <nav className="flex min-w-0 flex-col gap-1 p-0 font-sans text-base font-normal text-blue-gray-700">
                         <div role="button"
                         onClick={() =>navigate('/mapa')}
-                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
+                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-component hover:text-blue-gray-900 cursor-pointer">
                         <div className="grid mr-4 place-items-center">
                         </div>
                         Mapa de Calor
                         </div>
                         <div role="button"
                         onClick={() =>navigate('/reports')}
-                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50  dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
+                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md  hover:bg-component hover:text-blue-gray-900 cursor-pointer">
                         <div className="grid mr-4 place-items-center">
                         </div>
                         Reportes
                         </div>
                         <div role="button"
                         onClick={() =>navigate('/logs')}
-                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
+                        className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-component hover:text-blue-gray-900 cursor-pointer">
                         <div className="grid mr-4 place-items-center">
                         </div>
                         Logs
@@ -69,7 +69,7 @@ export default function SideBar(){
                 </div>
                 <div className="relative block w-full">
                 <div role="button"
-                    className="flex items-center w-full p-0 leading-tight transition-all rounded-lg outline-none text-start duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900">
+                    className="flex items-center w-full p-0 leading-tight transition-all rounded-lg outline-none text-start duration-200 hover:scale-105 hover:shadow-md hover:bg-component hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900">
                     <button type="button"
                         onClick={()=>navigate('/casos')}
                     className="flex items-center justify-between w-full p-3 font-sans text-xl antialiased font-semibold leading-snug text-left transition-colors border-b-0 select-none border-b-blue-gray-100 text-blue-gray-700 hover:text-blue-gray-900">
@@ -78,7 +78,7 @@ export default function SideBar(){
                             <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-15a3 3 0 00-3 3V18a3 3 0 003 3h15zM1.5 10.146V6a3 3 0 013-3h5.379a2.25 2.25 0 011.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 013 3v1.146A4.483 4.483 0 0019.5 9h-15a4.483 4.483 0 00-3 1.146z" />
                         </svg>
                     </div>
-                    <p className="block mr-auto font-sans text-base antialiased font-normal leading-relaxed text-gray-900 dark:text-white">
+                    <p className="block mr-auto font-sans text-base antialiased font-normal leading-relaxed font-clear">
                         Casos
                     </p>
                     <span className="ml-4"></span>
@@ -87,7 +87,7 @@ export default function SideBar(){
                 </div>
                 <div role="button"
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50  dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
+                    className="relative flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md  hover:bg-component hover:text-blue-gray-900 cursor-pointer">
                         <div className="grid mr-4 place-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
                                 className="w-5 h-5">
@@ -106,7 +106,7 @@ export default function SideBar(){
                 </div>
                 <div role="button"
                 onClick={()=>navigate('/usuarios')}
-                className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
+                className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-component hover:text-blue-gray-900 cursor-pointer">
                 <div className="grid mr-4 place-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
                     className="w-5 h-5">
@@ -119,7 +119,7 @@ export default function SideBar(){
                 </div>
                 <div role="button"
                 onClick={() =>navigate('/')}
-                className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-blue-gray-50 dark:hover:bg-slate-700 hover:text-blue-gray-900 cursor-pointer">
+                className="flex items-center w-full p-3 leading-tight rounded-lg outline-none text-start transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-component hover:text-blue-gray-900 cursor-pointer">
                 <div className="grid mr-4 place-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
                     className="w-5 h-5">
@@ -132,31 +132,31 @@ export default function SideBar(){
                 </div>
             </nav>
             {showNotifications && (
-                <div className='absolute left-full top-32 ml-3 z-50 w-40 rounded-xl bg-white dark:bg-slate-900 p-5 shadow-xl border border-grey-100'>
-                    <h2 className='mb-4 text-lg font-semibold text-dark:text-white'>
+                <div className='absolute left-full top-32 ml-3 z-50 w-40 rounded-xl bg-card p-5 shadow-xl border border-card'>
+                    <h2 className='mb-4 text-lg font-semibold font-clear'>
                         Notificaciones
                     </h2>
-                    <div className='border-b pb-3'>
-                        <p className='font-medium text-black dark:text-white'>
+                    <div className='border-b border-card pb-3'>
+                        <p className='font-medium'>
                             Seguimiento Vence mañana
                         </p>
-                        <p className='text-sm text-black dark:text-white'>
+                        <p className='text-sm'>
                             El caso 4 tiene 5 dias de cierre
                         </p>
                     </div>
-                    <div className='border-b pb-3'>
-                        <p className='font-medium text-black dark:text-white'>
+                    <div className='border-b border-card pb-3'>
+                        <p className='font-medium'>
                             Seguimiento Vence mañana
                         </p>
-                        <p className='text-sm text-black dark:text-white'>
+                        <p className='text-sm'>
                             El caso 4 tiene 5 dias de cierre
                         </p>
                     </div>
-                    <div className='border-b pb-3'>
-                        <p className='font-medium text-black dark:text-white'>
+                    <div className='border-b border-card pb-3'>
+                        <p className='font-medium'>
                             Seguimiento Vence mañana
                         </p>
-                        <p className='text-sm text-black dark:text-white'>
+                        <p className='text-sm'>
                             El caso 4 tiene 5 dias de cierre
                         </p>
                     </div>

@@ -27,8 +27,8 @@ const ESTATUS: Record<string, { pill: string; dot: string }> = {
 
 
 const ESTATUS_DEFAULT = {
-  pill: 'bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-700/40 dark:text-slate-300 dark:ring-slate-600',
-  dot: 'bg-slate-400',
+  pill: 'bg-gray-100 text-gray-700 ring-gray-200 dark:bg-gray-600/40 dark:text-gray-300 dark:ring-gray-500',
+  dot: 'bg-gray-400',
 };
  
 const RIESGO: Record<string, string> = {
@@ -50,8 +50,8 @@ function textoNNA(cantidad: Reporte['cantidad_nna'], edad: Reporte['edad_aproxim
   return `${c}, ${e}`;
 }
  
-const iconClass = 'mt-0.5 h-4 w-4 shrink-0 text-slate-500 dark:text-slate-400';
-const labelClass = 'font-semibold text-slate-900 dark:text-white';
+const iconClass = 'mt-0.5 h-4 w-4 shrink-0 font-diffuse';
+const labelClass = 'font-semibold';
  
 interface Props {
   reporte: Reporte;
@@ -66,29 +66,29 @@ export function ReporteCard({ reporte: r, onDetalle, onVerCaso }: Props) {
       : ESTATUS_DEFAULT;
 
   return (
-    <article className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900 lg:flex-row lg:items-start lg:justify-between">
+    <article className="flex flex-col gap-4 rounded-xl border border-card bg-card p-6 shadow-sm transition-colors duration-300 lg:flex-row lg:items-start lg:justify-between">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="font-mono text-lg font-bold text-blue-600 dark:text-blue-400">{r.folio_reporte}</h2>
+          <h2 className="font-mono text-lg font-bold font-accent">{r.folio_reporte}</h2>
           <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ring-1 ${estatus.pill}`}>
             <span className={`h-2 w-2 rounded-full ${estatus.dot}`} aria-hidden />
             {r.estatus_seguimiento}
           </span>
           {!esDesconocido(r.tipo_trabajo) && (
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            <span className="rounded-full bg-component px-3 py-1 text-sm font-diffuse">
               {r.tipo_trabajo}
             </span>
           )}
-          <span className={`text-sm font-medium ${r.riesgo ? RIESGO[r.riesgo] ?? 'text-slate-500' : 'text-slate-500 dark:text-slate-400'}`}>
+          <span className={`text-sm font-medium ${r.riesgo ? RIESGO[r.riesgo] ?? 'font-diffuse' : 'font-diffuse'}`}>
             {r.riesgo ? `Riesgo ${r.riesgo.toLowerCase()}` : 'Riesgo sin evaluar'}
           </span>
         </div>
  
-        <p className="mt-3 font-semibold text-slate-900 dark:text-white">
+        <p className="mt-3 font-semibold">
           {r.ubicacion.colonia} · {fechaFmt.format(new Date(r.fecha_reporte))}
         </p>
  
-        <div className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+        <div className="mt-3 space-y-2 text-sm">
           <p className="flex gap-2">
             <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
               <path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z" />
@@ -105,7 +105,7 @@ export function ReporteCard({ reporte: r, onDetalle, onVerCaso }: Props) {
             </svg>
             <span>
               <strong className={labelClass}>Menores:</strong> {textoNNA(r.cantidad_nna, r.edad_aproximada)}
-              <span className="text-slate-400 dark:text-slate-500"> · </span>
+              <span className="font-diffuse"> · </span>
               {r.id_usuario === null ? 'Reporte anónimo' : `Reportado por usuario #${r.id_usuario}`}
             </span>
           </p>
@@ -116,7 +116,7 @@ export function ReporteCard({ reporte: r, onDetalle, onVerCaso }: Props) {
             </svg>
             <span>
               <strong className={labelClass}>Descripción:</strong>{' '}
-              {r.descripcion ?? <em className="text-slate-400 dark:text-slate-500">Sin descripción</em>}
+              {r.descripcion ?? <em className="font-diffuse">Sin descripción</em>}
             </span>
           </p>
         </div>
@@ -127,14 +127,14 @@ export function ReporteCard({ reporte: r, onDetalle, onVerCaso }: Props) {
           <button
             type="button"
             onClick={onVerCaso}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
+            className="btn-secondary rounded-lg px-4 py-2 text-sm">
             Ver caso #{r.id_caso}
           </button>
         )}
         <button
           type="button"
           onClick={onDetalle}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+          className="btn-primary rounded-lg px-4 py-2 text-sm font-medium">
           Detalle →
         </button>
       </div>

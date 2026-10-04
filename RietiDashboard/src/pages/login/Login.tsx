@@ -24,7 +24,7 @@ const Login = () => (
         </div>
       </div>
 
-    <div className="flex-3 bg-gray-100 dark:bg-gray-800 content-center">
+    <div className="flex-3 bg-panel content-center">
       <LoginCard />
     </div>
     </div>
