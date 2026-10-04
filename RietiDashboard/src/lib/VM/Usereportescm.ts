@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Reporte } from '../types/Report';
 // TODO: ajusta la ruta a donde esté tu archivo con `reports`
-import { reports } from '../api/reports';
+import { getReports } from '../api/reports';
 
 export const TODOS = 'Todos';
 
@@ -18,7 +18,7 @@ export function useReportesVM() {
   const [busqueda, setBusqueda] = useState('');
 
   // TODO: cuando exista el endpoint, `reports` vendrá del fetch en vez del import
-  const todos: Reporte[] = reports;
+  const todos: Reporte[] = getReports();
 
   // Filtros con conteo, sacados de los datos: [{ value: 'Recibido', total: 11 }, ...]
   const filtros = useMemo(() => {

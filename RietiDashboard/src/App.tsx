@@ -9,7 +9,7 @@ function App() {
   return (
     // <AuthProvider>
       <Routes>
-        <Route path="/" element={<Login/>} />
+        <Route path="/login" element={<Login/>} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/reports" element={<ReportPage/>} />
         <Route path="/map" element={<HeatMapPage/>} />
