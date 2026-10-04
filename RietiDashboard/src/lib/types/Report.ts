@@ -101,27 +101,25 @@ export interface Ubicacion {
 
 export type FeatureReportProps = {
   id: string;
-  folio: string;
-  riesgo: Riesgo | null;
+  risk: Riesgo | null;
   nna: CantidadNNA;
-  tipo_trabajo: TipoTrabajo;
-  edad_aproximada: EdadAproximada | null;
-  estatus: EstatusSeguimiento | null;
-  case: boolean;
-  fecha_reporte: string;
-  hora: number;              // 0-23 hrs
-  dia_semana: number;        // 0 = sunday ... 6 = saturday
-  dias_sin_atender: number | null; // if case doesnt exists
+  approx_age: EdadAproximada | null;
+  status: EstatusSeguimiento | null;
+  report_date: string;
+  hour: number;                    // 0-23 hrs
+  weekday: number;                 // 0 = sunday ... 6 = saturday
+  days_unattended: number | null;  // null if the report already has a case
 };
 
-const MS_DAY = 1000 * 60 * 60 * 24;
+// property of FeatureReportProps used to color the report circles
+export type ReportVisual = "risk" | "nna" | "approx_age" | "days_unattended";
 
-export function reports2GeoJSON(
+export const MS_DAY = 1000 * 60 * 60 * 24;
+
+export const reports2GeoJSON = (
   reports: Reporte[],
   currDate: Date = new Date(),
-): FeatureCollection<Point, FeatureReportProps> {
-
-  return {
+): FeatureCollection<Point, FeatureReportProps> => ({
     type: "FeatureCollection",
     features: reports.flatMap((r) => {
       const { ubicacion } = r
@@ -133,21 +131,17 @@ export function reports2GeoJSON(
         geometry: { type: "Point" as const, coordinates: [ubicacion.lng, ubicacion.lat] }, 
         properties: {
           id: String(r.id_reporte),
-          folio: r.folio_reporte,
-          riesgo: r.riesgo,
+          risk: r.riesgo,
           nna: r.cantidad_nna,
-          tipo_trabajo: r.tipo_trabajo,
-          edad_aproximada: r.edad_aproximada,
-          estatus: r.estatus_seguimiento,
-          case: !noCase,
-          fecha_reporte: r.fecha_reporte,
-          hora: date.getHours(),
-          dia_semana: date.getDay(),
-          dias_sin_atender: noCase
+          approx_age: r.edad_aproximada,
+          status: r.estatus_seguimiento,
+          report_date: r.fecha_reporte,
+          hour: date.getHours(),
+          weekday: date.getDay(),
+          days_unattended: noCase
             ? Math.floor((currDate.getTime() - date.getTime()) / MS_DAY)
             : null,
-        },
+        }
       }];
     }),
-  };
-}
+  })
