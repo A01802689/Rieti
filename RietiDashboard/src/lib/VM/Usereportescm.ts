@@ -3,55 +3,83 @@ import type { Reporte } from '../types/Report';
 // TODO: ajusta la ruta a donde esté tu archivo con `reports`
 import { getReports } from '../api/reports';
 
-export const TODOS = 'Todos';
+export const ALL_OPTION = 'Todos';
 
-// Orden del flujo: sólo sirve para acomodar los filtros, no para inventar estatus.
-// Si aparece un estatus nuevo en los datos, se agrega al final automáticamente.
-const ORDEN_FLUJO = ['Recibido', 'En revisión', 'Canalizado', 'En atención', 'Concluido'];
+const STATUS_WORKFLOW_ORDER = [
+  'Recibido',
+  'En revisión',
+  'Canalizado',
+  'En atención',
+  'Concluido',
+];
 
-function normalizar(s: string | null | undefined): string {
-  return (s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+function normalizeString(text: string | null | undefined): string {
+  return (text ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 }
 
-export function useReportesVM() {
-  const [filtro, setFiltro] = useState<string>(TODOS);
-  const [busqueda, setBusqueda] = useState('');
+export function useReportsViewModel() {
+  const [selectedFilter, setSelectedFilter] = useState<string>(ALL_OPTION);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // TODO: cuando exista el endpoint, `reports` vendrá del fetch en vez del import
-  const todos: Reporte[] = getReports();
+  const allReports: Reporte[] = getReports();
 
-  // Filtros con conteo, sacados de los datos: [{ value: 'Recibido', total: 11 }, ...]
-  const filtros = useMemo(() => {
-    const conteo = new Map<string, number>();
-    todos.forEach((r) => {
-      const estatus = r.estatus_seguimiento ?? '';
-      conteo.set(estatus, (conteo.get(estatus) ?? 0) + 1);
+  const filterOptions = useMemo(() => {
+    const countsMap = new Map<string, number>();
+    allReports.forEach((report) => {
+      const status = report.estatus_seguimiento ?? '';
+      countsMap.set(status, (countsMap.get(status) ?? 0) + 1);
     });
-    const posicion = (e: string) => {
-      const i = ORDEN_FLUJO.indexOf(e);
-      return i === -1 ? ORDEN_FLUJO.length : i;
+
+    const getStatusIndex = (status: string) => {
+      const index = STATUS_WORKFLOW_ORDER.indexOf(status);
+      return index === -1 ? STATUS_WORKFLOW_ORDER.length : index;
     };
-    const estatus = [...conteo.keys()].sort((a, b) => posicion(a) - posicion(b));
+
+    const sortedStatuses = [...countsMap.keys()].sort(
+      (a, b) => getStatusIndex(a) - getStatusIndex(b)
+    );
+
     return [
-      { value: TODOS, total: todos.length },
-      ...estatus.map((e) => ({ value: e, total: conteo.get(e) ?? 0 })),
+      { value: ALL_OPTION, total: allReports.length },
+      ...sortedStatuses.map((status) => ({
+        value: status,
+        total: countsMap.get(status) ?? 0,
+      })),
     ];
-  }, [todos]);
+  }, [allReports]);
 
-  const reportes = useMemo(() => {
-    const q = normalizar(busqueda.trim());
-    return todos
-      .filter((r) => filtro === TODOS || r.estatus_seguimiento === filtro)
+  const filteredReports = useMemo(() => {
+    const query = normalizeString(searchQuery.trim());
+    return allReports
       .filter(
-        (r) =>
-          !q ||
-          normalizar(r.folio_reporte).includes(q) ||
-          normalizar(r.ubicacion.colonia).includes(q) ||
-          normalizar(r.ubicacion.calle).includes(q) ||
-          normalizar(r.tipo_trabajo).includes(q),
+        (report) =>
+          selectedFilter === ALL_OPTION ||
+          report.estatus_seguimiento === selectedFilter
       )
-      .sort((a, b) => new Date(b.fecha_reporte).getTime() - new Date(a.fecha_reporte).getTime());
-  }, [todos, filtro, busqueda]);
+      .filter(
+        (report) =>
+          !query ||
+          normalizeString(report.folio_reporte).includes(query) ||
+          normalizeString(report.ubicacion.colonia).includes(query) ||
+          normalizeString(report.ubicacion.calle).includes(query) ||
+          normalizeString(report.tipo_trabajo).includes(query)
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.fecha_reporte).getTime() -
+          new Date(a.fecha_reporte).getTime()
+      );
+  }, [allReports, selectedFilter, searchQuery]);
 
-  return { reportes, filtros, filtro, setFiltro, busqueda, setBusqueda };
+  return {
+    reports: filteredReports,
+    filterOptions,
+    selectedFilter,
+    setSelectedFilter,
+    searchQuery,
+    setSearchQuery,
+  };
 }
