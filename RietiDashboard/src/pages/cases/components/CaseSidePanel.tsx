@@ -1,3 +1,4 @@
+import { InfoIcon, PencilIcon } from './CaseIcons';
 import { useState } from 'react';
 import type { Caso, CaseUrgency } from '@/lib/types/Case';
 import type { Reporte } from '@/lib/types/Report';
@@ -14,7 +15,7 @@ export function AddNoteCard({ caso }: { caso: Caso }) {
     const [note, setNote] = useState('');
 
     return (
-        <Card title="Agregar nota" icon="✎" tone="bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300">
+        <Card title="Agregar nota" icon={<PencilIcon />} tone="bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300">
             <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -42,7 +43,7 @@ export function MetadataCard({ caso, reports }: { caso: Caso; reports: Reporte[]
     const role = useRole();
 
     return (
-        <Card title="Metadatos" icon="ℹ" tone="bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
+        <Card title="Metadatos" icon={<InfoIcon />} tone="bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
             <dl className="flex flex-col gap-2 text-sm">
                 {[
                     ['Folio', caseFolio(caso)],

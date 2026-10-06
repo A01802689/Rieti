@@ -1,3 +1,4 @@
+import { DocumentIcon, UserIcon } from './CaseIcons';
 import type { Caso } from '@/lib/types/Case';
 import type { Reporte } from '@/lib/types/Report';
 import { Empty, Field } from '@/components/ui/ReportDetails';
@@ -7,7 +8,7 @@ import { formatDateTime, isUnknown } from '@/lib/utilities/reportStyles';
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 
-export function Card({ title, icon, tone, children }: { title: string; icon: string; tone: string; children: React.ReactNode }) {
+export function Card({ title, icon, tone, children }: { title: string; icon: React.ReactNode; tone: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-4 rounded-xl border border-card bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
             <div className="flex items-center gap-3">
@@ -25,7 +26,7 @@ export function Card({ title, icon, tone, children }: { title: string; icon: str
 export function ReporterCard({ reports }: { reports: Reporte[] }) {
     const first = reports[0];
     return (
-        <Card title="Información del denunciante" icon="👤" tone="bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300">
+        <Card title="Información del denunciante" icon={<UserIcon />} tone="bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300">
             {first ? (
                 <dl className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <Field label="Reportante">
@@ -51,7 +52,7 @@ export function CaseDataCard({ caso, reports }: { caso: Caso; reports: Reporte[]
     const photos = reports.filter((r) => r.imagen);
 
     return (
-        <Card title="Datos del caso" icon="📄" tone="bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
+        <Card title="Datos del caso" icon={<DocumentIcon />} tone="bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
             <dl className="grid grid-cols-2 gap-2 lg:grid-cols-4">
                 <Field label="Niños">{kids}</Field>
                 <Field label="Edades">{ages.length ? `${ages.join(', ')} años` : <Empty text="Sin dato" />}</Field>

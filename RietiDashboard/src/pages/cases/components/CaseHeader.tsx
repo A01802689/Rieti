@@ -33,7 +33,7 @@ export function CaseHeader({ caso, firstReport }: { caso: Caso; firstReport: Rep
                         ← Volver
                     </button>
                     <div className="mt-1 flex flex-wrap items-center gap-3">
-                        <h1 className="font-display p-0 text-2xl sm:text-3xl">{caseFolio(caso)}</h1>
+                        <h1 className="p-0 text-2xl font-semibold sm:text-3xl">{caseFolio(caso)}</h1>
                         <span
                             className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ring-1 ${style.pill}`}
                         >

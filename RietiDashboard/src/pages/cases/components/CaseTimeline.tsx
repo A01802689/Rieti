@@ -1,3 +1,4 @@
+import { PlusIcon } from './CaseIcons';
 import type { Caso } from '@/lib/types/Case';
 import { timelineOf } from '@/lib/utilities/caseTimeline';
 import { formatDateTime } from '@/lib/utilities/reportStyles';
@@ -7,7 +8,7 @@ export function CaseTimeline({ caso }: { caso: Caso }) {
     const entries = timelineOf(caso);
 
     return (
-        <Card title="Folios de seguimiento" icon="+" tone="bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+        <Card title="Folios de seguimiento" icon={<PlusIcon />} tone="bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
             <ol className="flex flex-col">
                 {entries.map((entry, i) => (
                     <li key={entry.folio} className="flex gap-4">

@@ -1,3 +1,4 @@
+import { ListIcon } from './components/CaseIcons';
 import SideBar from '../../components/ui/SideBar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CaseHeader } from './components/CaseHeader';
@@ -33,7 +34,7 @@ const CaseDetailPage = () => {
                             <div className="flex min-w-0 flex-col gap-4 sm:gap-6">
                                 <AddNoteCard caso={caso} />
                                 <MetadataCard caso={caso} reports={reports} />
-                                <Card title="Reportes del caso" icon="#" tone="bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
+                                <Card title="Reportes del caso" icon={<ListIcon />} tone="bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
                                     {reports.length === 0 ? (
                                         <p className="p-0 font-diffuse">Sin reportes asociados.</p>
                                     ) : (
