@@ -1,9 +1,7 @@
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Eye, EyeClosed } from 'lucide-react'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import getRoute from '../../lib/routes';
 
 interface LoginInputs {
   email: string;
@@ -15,12 +13,10 @@ export const LoginCard = () => {
   const go = useNavigate();
 
   // // const [passwordChange, setPasswordChange] = useState(false);
-  const [attempts, setAttempts] = useState(0);
 
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitting },
   } = useForm<LoginInputs>({
     defaultValues: { email: '', password: '' },

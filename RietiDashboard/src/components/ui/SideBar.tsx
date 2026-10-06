@@ -184,7 +184,7 @@ export default function SideBar() {
                         </div>
 
                         {/* Cases */}
-                        <button type="button" onClick={() => goTo('/case')} className={`${itemBaseClass} ${activeClass('/case')}`}>
+                        <button type="button" onClick={() => goTo('/case')} className={`${itemBaseClass} ${location.pathname.startsWith('/case') ? 'bg-component text-blue-gray-900 font-medium' : 'text-blue-gray-700'}`}>
                             <span className="mr-4 grid place-items-center">
                                 <CasesIcon />
                             </span>

@@ -67,12 +67,11 @@ const ReportPage = () => {
                                     No hay reportes que coincidan con la búsqueda.
                                 </p>
                             ) : (
-                                vm.reports.map((report: any) => (
+                                vm.reports.map((report) => (
                                     <ReportCard
                                         key={report.id_reporte}
                                         report={report}
-                                        onDetailClick={() => navigate(`/reportes/${report.id_reporte}`)}
-                                        onViewCaseClick={() => navigate(`/casos/${report.id_caso}`)}
+                                        onCaseCreated={(caseId) => navigate(`/case/${caseId}`)}
                                     />
                                 ))
                             )}

@@ -10,10 +10,9 @@ let  reports: Reporte[] = []
     // fetch block
     reports = reportes
   } catch (e) {
-    throw `Error fetching reports from API for HeatMap ${e}`
-  } finally {
-    return reports
+    throw new Error(`Error fetching reports from API for HeatMap ${e}`)
   }
+  return reports
 }
 // ---------- Locations (Atizapán de Zaragoza, coordenadas aproximadas) ----------
 
@@ -63,14 +62,14 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00001", estatus_seguimiento: "Concluido",
     cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Venta ambulante",
     descripcion: "Dos niños vendiendo dulces entre las mesas de un corredor peatonal.",
-    fecha_reporte: "2026-08-03T18:42:10-06:00", imagen: "https://example.com/rieti/rpt-001.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-08-03T18:42:10-06:00", imagen: "https://picsum.photos/seed/rieti-001/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 2, id_usuario: null, id_caso: 2, ubicacion: ubicaciones[1],
     folio_reporte: "RIETI-2026-00002", estatus_seguimiento: "En atención",
     cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Carga y descarga",
     descripcion: "Menores cargando cajas de fruta desde camiones al interior del mercado.",
-    fecha_reporte: "2026-08-05T06:15:33-06:00", imagen: "https://example.com/rieti/rpt-002.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-08-05T06:15:33-06:00", imagen: "https://picsum.photos/seed/rieti-002/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 3, id_usuario: 7, id_caso: 2, ubicacion: ubicaciones[1],
@@ -84,7 +83,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00004", estatus_seguimiento: "Recibido",
     cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
     descripcion: "Niño pequeño pidiendo dinero entre autos en un semáforo de noche.",
-    fecha_reporte: "2026-09-25T21:10:45-06:00", imagen: "https://example.com/rieti/rpt-004.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-25T21:10:45-06:00", imagen: "https://picsum.photos/seed/rieti-004/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 5, id_usuario: null, id_caso: null, ubicacion: ubicaciones[5],
@@ -98,7 +97,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00006", estatus_seguimiento: "Canalizado",
     cantidad_nna: "5 o más", edad_aproximada: "6-11", tipo_trabajo: "Trabajo en comercio",
     descripcion: "Varios niños atendiendo puestos de ropa en horario escolar.",
-    fecha_reporte: "2026-08-18T17:30:00-06:00", imagen: "https://example.com/rieti/rpt-006.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-08-18T17:30:00-06:00", imagen: "https://picsum.photos/seed/rieti-006/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 7, id_usuario: 9, id_caso: null, ubicacion: ubicaciones[3],
@@ -119,14 +118,14 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00009", estatus_seguimiento: "Concluido",
     cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Limpieza de parabrisas",
     descripcion: "Adolescente en crucero cercano a la terminal de autobuses.",
-    fecha_reporte: "2026-07-28T16:20:05-06:00", imagen: "https://example.com/rieti/rpt-009.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-07-28T16:20:05-06:00", imagen: "https://picsum.photos/seed/rieti-009/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 10, id_usuario: 2, id_caso: null, ubicacion: ubicaciones[8],
     folio_reporte: "RIETI-2026-00010", estatus_seguimiento: "En revisión",
     cantidad_nna: 2, edad_aproximada: "12-14", tipo_trabajo: "Campo",
     descripcion: "Menores trabajando en parcelas de hortalizas en la zona periférica.",
-    fecha_reporte: "2026-09-13T10:02:37-06:00", imagen: "https://example.com/rieti/rpt-010.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-13T10:02:37-06:00", imagen: "https://picsum.photos/seed/rieti-010/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 11, id_usuario: null, id_caso: null, ubicacion: ubicaciones[9],
@@ -140,7 +139,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00012", estatus_seguimiento: "En atención",
     cantidad_nna: 3, edad_aproximada: "6-11", tipo_trabajo: "Recolección de residuos",
     descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-08-29T07:33:18-06:00", imagen: "https://example.com/rieti/rpt-012.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-08-29T07:33:18-06:00", imagen: "https://picsum.photos/seed/rieti-012/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 13, id_usuario: 18, id_caso: null, ubicacion: ubicaciones[11],
@@ -154,7 +153,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00014", estatus_seguimiento: "Recibido",
     cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
     descripcion: "Dos niños pequeños pidiendo dinero afuera de un centro comercial.",
-    fecha_reporte: "2026-09-27T12:30:15-06:00", imagen: "https://example.com/rieti/rpt-014.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-27T12:30:15-06:00", imagen: "https://picsum.photos/seed/rieti-014/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 15, id_usuario: 11, id_caso: 3, ubicacion: ubicaciones[2],
@@ -175,14 +174,14 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00017", estatus_seguimiento: "En revisión",
     cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Venta ambulante",
     descripcion: "Niños vendiendo flores entre autos después de las 10 pm.",
-    fecha_reporte: "2026-09-15T22:40:09-06:00", imagen: "https://example.com/rieti/rpt-017.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-15T22:40:09-06:00", imagen: "https://picsum.photos/seed/rieti-017/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 18, id_usuario: 16, id_caso: 6, ubicacion: ubicaciones[3],
     folio_reporte: "RIETI-2026-00018", estatus_seguimiento: "Canalizado",
     cantidad_nna: "5 o más", edad_aproximada: "15-17", tipo_trabajo: "Carga y descarga",
     descripcion: "Grupo de adolescentes trabajando como cargadores en andenes.",
-    fecha_reporte: "2026-08-12T05:20:48-06:00", imagen: "https://example.com/rieti/rpt-018.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-08-12T05:20:48-06:00", imagen: "https://picsum.photos/seed/rieti-018/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 19, id_usuario: 8, id_caso: null, ubicacion: ubicaciones[7],
@@ -210,7 +209,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00022", estatus_seguimiento: "Recibido",
     cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Campo",
     descripcion: "Menores cosechando en parcelas por la mañana.",
-    fecha_reporte: "2026-09-23T07:05:51-06:00", imagen: "https://example.com/rieti/rpt-022.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-23T07:05:51-06:00", imagen: "https://picsum.photos/seed/rieti-022/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 23, id_usuario: null, id_caso: null, ubicacion: ubicaciones[10],
@@ -224,7 +223,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00024", estatus_seguimiento: "En atención",
     cantidad_nna: 4, edad_aproximada: "6-11", tipo_trabajo: "Recolección de residuos",
     descripcion: "Mismo punto de reciclaje, más niños que en el reporte anterior.",
-    fecha_reporte: "2026-08-30T09:12:14-06:00", imagen: "https://example.com/rieti/rpt-024.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-08-30T09:12:14-06:00", imagen: "https://picsum.photos/seed/rieti-024/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 25, id_usuario: 13, id_caso: null, ubicacion: ubicaciones[9],
@@ -245,7 +244,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00027", estatus_seguimiento: "En revisión",
     cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
     descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-12T07:13:17-06:00", imagen: "https://example.com/rieti/rpt-027.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-12T07:13:17-06:00", imagen: "https://picsum.photos/seed/rieti-027/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 28, id_usuario: 15, id_caso: null, ubicacion: ubicaciones[0],
@@ -266,7 +265,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00030", estatus_seguimiento: "En atención",
     cantidad_nna: "5 o más", edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
     descripcion: "Niño pidiendo dinero entre los autos detenidos.",
-    fecha_reporte: "2026-09-17T04:52:08-06:00", imagen: "https://example.com/rieti/rpt-030.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-17T04:52:08-06:00", imagen: "https://picsum.photos/seed/rieti-030/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 31, id_usuario: 11, id_caso: null, ubicacion: ubicaciones[22],
@@ -287,7 +286,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00033", estatus_seguimiento: "En revisión",
     cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
     descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-22T01:31:59-06:00", imagen: "https://example.com/rieti/rpt-033.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-22T01:31:59-06:00", imagen: "https://picsum.photos/seed/rieti-033/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 34, id_usuario: 7, id_caso: null, ubicacion: ubicaciones[22],
@@ -308,7 +307,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00036", estatus_seguimiento: "Concluido",
     cantidad_nna: 4, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
     descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-27T22:10:50-06:00", imagen: "https://example.com/rieti/rpt-036.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-27T22:10:50-06:00", imagen: "https://picsum.photos/seed/rieti-036/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 37, id_usuario: 3, id_caso: null, ubicacion: ubicaciones[23],
@@ -329,7 +328,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00039", estatus_seguimiento: "Recibido",
     cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
     descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-04T19:49:41-06:00", imagen: "https://example.com/rieti/rpt-039.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-04T19:49:41-06:00", imagen: "https://picsum.photos/seed/rieti-039/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 40, id_usuario: 24, id_caso: 10, ubicacion: ubicaciones[24],
@@ -350,7 +349,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00042", estatus_seguimiento: "Recibido",
     cantidad_nna: 3, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
     descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-09T16:28:32-06:00", imagen: "https://example.com/rieti/rpt-042.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-09T16:28:32-06:00", imagen: "https://picsum.photos/seed/rieti-042/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 43, id_usuario: 20, id_caso: null, ubicacion: ubicaciones[25],
@@ -371,7 +370,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00045", estatus_seguimiento: "Recibido",
     cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Recolección de residuos",
     descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-09-14T13:07:23-06:00", imagen: "https://example.com/rieti/rpt-045.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-14T13:07:23-06:00", imagen: "https://picsum.photos/seed/rieti-045/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 46, id_usuario: 16, id_caso: null, ubicacion: ubicaciones[1],
@@ -392,7 +391,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00048", estatus_seguimiento: "Recibido",
     cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
     descripcion: "Niño pidiendo dinero entre los autos detenidos.",
-    fecha_reporte: "2026-09-19T10:46:14-06:00", imagen: "https://example.com/rieti/rpt-048.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-19T10:46:14-06:00", imagen: "https://picsum.photos/seed/rieti-048/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 49, id_usuario: 12, id_caso: null, ubicacion: ubicaciones[27],
@@ -413,7 +412,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00051", estatus_seguimiento: "En atención",
     cantidad_nna: "5 o más", edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
     descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-24T07:25:05-06:00", imagen: "https://example.com/rieti/rpt-051.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-24T07:25:05-06:00", imagen: "https://picsum.photos/seed/rieti-051/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 52, id_usuario: 8, id_caso: 11, ubicacion: ubicaciones[28],
@@ -434,7 +433,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00054", estatus_seguimiento: "Concluido",
     cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Construcción",
     descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-09-01T04:04:56-06:00", imagen: "https://example.com/rieti/rpt-054.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-01T04:04:56-06:00", imagen: "https://picsum.photos/seed/rieti-054/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 55, id_usuario: 4, id_caso: null, ubicacion: ubicaciones[12],
@@ -455,7 +454,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00057", estatus_seguimiento: "Recibido",
     cantidad_nna: 4, edad_aproximada: "0-5", tipo_trabajo: "Construcción",
     descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-09-06T01:43:47-06:00", imagen: "https://example.com/rieti/rpt-057.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-06T01:43:47-06:00", imagen: "https://picsum.photos/seed/rieti-057/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 58, id_usuario: 25, id_caso: 13, ubicacion: ubicaciones[13],
@@ -476,7 +475,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00060", estatus_seguimiento: "Recibido",
     cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Construcción",
     descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-09-11T22:22:38-06:00", imagen: "https://example.com/rieti/rpt-060.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-11T22:22:38-06:00", imagen: "https://picsum.photos/seed/rieti-060/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 61, id_usuario: 21, id_caso: null, ubicacion: ubicaciones[15],
@@ -497,7 +496,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00063", estatus_seguimiento: "En atención",
     cantidad_nna: 3, edad_aproximada: "6-11", tipo_trabajo: "Trabajo doméstico",
     descripcion: "Adolescente realizando labores domésticas durante el día.",
-    fecha_reporte: "2026-09-16T19:01:29-06:00", imagen: "https://example.com/rieti/rpt-063.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-16T19:01:29-06:00", imagen: "https://picsum.photos/seed/rieti-063/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 64, id_usuario: 17, id_caso: 14, ubicacion: ubicaciones[16],
@@ -518,7 +517,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00066", estatus_seguimiento: "En revisión",
     cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Trabajo doméstico",
     descripcion: "Adolescente realizando labores domésticas durante el día.",
-    fecha_reporte: "2026-09-21T16:40:20-06:00", imagen: "https://example.com/rieti/rpt-066.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-21T16:40:20-06:00", imagen: "https://picsum.photos/seed/rieti-066/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 67, id_usuario: 13, id_caso: 15, ubicacion: ubicaciones[18],
@@ -539,7 +538,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00069", estatus_seguimiento: "Recibido",
     cantidad_nna: 2, edad_aproximada: "12-14", tipo_trabajo: "Recolección de residuos",
     descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-09-26T13:19:11-06:00", imagen: "https://example.com/rieti/rpt-069.jpg", riesgo: "Bajo",
+    fecha_reporte: "2026-09-26T13:19:11-06:00", imagen: "https://picsum.photos/seed/rieti-069/640/400", riesgo: "Bajo",
   },
   {
     id_reporte: 70, id_usuario: 9, id_caso: null, ubicacion: ubicaciones[20],
@@ -560,7 +559,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00072", estatus_seguimiento: "Canalizado",
     cantidad_nna: "5 o más", edad_aproximada: "12-14", tipo_trabajo: "Recolección de residuos",
     descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-09-03T10:58:02-06:00", imagen: "https://example.com/rieti/rpt-072.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-03T10:58:02-06:00", imagen: "https://picsum.photos/seed/rieti-072/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 73, id_usuario: 5, id_caso: 17, ubicacion: ubicaciones[21],
@@ -581,7 +580,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00075", estatus_seguimiento: "Recibido",
     cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
     descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-09-08T07:37:53-06:00", imagen: "https://example.com/rieti/rpt-075.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-08T07:37:53-06:00", imagen: "https://picsum.photos/seed/rieti-075/640/400", riesgo: "Medio",
   },
   {
     id_reporte: 76, id_usuario: 1, id_caso: 17, ubicacion: ubicaciones[2],
@@ -602,7 +601,7 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00078", estatus_seguimiento: "Recibido",
     cantidad_nna: 4, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
     descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-09-13T04:16:44-06:00", imagen: "https://example.com/rieti/rpt-078.jpg", riesgo: "Alto",
+    fecha_reporte: "2026-09-13T04:16:44-06:00", imagen: "https://picsum.photos/seed/rieti-078/640/400", riesgo: "Alto",
   },
   {
     id_reporte: 79, id_usuario: 22, id_caso: null, ubicacion: ubicaciones[4],
@@ -623,6 +622,6 @@ export const reportes: Reporte[] = [
     folio_reporte: "RIETI-2026-00081", estatus_seguimiento: "En atención",
     cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Venta ambulante",
     descripcion: "Menor vendiendo dulces y botanas cerca de una esquina concurrida.",
-    fecha_reporte: "2026-09-18T01:55:35-06:00", imagen: "https://example.com/rieti/rpt-081.jpg", riesgo: "Medio",
+    fecha_reporte: "2026-09-18T01:55:35-06:00", imagen: "https://picsum.photos/seed/rieti-081/640/400", riesgo: "Medio",
   },
 ];

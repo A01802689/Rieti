@@ -44,9 +44,18 @@ import { type Ubicacion, type CantidadNNA, MS_DAY } from "./Report";
 export interface Municipio {
   nombre: string
 }
-type CaseState = "Abierto" | "En desarrollo" | "Cerrado"
-type CaseUrgency = "Baja" | "Media" | "Alta"
+export type CaseState = "Abierto" | "En desarrollo" | "Cerrado"
+export type CaseUrgency = "Baja" | "Media" | "Alta"
 
+
+// A "folio de seguimiento": one entry of the case timeline
+export interface Seguimiento {
+  folio: string // SEG-2026-0012-01
+  fecha: string // ISO 8601 TIMESTAMP
+  tipo: string // 'Recepción de reporte' | 'Nota' | 'Cambio de estado' | 'Transferencia'
+  autor: string
+  nota: string | null
+}
 
 export interface Caso {
   id_caso: number
@@ -57,6 +66,7 @@ export interface Caso {
   fecha_caso: string // ISO 8601 TIMESTAMP
   notas: string
   urgencia: CaseUrgency
+  seguimientos?: Seguimiento[] // mock cases without it get a derived first entry, see lib/utilities/caseTimeline.ts
 }
 
 export type FeatureCaseProps = {

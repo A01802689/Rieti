@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { Reporte } from '../types/Report';
 // TODO: ajusta la ruta a donde esté tu archivo con `reports`
 import { getReports } from '../api/reports';
+import { useStoreVersion } from '../api/store';
 
 export const ALL_OPTION = 'Todos';
 
@@ -24,6 +25,8 @@ export function useReportsViewModel() {
   const [selectedFilter, setSelectedFilter] = useState<string>(ALL_OPTION);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const version = useStoreVersion();
+  // getReports returns the same array reference after a mutation, so `version` drives the memos
   const allReports: Reporte[] = getReports();
 
   const filterOptions = useMemo(() => {
@@ -49,7 +52,8 @@ export function useReportsViewModel() {
         total: countsMap.get(status) ?? 0,
       })),
     ];
-  }, [allReports]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allReports, version]);
 
   const filteredReports = useMemo(() => {
     const query = normalizeString(searchQuery.trim());
@@ -72,7 +76,8 @@ export function useReportsViewModel() {
           new Date(b.fecha_reporte).getTime() -
           new Date(a.fecha_reporte).getTime()
       );
-  }, [allReports, selectedFilter, searchQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allReports, version, selectedFilter, searchQuery]);
 
   return {
     reports: filteredReports,
