@@ -6,8 +6,9 @@ from pydantic import BaseModel
 class MunicipioResponse(BaseModel):
     id_municipio: int
     nombre: str
+    clave: str
     model_config = {"from_attributes": True}
-
 
 class MunicipioCreate(BaseModel):
      nombre: str
+     clave: str

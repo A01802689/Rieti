@@ -10,4 +10,4 @@ router = APIRouter()
 @router.post("/municipio", response_model= MunicipioResponse)
 
 def crear_municipio(datos: MunicipioCreate, db: Session = Depends(get_db)):
-     return municipio_service.create_Municipio(db, datos)   
+     return municipio_service.create_Municipio(db, datos)

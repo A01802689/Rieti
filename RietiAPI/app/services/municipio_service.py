@@ -1,6 +1,6 @@
 from app.repositories import municipio_repository
 from app.models.municipio import Municipio
-from app.schemas.municipio import MunicipioCreate, MunicipioResponse
+from app.schemas.municipio import MunicipioCreate
 from sqlalchemy.orm import Session
 #junto todo lo de, schemas, modelo y repositorio
 
@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 # el repositorio (consulta o modfica la base de datos)
 def create_Municipio(db:Session, info: MunicipioCreate):
     nuevo_municipio = Municipio(
-        nombre = info.nombre
+        nombre = info.nombre,
+        clave = info.clave
     )
     return municipio_repository.create_municipio(db, nuevo_municipio)
