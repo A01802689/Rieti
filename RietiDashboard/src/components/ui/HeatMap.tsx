@@ -4,11 +4,12 @@ import Map, { Source, Layer, type MapLayerMouseEvent, type MapRef } from "react-
 import type { Feature, FeatureCollection, Point } from "geojson"
 import "maplibre-gl/dist/maplibre-gl.css"
 import { reports2GeoJSON, type Reporte, type ReportVisual, type FeatureReportProps } from "@/lib/types/Report"
-import { cases2GeoJSON, type Case, type CaseVisual, type FeatureCaseProps } from "@/lib/types/Case"
+import { cases2GeoJSON, type Caso, type CaseVisual, type FeatureCaseProps } from "@/lib/types/Case"
 import { locations2Zones, type ZoneCollection } from "@/lib/types/Zone"
 import { getReports } from "@/lib/api/reports"
-import { reportColor, caseColor, SELECTED_STROKE } from "@/lib/map/colors"
-import useIsDark from "@/lib/utilities/useTheme"
+import type { Selected } from "@/lib/types/Selected"
+import { reportColor, caseColor, ZONE_FILL_COLOR, SELECTED_STROKE } from "@/lib/map/colors"
+import { ColorLegend } from "@/components/ui/ColorLegend"
 
 
 
@@ -18,8 +19,7 @@ const ZonesLayer = ({ data }: { data: ZoneCollection }) => (
       id="zonas-fill"
       type="fill"
       paint={{
-        // count = nocolor: white, 1-9: yellow, 10-19: red, 20+: darker red
-        'fill-color': ['step', ['get', 'count'], '#ffffff', 1, '#fbbf24', 10, '#ff4626', 20, '#b00323'],
+        'fill-color': ZONE_FILL_COLOR,
         'fill-opacity': ['step', ['get', 'count'],0, 1, 0.35],
       }}
     />
@@ -92,28 +92,32 @@ const useDefaultReports = (enabled: boolean): Reporte[] | undefined => {
 // Zones count the reports (or cases when there r no reports).
 interface HeatMapProps {
   reportsArr?: Reporte[]
-  casesArr?: Case[]
+  casesArr?: Caso[]
+  showReports?: boolean
+  showCases?: boolean
   reportVisual?: ReportVisual
   caseVisual?: CaseVisual
   showZones?: boolean
   zoneCellKm?: number
-  selectedReportId?: string | null
-  setSelectedReportId?: Dispatch<SetStateAction<string | null>>
-  selectedCaseId?: string | null
-  setSelectedCaseId?: Dispatch<SetStateAction<string | null>>
+  showLegend?: boolean
+  legendClassName?: string // position of the legend
+  selected?: Selected | null
+  setSelected?: Dispatch<SetStateAction<Selected | null>>
 }
 
 const HeatMap = ({
   reportsArr,
   casesArr,
+  showReports = true,
+  showCases = true,
   reportVisual = 'risk',
   caseVisual = 'urgency',
   showZones = true,
   zoneCellKm = 0.5,
-  selectedReportId = null,
-  setSelectedReportId,
-  selectedCaseId = null,
-  setSelectedCaseId
+  showLegend = true,
+  legendClassName = 'bottom-4 left-4',
+  selected = null,
+  setSelected,
 }: HeatMapProps) => {
   const [cursor, setCursor] = useState<string>('grab')
   const [mapLoaded, setMapLoaded] = useState(false)
@@ -126,24 +130,29 @@ const HeatMap = ({
 
   const mapReports = useMemo(() => (reports ? reports2GeoJSON(reports) : undefined), [reports])
   const mapCases = useMemo(() => (casesArr ? cases2GeoJSON(casesArr) : undefined), [casesArr])
+  // zones count every point, even the hidden layers
   const mapZones = useMemo(() => {
     const items = reports ?? casesArr
     return showZones && items ? locations2Zones(items, zoneCellKm) : undefined
   }, [reports, casesArr, showZones, zoneCellKm])
 
-  // only the defined layers can be clicked
+  // hide the layers that are turned off
+  const shownReports = showReports ? mapReports : undefined
+  const shownCases = showCases ? mapCases : undefined
+
+  // only the shown layers can be clicked
   const interactiveLayerIds = useMemo(
-    () => [...(mapReports ? ['reportes'] : []), ...(mapCases ? ['casos'] : [])],
-    [mapReports, mapCases],
+    () => [...(shownReports ? ['reportes'] : []), ...(shownCases ? ['casos'] : [])],
+    [shownReports, shownCases],
   )
 
   // box that contains every point shown (reports and cases)
   const bounds = useMemo(() => {
-    const features: Feature<Point>[] = [...(mapReports?.features ?? []), ...(mapCases?.features ?? [])]
+    const features: Feature<Point>[] = [...(shownReports?.features ?? []), ...(shownCases?.features ?? [])]
     if (features.length === 0) return undefined
     const [west, south, east, north] = bbox(featureCollection(features))
     return [west, south, east, north] as [number, number, number, number]
-  }, [mapReports, mapCases])
+  }, [shownReports, shownCases])
 
   // center the map once
   useEffect(() => {
@@ -157,21 +166,13 @@ const HeatMap = ({
     const feature = e.features?.[0];
 
     if (!feature) {
-      setSelectedReportId?.(null);
-      setSelectedCaseId?.(null);
+      setSelected?.(null);
       return;
     }
 
     const id = feature.properties?.id;
     if (id == null) return;
-
-    if (feature.layer.id === 'casos') {
-      setSelectedCaseId?.(String(id));
-      setSelectedReportId?.(null);
-    } else {
-      setSelectedReportId?.(String(id));
-      setSelectedCaseId?.(null);
-    }
+    setSelected?.({ type: feature.layer.id === 'casos' ? 'case' : 'report', id: String(id) })
 
     const geom = feature.geometry;
     if (geom.type !== 'Point') return;
@@ -183,35 +184,41 @@ const HeatMap = ({
       zoom: Math.max(e.target.getZoom(), 14),
       duration: 600,
     });
-  }, [setSelectedReportId, setSelectedCaseId]);
+  }, [setSelected]);
 
-  let mapStyle= (useIsDark()) ? 'dark' : 'positron'
-  // useEffect( ()=>{ mapStyle  }, [useIsDark])
 
   return (
     // no cambies el estilo, si necesitas que se vea diferente, cambialo en el contenedor que contenga a HeatMap
-    <>
+    <div className="relative h-full w-full">
       <Map
         ref={mapRef}
         onLoad={() => setMapLoaded(true)}
         initialViewState={{ longitude: -99.6559, latitude: 19.4969, zoom: 8 }}
-        mapStyle={"https://tiles.openfreemap.org/styles/" + mapStyle}
+        mapStyle={"https://tiles.openfreemap.org/styles/positron"}
         interactiveLayerIds={interactiveLayerIds}
         onClick={onClick}
         onMouseEnter={() => setCursor('pointer')}
         onMouseLeave={() => setCursor('grab')}
         cursor={cursor}
       >
-        {/* zones first, circles drawn on top */}
         {mapZones && <ZonesLayer data={mapZones} />}
-        {mapReports && <ReportsLayer data={mapReports} selectedId={selectedReportId} visual={reportVisual} />}
-        {mapCases && <CasesLayer data={mapCases} selectedId={selectedCaseId} visual={caseVisual} />}
+        {shownReports && <ReportsLayer data={shownReports} selectedId={selected?.type === 'report' ? selected.id : null} visual={reportVisual} />}
+        {shownCases && <CasesLayer data={shownCases} selectedId={selected?.type === 'case' ? selected.id : null} visual={caseVisual} />}
       </Map>
 
-      {/* {selectedId && (
-        <PanelCaso id={selectedId} onClose={() => setSelectedId(null)} />
-      )} */}
-    </>
+      {/* show the colors of the layers that are on */}
+      {showLegend && (
+        <div className={`absolute z-10 ${legendClassName}`}>
+          <ColorLegend
+            showReports={!!shownReports}
+            showCases={!!shownCases}
+            showZones={!!mapZones}
+            reportVisual={reportVisual}
+            caseVisual={caseVisual}
+          />
+        </div>
+      )}
+    </div>
   );
 }
 

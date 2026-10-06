@@ -13,6 +13,7 @@
     "lng": "number"
   },
   "estado": "'Abierto' | 'En desarrollo' | 'Cerrado'",
+  "cantidad_nna": "1 | 2 | 3 | 4 | '5 o más' | 'No sé'",
   "fecha_caso": "string (ISO 8601 TIMESTAMP)",
   "notas": "string",
   "urgencia": "'Baja' | 'Media' | 'Alta'"
@@ -31,13 +32,14 @@
     "lng": "number"
   },
   "estado": "'Abierto' | 'En desarrollo' | 'Cerrado'",
+  "cantidad_nna": "1 | 2 | 3 | 4 | '5 o más' | 'No sé'",
   "fecha_caso": "string (ISO 8601 TIMESTAMP)",
   "urgencia": "'Baja' | 'Media' | 'Alta' | null"
 }, ...]
 */
 
 import type { FeatureCollection, Point } from "geojson";
-import { type Ubicacion, MS_DAY } from "./Report";
+import { type Ubicacion, type CantidadNNA, MS_DAY } from "./Report";
 
 export interface Municipio {
   nombre: string
@@ -46,11 +48,12 @@ type CaseState = "Abierto" | "En desarrollo" | "Cerrado"
 type CaseUrgency = "Baja" | "Media" | "Alta"
 
 
-export interface Case {
+export interface Caso {
   id_caso: number
   municipio: Municipio
   ubicacion: Ubicacion
   estado: CaseState
+  cantidad_nna: CantidadNNA
   fecha_caso: string // ISO 8601 TIMESTAMP
   notas: string
   urgencia: CaseUrgency
@@ -60,15 +63,16 @@ export type FeatureCaseProps = {
   id: string
   status: CaseState
   urgency: CaseUrgency
+  nna: CantidadNNA
   caseDate: string
   daysElapsed: number
 }
 
 // property of FeatureCaseProps used to color the case circles
-export type CaseVisual = "urgency" | "daysElapsed"
+export type CaseVisual = "urgency" | "daysElapsed" | "nna"
 
 export const cases2GeoJSON = (
-  cases: Case[], 
+  cases: Caso[], 
   currDate: Date = new Date()
 ): FeatureCollection<Point, FeatureCaseProps> => ({
     type: "FeatureCollection",
@@ -82,6 +86,7 @@ export const cases2GeoJSON = (
         id: String(c.id_caso),
         status: c.estado,
         urgency: c.urgencia,
+        nna: c.cantidad_nna,
         caseDate: c.fecha_caso,
         daysElapsed: Math.floor((currDate.getTime() - date.getTime()) / MS_DAY)
       }

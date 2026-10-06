@@ -55,20 +55,26 @@ export type CantidadNNA = 1 | 2 | 3 | 4 | "5 o más" | "No sé";
 
 export type EdadAproximada = "0-5" | "6-11" | "12-14" | "15-17" | "No sé";
 
-export type TipoTrabajo =
-  | "Venta ambulante"
-  | "Limpieza de parabrisas"
-  | "Mendicidad"
-  | "Carga y descarga"
-  | "Trabajo en comercio"
-  | "Campo"
-  | "Construcción"
-  | "Trabajo doméstico"
-  | "Recolección de residuos"
-  | "Otra actividad"
-  | "No sé";
+// lists also used as dropdown options
+export const WORK_TYPES = [
+  "Venta ambulante",
+  "Limpieza de parabrisas",
+  "Mendicidad",
+  "Carga y descarga",
+  "Trabajo en comercio",
+  "Campo",
+  "Construcción",
+  "Trabajo doméstico",
+  "Recolección de residuos",
+  "Otra actividad",
+  "No sé",
+] as const;
 
-export type Riesgo = "Bajo" | "Medio" | "Alto";
+export type TipoTrabajo = (typeof WORK_TYPES)[number];
+
+export const RISK_LEVELS = ["Bajo", "Medio", "Alto"] as const;
+
+export type Riesgo = (typeof RISK_LEVELS)[number];
 
 export interface Reporte {
   id_reporte: number;

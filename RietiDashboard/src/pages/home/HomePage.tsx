@@ -86,7 +86,7 @@ const HomePage = () => {
 
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/mapa')}
+                                    onClick={() => navigate('/map')}
                                     className="btn-secondary w-full rounded-lg px-4 py-2 text-xs font-semibold outline-none transition-all sm:w-auto"
                                 >
                                     Ir al mapa

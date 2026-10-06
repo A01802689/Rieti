@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 /* @custom-variant dark (&:where(@media (prefers-color-scheme: dark), @media (prefers-color-scheme: dark) *)); */
 
@@ -14,7 +15,7 @@
   }
   h2 {
     @apply text-xl font-medium p-1.5 text-gray-950 dark:text-gray-200;
-  }
+  } 
   p {
     @apply text-sm font-sans p-1.5 text-gray-950 dark:text-gray-200;
   }
@@ -104,4 +105,30 @@ for common components (they work as classes)
 /* background and text of an input in dark mode (the size and radius come from the base input) */
 @utility input-field{
   @apply border-slate-200 bg-white text-gray-900 placeholder-gray-500 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:placeholder-gray-400;
+}
+
+/* ---------- Form controls (slider, select) ---------- */
+
+/* empty part of a slider track, separators */
+@utility bg-track{
+  @apply bg-slate-200 dark:bg-slate-700;
+}
+
+/* filled part and thumb of a slider (same blue as btn-primary) */
+@utility bg-brand{
+  @apply bg-[#2563eb];
+}
+
+@utility border-brand{
+  @apply border-[#2563eb];
+}
+
+/* focus / hover ring */
+@utility ring-brand{
+  @apply ring-blue-500/50;
+}
+
+/* thin ring around floating panels (select list) */
+@utility ring-card{
+  @apply ring-slate-200 dark:ring-slate-700;
 }

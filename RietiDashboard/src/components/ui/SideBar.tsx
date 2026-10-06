@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const dashboardLinks = [
-    { label: 'Mapa de Calor', path: '/maps' },
+    { label: 'Mapa de Calor', path: '/map' },
     { label: 'Reportes', path: '/reports' },
     { label: 'Logs', path: '/logs' },
 ];
