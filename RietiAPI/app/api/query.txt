@@ -1,0 +1,106 @@
+
+DROP TABLE IF EXISTS logs;
+DROP TABLE IF EXISTS usuario_caso;
+DROP TABLE IF EXISTS reporte;
+DROP TABLE IF EXISTS caso;
+DROP TABLE IF EXISTS ubicacion;
+DROP TABLE IF EXISTS usuario;
+DROP TABLE IF EXISTS municipio;
+
+
+DROP TYPE IF EXISTS rol_usuario;
+DROP TYPE IF EXISTS estatus_seguimiento_reporte;
+DROP TYPE IF EXISTS cantidad_nna_reporte;
+DROP TYPE IF EXISTS edad_aproximada_reporte;
+DROP TYPE IF EXISTS tipo_trabajo_reporte;
+DROP TYPE IF EXISTS riesgo_reporte;
+DROP TYPE IF EXISTS estado_caso;
+DROP TYPE IF EXISTS urgencia_caso;
+DROP TYPE IF EXISTS estado;
+DROP TYPE IF EXISTS urgencia;
+DROP TYPE IF EXISTS entity_type_logs;
+
+
+CREATE TYPE rol_usuario AS ENUM ('Alimentador', 'Administrador');
+CREATE TYPE estatus_seguimiento_reporte AS ENUM ('Recibido', 'En revisión', 'Canalizado', 'En atención', 'Concluido');
+CREATE TYPE cantidad_nna_reporte AS ENUM ('1', '2', '3', '4', '5 o más', 'No sé');
+CREATE TYPE edad_aproximada_reporte AS ENUM ('0–5', '6–11', '12–14', '15–17', 'No sé');
+CREATE TYPE tipo_trabajo_reporte AS ENUM ('Venta ambulante', 'Limpieza de parabrisas', 'Mendicidad', 'Carga y descarga', 'Trabajo en comercio', 'Campo', 'Construcción', 'Trabajo doméstico', 'Recolección de residuos', 'Otra actividad', 'No sé');
+CREATE TYPE riesgo_reporte AS ENUM ('Bajo', 'Medio', 'Alto');
+CREATE TYPE estado AS ENUM ('Abierto', 'En desarrollo', 'Cerrado');
+CREATE TYPE urgencia AS ENUM ('Baja', 'Media', 'Alta');
+CREATE TYPE entity_type_logs AS ENUM ('Caso', 'Usuario', 'Reporte', 'Ubicacion');
+
+
+
+
+CREATE TABLE municipio (
+    id_municipio INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    clave VARCHAR(25) NOT NULL UNIQUE
+);
+
+
+CREATE TABLE usuario (
+    id_usuario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_municipio INTEGER REFERENCES municipio(id_municipio),
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    correo VARCHAR(30) NOT NULL,
+    contrasena_hash VARCHAR(100) NOT NULL,
+    rol rol_usuario
+);
+
+
+CREATE TABLE ubicacion (
+    id_ubicacion INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_municipio INTEGER NOT NULL REFERENCES municipio(id_municipio),
+    colonia VARCHAR(100) NOT NULL,
+    calle VARCHAR(100) NOT NULL,
+    coordenadas GEOMETRY(Point, 4326) NOT NULL,
+    referencia TEXT
+);
+
+
+CREATE TABLE caso (
+    id_caso INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_municipio INTEGER NOT NULL REFERENCES municipio(id_municipio),
+    id_ubicacion INTEGER NOT NULL REFERENCES ubicacion(id_ubicacion),
+    estado estado,
+    fecha_caso TIMESTAMP NOT NULL DEFAULT now(),
+    notas TEXT,
+    urgencia urgencia
+);
+
+
+CREATE TABLE reporte (
+    id_reporte VARCHAR(50) PRIMARY KEY,
+    id_usuario INTEGER REFERENCES usuario(id_usuario),
+    id_caso INTEGER REFERENCES caso(id_caso),
+    id_ubicacion INTEGER NOT NULL REFERENCES ubicacion(id_ubicacion),
+    estatus_seguimiento estatus_seguimiento_reporte,
+    cantidad_nna cantidad_nna_reporte NOT NULL,
+    edad_aproximada edad_aproximada_reporte NOT NULL,
+    tipo_trabajo tipo_trabajo_reporte NOT NULL,
+    descripcion TEXT,
+    fecha_reporte TIMESTAMP NOT NULL DEFAULT now(),
+    imagen VARCHAR(50)
+);
+
+
+CREATE TABLE usuario_caso (
+    id_usuario_caso INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario INTEGER NOT NULL REFERENCES usuario(id_usuario),
+    id_caso INTEGER NOT NULL REFERENCES caso(id_caso)
+);
+
+CREATE TABLE logs (
+    id_logs INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario INTEGER NOT NULL,
+    action TEXT NOT NULL,
+    entity_type entity_type_logs NOT NULL,
+    id_registro_afectado INTEGER NOT NULL,
+    before_data JSONB NOT NULL,
+    after_data JSONB,
+    fecha TIMESTAMP NOT NULL DEFAULT now()
+);

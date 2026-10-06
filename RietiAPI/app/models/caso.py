@@ -18,10 +18,8 @@ class Caso(Base):
     __tablename__ = "caso"
 
     id_caso = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+        Integer,primary_key=True,index=True
+)
     id_municipio = Column(
         Integer,
         ForeignKey("municipio.id_municipio"),
@@ -40,7 +38,7 @@ class Caso(Base):
                 item.value for item in enum_class
             ]
         ),
-        nullable = False
+        nullable = True
     )
     fecha_caso = Column(
         DateTime,
@@ -49,16 +47,16 @@ class Caso(Base):
     )
     notas = Column(
         Text,
-        nullable = False, 
+        nullable = True, 
     )
-    urgencia = Column(
+
+    urgencia = Column(     
         SQLEnum(
             Urgencia,
-            name = "urgencia",
-            values_callable = lambda enum_class: [
+            name="urgencia",
+            values_callable=lambda enum_class: [
                 item.value for item in enum_class
-            ],
-            nullable = False
-        )
-
+            ]
+        ),
+        nullable=True
     )
