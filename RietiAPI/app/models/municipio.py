@@ -6,3 +6,4 @@ class Municipio(Base):
     __tablename__ = "municipio"    #si debe llamarse  de forma tal cual 
     id_municipio = Column(Integer, primary_key=True)
     nombre = Column(String(100), nullable= False)
+    clave = Column(String(25), nullable=False)

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from enum import Enum
+from app.schemas.ubicacion import UbicacionCreate
 
 class CantidadNna(str, Enum):
     UNO = "1"
@@ -30,13 +31,20 @@ class TipoTrabajo(str, Enum):
     NO_SE = "No sé"
 
 class ReporteCreate(BaseModel):
-    id_usuario: int | None = None
-    id_ubicacion: int
-    folio_reporte: str
+    id_usuario: str | None = None
+    ubicacion: UbicacionCreate
     cantidad_nna: CantidadNna
-    edad_aproximada: EdadAproximada
+    edad_aproximada: EdadAproximada 
     tipo_trabajo: TipoTrabajo
     descripcion: str | None = None
-    imagen: str
+    imagen: str | None = None
+
+class ReporteResponse(BaseModel):
+    id_reporte: int
+    id_usuario: int
+    id_caso: int
+
+    model_config = {"from_attributes": True}
+
 
 

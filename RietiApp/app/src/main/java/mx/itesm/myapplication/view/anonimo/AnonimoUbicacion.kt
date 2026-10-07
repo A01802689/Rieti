@@ -1,13 +1,14 @@
-package mx.itesm.myapplication.view.seguimiento
+package mx.itesm.myapplication.view.anonimo
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -19,19 +20,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import mx.itesm.myapplication.view.general.Enviar
+import mx.itesm.myapplication.view.general.Ubicacion
+
 
 @Composable
-fun SeguimientoEnviar(navController: NavController){
-
-
-
+fun AnonimoUbicacion(navController: NavController) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp)
+        modifier = Modifier.fillMaxWidth().padding(20.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
-        ) {
+        ){
             IconButton(onClick = {
                 navController.popBackStack()
             })
@@ -44,19 +43,26 @@ fun SeguimientoEnviar(navController: NavController){
             Text(text = "Volver")
         }
         Spacer(modifier = Modifier.height(10.dp))
-
         Text(
-            text = "Reporte con Seguimiento",
+            text = "Reporte Anónimo",
             fontWeight = FontWeight.Bold
         )
 
-        Enviar(navController = navController,
-            modifier = Modifier)
+        Spacer(modifier = Modifier.height(25.dp))
+        Ubicacion(navController = navController,
+            modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = {
+                navController.navigate(route = "AnFormulario")
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("Continuar") }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun SeguimientoPrev() {
-    SeguimientoEnviar(navController = rememberNavController())
+fun PrevAnonimoUbicacion() {
+    AnonimoUbicacion(navController = rememberNavController())
 }

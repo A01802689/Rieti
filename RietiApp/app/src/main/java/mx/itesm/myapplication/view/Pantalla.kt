@@ -6,7 +6,8 @@ sealed class Pantalla(
 ) {
     companion object {
         var listaPantallas = listOf(Login, Register, MainView, ReporteSeguimiento,
-            SeguimientoUbicacion, SeguimientoEnviar, SeguimientoFormulario)
+            SeguimientoUbicacion, SeguimientoEnviar, SeguimientoFormulario,
+            AnonimoUbicacion, AnonimoEnviar, AnonimoFormulario, ReportView2, ReportView3)
         const val RUTA_LOGIN = "login"
         const val RUTA_REGISTER = "register"
         const val RUTA_MAIN = "main-view"
@@ -14,6 +15,10 @@ sealed class Pantalla(
         const val RUTA_SEGUBICACION = "SegUbicacion"
         const val RUTA_SEGENVIAR = "SegEnviar"
         const val RUTA_SEGFORM = "SegFormulario"
+        const val RUTA_ANONIMOBICACION = "AnUbicacion"
+        const val RUTA_ANONIMOENVIAR = "AnEnviar"
+        const val RUTA_ANONIMOFORM = "AnFormulario"
+
         const val RUTA_REPORT2 = "report-route-2"
         const val RUTA_REPORT3 = "report-route-3"
     }
@@ -25,6 +30,9 @@ sealed class Pantalla(
     data object SeguimientoUbicacion : Pantalla(RUTA_SEGUBICACION, "Ubicacion para el reporte de Seguimiento")
     data object SeguimientoEnviar : Pantalla(RUTA_SEGENVIAR, "Enviar el reporte")
     data object SeguimientoFormulario : Pantalla(RUTA_SEGFORM, "Formulario de Seguimiento")
+    data object AnonimoUbicacion : Pantalla(RUTA_ANONIMOBICACION, "Ubicacion para el reporte anonimo")
+    data object AnonimoEnviar : Pantalla(RUTA_ANONIMOENVIAR, "Enviar el reporte de forma anonima")
+    data object AnonimoFormulario : Pantalla(RUTA_ANONIMOFORM, "Formulario de reporte anonimo")
     data object ReportView2: Pantalla(RUTA_REPORT2, "Continuar Reporte")
     data object ReportView3: Pantalla(RUTA_REPORT3, "Continuar Reporte")
 }

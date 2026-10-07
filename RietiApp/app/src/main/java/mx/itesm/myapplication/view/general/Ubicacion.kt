@@ -66,12 +66,5 @@ fun Ubicacion(
             label = {Text("Calle")},
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = {
-                navController.navigate("SegEnviar")
-            }, modifier = Modifier.fillMaxWidth()
-        ) {Text("Continuar") }
     }
 }

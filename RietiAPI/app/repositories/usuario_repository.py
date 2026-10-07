@@ -12,7 +12,7 @@ def get_by_id(db: Session, id_usuario: int):
 def get_by_email(db: Session, email: str):
     return db.query(Usuario).filter(Usuario.correo == email).first()
 
-                                 #ya usuario ya como objeto de la clase Usuario
+#ya usuario ya como objeto de la clase Usuario
 def create(db: Session, usuario: Usuario):
     db.add(usuario)
     db.commit()

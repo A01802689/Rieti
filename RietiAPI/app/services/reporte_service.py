@@ -1,18 +1,52 @@
+from fastapi import HTTPException
+from geoalchemy2.elements import WKTElement
 from sqlalchemy.orm import Session
 
+from app.models.municipio import Municipio
+from app.models.ubicacion import Ubicacion
 from app.models.reporte import Reporte
 from app.schemas.reporte import ReporteCreate
-from app.repositories import reporte_repositorio
 
 def create_reporte(db: Session, datos: ReporteCreate):
+
+    municipio = (
+        db.query(Municipio)
+        .filter(Municipio.nombre == datos.ubicacion.municipio)
+        .first()
+    )
+
+    if municipio is None:
+        raise HTTPException(
+            status_code=404,
+            detail="El municipio no existe"
+        )
+    
+    nueva_ubicacion = Ubicacion(
+        id_municipio=municipio.id_municipio,
+        colonia = datos.ubicacion.colonia,
+        calle = datos.ubicacion.calle,
+        coordenadas = WKTElement(
+            f"POINT({datos.ubicacion.longitud} {datos.ubicacion.latitud})",
+            srid=4326,
+        ),
+        referencia = datos.ubicacion.referencia
+    )
+
+    db.add(nueva_ubicacion)
+    db.flush()
+
     nuevo_reporte = Reporte(
         id_usuario=datos.id_usuario,
-        id_ubicacion=datos.id_ubicacion,
-        folio_reporte=datos.folio_reporte,
+        id_ubicacion=nueva_ubicacion.id_ubicacion,
         cantidad_nna=datos.cantidad_nna,
         edad_aproximada=datos.edad_aproximada,
         tipo_trabajo=datos.tipo_trabajo,
         descripcion=datos.descripcion,
         imagen=datos.imagen,
     )
-    return reporte_repositorio.create(db, nuevo_reporte)
+
+    db.add(nuevo_reporte)
+    db.commit()
+    db.refresh(nuevo_reporte)
+
+    return nuevo_reporte

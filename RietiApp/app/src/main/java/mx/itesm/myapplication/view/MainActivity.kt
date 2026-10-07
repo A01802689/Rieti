@@ -12,6 +12,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat.enableEdgeToEdge
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.ui.theme.MyApplicationTheme
 

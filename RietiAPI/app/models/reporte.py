@@ -77,7 +77,7 @@ class Reporte(Base):
                 item.value for item in enum_class
             ]
         ),
-        nullable = True
+        nullable = False
     )
     tipo_trabajo = Column(
         SQLEnum(

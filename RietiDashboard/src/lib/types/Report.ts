@@ -49,7 +49,8 @@ export type EstatusSeguimiento =
   | "En revisión"
   | "Canalizado"
   | "En atención"
-  | "Concluido";
+  | "Concluido"
+  | "Rechazado";
 
 export type CantidadNNA = 1 | 2 | 3 | 4 | "5 o más" | "No sé";
 

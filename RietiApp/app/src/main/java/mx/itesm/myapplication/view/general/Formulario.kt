@@ -105,13 +105,5 @@ fun Formulario(
                 )
             }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-        Button(
-            onClick = {
-                navController.navigate(route = "SegUbicacion")
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("Continuar") }
     }
 }

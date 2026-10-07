@@ -1,4 +1,4 @@
-package mx.itesm.myapplication.view.seguimiento
+package mx.itesm.myapplication.view.anonimo
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,12 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import mx.itesm.myapplication.view.Pantalla
 import mx.itesm.myapplication.view.general.Enviar
 
 @Composable
-fun SeguimientoEnviar(navController: NavController){
-
-
+fun AnonimoEnviar(navController: NavController){
 
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp)
@@ -46,7 +45,7 @@ fun SeguimientoEnviar(navController: NavController){
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Reporte con Seguimiento",
+            text = "Reporte Anónimo",
             fontWeight = FontWeight.Bold
         )
 
@@ -55,8 +54,8 @@ fun SeguimientoEnviar(navController: NavController){
     }
 }
 
-@Preview(showBackground = true)
+@Preview (showBackground = true)
 @Composable
-fun SeguimientoPrev() {
-    SeguimientoEnviar(navController = rememberNavController())
+fun AnonimoEnvPrev(){
+    AnonimoEnviar(navController = rememberNavController())
 }
