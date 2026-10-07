@@ -7,6 +7,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import mx.itesm.myapplication.view.MainVIew.MainView
+import mx.itesm.myapplication.view.anonimo.AnonimoEnviar
+import mx.itesm.myapplication.view.anonimo.AnonimoFormulario
+import mx.itesm.myapplication.view.anonimo.AnonimoUbicacion
 import mx.itesm.myapplication.view.seguimiento.ReporteSeguimiento
 import mx.itesm.myapplication.view.seguimiento.SeguimientoEnviar
 import mx.itesm.myapplication.view.seguimiento.SeguimientoFormulario
@@ -40,8 +43,14 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(Pantalla.RUTA_SEGFORM){
             SeguimientoFormulario(navController)
         }
-        composable(Pantalla.RUTA_REPORT2) {
-            reportePantallaB(navController)
+        composable(Pantalla.RUTA_ANONIMOENVIAR){
+            AnonimoEnviar(navController)
+        }
+        composable(Pantalla.RUTA_ANONIMOBICACION){
+            AnonimoUbicacion(navController)
+        }
+        composable(Pantalla.RUTA_ANONIMOFORM){
+            AnonimoFormulario(navController)
         }
     }
 }
