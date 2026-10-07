@@ -3,6 +3,10 @@ from app.api.routes import usuario as usuario_routes
 from app.api.routes import municipio as municipio_routes
 from app.api.routes import reporte as reporte_routes
 from app.models import municipio, usuario
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from app.core.limiter import limiter
+
 
 app = FastAPI(
     title="Rieti API",
@@ -20,3 +24,8 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+app.state.limiter = limiter #conceta el limiter con app 
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+#si excede el numero de peticones manda un error el 429

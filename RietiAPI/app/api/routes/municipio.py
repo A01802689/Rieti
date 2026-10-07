@@ -4,7 +4,11 @@ from app.schemas.municipio import MunicipioCreate, MunicipioResponse
 from app.services import municipio_service
 from fastapi import APIRouter, Depends
 
-# PODRIAa agrefar una expepcion en caso de que no quieran que se repitabn los municipio
+# PODRIAa agrefar una expepcion en caso de que no quieran que se repitabn los municipio.
+
+
+
+
 
 router = APIRouter()
 @router.post("/municipio", response_model= MunicipioResponse)
