@@ -41,13 +41,13 @@ class CantidadNNA(str, Enum):
     NO_SE = "No sé"
 
 class Reporte(Base):
-    __tablename__ = "reportes"
+    __tablename__ = "reporte"
 
     id_reporte = Column(Integer, primary_key=True, index=True)
     id_usuario = Column(Integer, ForeignKey("usuario.id_usuario"), nullable=True)
     id_caso = Column(Integer, ForeignKey("caso.id_caso"), nullable=True)
     id_ubicacion = Column(Integer, ForeignKey("ubicacion.id_ubicacion"), nullable=False)
-    folio_reporte = Column(String(25), nullable=False, unique = True, index = True)
+    folio_reporte = Column(String(60), nullable=False, unique=True, index=True)
     estatus_seguimiento = Column(
         SQLEnum(
             EstatusSeguimiento,
@@ -98,7 +98,7 @@ class Reporte(Base):
         nullable = False,
         server_default = func.now()
     )
-    imagen = Column (
-        String(50),
-        nullable = True
+    imagen = Column(
+        String(255),
+        nullable=True,
     )

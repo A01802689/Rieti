@@ -1,6 +1,7 @@
-
+-- ADVERTENCIA: este script elimina las tablas existentes y sus datos.
 DROP TABLE IF EXISTS logs;
 DROP TABLE IF EXISTS usuario_caso;
+DROP TABLE IF EXISTS folio_contador;
 DROP TABLE IF EXISTS reporte;
 DROP TABLE IF EXISTS caso;
 DROP TABLE IF EXISTS ubicacion;
@@ -24,7 +25,7 @@ DROP TYPE IF EXISTS entity_type_logs;
 CREATE TYPE rol_usuario AS ENUM ('Alimentador', 'Administrador');
 CREATE TYPE estatus_seguimiento_reporte AS ENUM ('Recibido', 'En revisión', 'Canalizado', 'En atención', 'Concluido');
 CREATE TYPE cantidad_nna_reporte AS ENUM ('1', '2', '3', '4', '5 o más', 'No sé');
-CREATE TYPE edad_aproximada_reporte AS ENUM ('0–5', '6–11', '12–14', '15–17', 'No sé');
+CREATE TYPE edad_aproximada_reporte AS ENUM ('0-5', '6-11', '12-14', '15-17', 'No sé');
 CREATE TYPE tipo_trabajo_reporte AS ENUM ('Venta ambulante', 'Limpieza de parabrisas', 'Mendicidad', 'Carga y descarga', 'Trabajo en comercio', 'Campo', 'Construcción', 'Trabajo doméstico', 'Recolección de residuos', 'Otra actividad', 'No sé');
 CREATE TYPE riesgo_reporte AS ENUM ('Bajo', 'Medio', 'Alto');
 CREATE TYPE estado AS ENUM ('Abierto', 'En desarrollo', 'Cerrado');
@@ -74,17 +75,18 @@ CREATE TABLE caso (
 
 
 CREATE TABLE reporte (
-    id_reporte VARCHAR(50) PRIMARY KEY,
+    id_reporte INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_usuario INTEGER REFERENCES usuario(id_usuario),
     id_caso INTEGER REFERENCES caso(id_caso),
     id_ubicacion INTEGER NOT NULL REFERENCES ubicacion(id_ubicacion),
+    folio_reporte VARCHAR(60) NOT NULL UNIQUE,
     estatus_seguimiento estatus_seguimiento_reporte,
     cantidad_nna cantidad_nna_reporte NOT NULL,
     edad_aproximada edad_aproximada_reporte NOT NULL,
     tipo_trabajo tipo_trabajo_reporte NOT NULL,
     descripcion TEXT,
     fecha_reporte TIMESTAMP NOT NULL DEFAULT now(),
-    imagen VARCHAR(50)
+    imagen VARCHAR(255)
 );
 
 
@@ -92,6 +94,17 @@ CREATE TABLE usuario_caso (
     id_usuario_caso INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_usuario INTEGER NOT NULL REFERENCES usuario(id_usuario),
     id_caso INTEGER NOT NULL REFERENCES caso(id_caso)
+);
+
+CREATE TABLE folio_contador (
+    id_folio_contador INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_municipio INTEGER NOT NULL
+        REFERENCES municipio(id_municipio),
+    anio INTEGER NOT NULL CHECK (anio BETWEEN 2000 AND 9999),
+    ultimo_consecutivo INTEGER NOT NULL DEFAULT 0
+        CHECK (ultimo_consecutivo >= 0),
+    CONSTRAINT uq_folio_contador_municipio_anio
+        UNIQUE (id_municipio, anio)
 );
 
 CREATE TABLE logs (

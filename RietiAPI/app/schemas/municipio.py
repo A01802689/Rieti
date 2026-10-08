@@ -10,5 +10,5 @@ class MunicipioResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 class MunicipioCreate(BaseModel):
-     nombre: str
-     clave: str
+    nombre: str
+    clave: str
