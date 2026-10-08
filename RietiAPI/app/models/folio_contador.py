@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, ForeignKey, UniqueConstraint, Column
+from sqlalchemy import Integer, ForeignKey, UniqueConstraint, Column
 from app.db.base import Base
 
 class FolioContador(Base):
@@ -14,10 +14,21 @@ class FolioContador(Base):
         nullable=False
     )
 
+    anio = Column(
+        Integer,
+        nullable=False
+    )
+
+    ultimo_consecutivo = Column (
+        Integer,
+        nullable = False,
+        default=0
+    )
+
     __table_args__ = (
         UniqueConstraint(
             "id_municipio",
             "anio",
-            name="uq_folio_contador_munipio_anio"
+            name="uq_folio_contador_municipio_anio"
         ),
     )

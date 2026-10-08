@@ -1,6 +1,9 @@
 from fastapi import HTTPException
 from geoalchemy2.elements import WKTElement
 from sqlalchemy.orm import Session
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from app.repositories import folio_contador_repository
 
 from app.models.municipio import Municipio
 from app.models.ubicacion import Ubicacion
@@ -21,32 +24,45 @@ def create_reporte(db: Session, datos: ReporteCreate):
             detail="El municipio no existe"
         )
     
-    nueva_ubicacion = Ubicacion(
-        id_municipio=municipio.id_municipio,
-        colonia = datos.ubicacion.colonia,
-        calle = datos.ubicacion.calle,
-        coordenadas = WKTElement(
-            f"POINT({datos.ubicacion.longitud} {datos.ubicacion.latitud})",
-            srid=4326,
-        ),
-        referencia = datos.ubicacion.referencia
-    )
+    try:
+        anio = datetime.now(ZoneInfo("America/Mexico_City")).year
 
-    db.add(nueva_ubicacion)
-    db.flush()
+        consecutivo = folio_contador_repository.obtener_siguiente_consecutivo(
+            db=db,
+            id_municipio=municipio.id_municipio,
+            anio=anio,
+        )
+        folio_reporte = f"RIETI-{municipio.clave}-{anio}-{consecutivo:06d}"
 
-    nuevo_reporte = Reporte(
-        id_usuario=datos.id_usuario,
-        id_ubicacion=nueva_ubicacion.id_ubicacion,
-        cantidad_nna=datos.cantidad_nna,
-        edad_aproximada=datos.edad_aproximada,
-        tipo_trabajo=datos.tipo_trabajo,
-        descripcion=datos.descripcion,
-        imagen=datos.imagen,
-    )
+        nueva_ubicacion = Ubicacion(
+            id_municipio=municipio.id_municipio,
+            colonia=datos.ubicacion.colonia,
+            calle=datos.ubicacion.calle,
+            coordenadas=WKTElement(
+                f"POINT({datos.ubicacion.longitud} {datos.ubicacion.latitud})",
+                srid=4326,
+            ),
+            referencia=datos.ubicacion.referencia,
+        )
 
-    db.add(nuevo_reporte)
-    db.commit()
-    db.refresh(nuevo_reporte)
+        db.add(nueva_ubicacion)
+        db.flush()
 
-    return nuevo_reporte
+        nuevo_reporte = Reporte(
+            id_usuario=datos.id_usuario,
+            id_ubicacion=nueva_ubicacion.id_ubicacion,
+            folio_reporte=folio_reporte,
+            cantidad_nna=datos.cantidad_nna,
+            edad_aproximada=datos.edad_aproximada,
+            tipo_trabajo=datos.tipo_trabajo,
+            descripcion=datos.descripcion,
+            imagen=datos.imagen,
+        )
+
+        db.add(nuevo_reporte)
+        db.commit()
+        db.refresh(nuevo_reporte)
+        return nuevo_reporte
+    except Exception:
+        db.rollback()
+        raise

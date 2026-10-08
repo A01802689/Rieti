@@ -31,7 +31,7 @@ class TipoTrabajo(str, Enum):
     NO_SE = "No sé"
 
 class ReporteCreate(BaseModel):
-    id_usuario: str | None = None
+    id_usuario: int | None = None
     ubicacion: UbicacionCreate
     cantidad_nna: CantidadNna
     edad_aproximada: EdadAproximada 
@@ -41,10 +41,11 @@ class ReporteCreate(BaseModel):
 
 class ReporteResponse(BaseModel):
     id_reporte: int
-    id_usuario: int
-    id_caso: int
+    folio_reporte: str
+    id_usuario: int | None
+    id_caso: int | None
+    id_ubicacion: int
 
     model_config = {"from_attributes": True}
-
 
 
