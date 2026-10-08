@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_current_user
 from app.services import usuario_service
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioLogin, UsuarioCreateAdmin
 from app.models.usuario import Usuario
 from app.core.security import create_access_token
-
+from app.core.limiter import limiter
 router = APIRouter()
 
 
@@ -17,13 +17,15 @@ def logout(response: Response):
 
 
 @router.post("/usuarios", response_model=UsuarioResponse)
-def crear_usuario(datos: UsuarioCreate, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def crear_usuario(request: Request, datos: UsuarioCreate, db: Session = Depends(get_db)):
     return usuario_service.create_usuario(db, datos)
 
 
 #este lo genere solo par ausarios los admins lo hare en otro .py
 @router.post("/usuarios/login", response_model=UsuarioResponse)
-def login(datos: UsuarioLogin,response: Response ,db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, datos: UsuarioLogin,response: Response ,db: Session = Depends(get_db)):
     usuario = usuario_service.login(db, datos.correo, datos.contrasena)
     if usuario is None:
         raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos")
