@@ -6,8 +6,10 @@ import { useHeatMap } from "./useHeatMap"
 import { DragableMenu } from "../../components/layout/DragableMenu"
 import { Filters } from "./components/Filters"
 import { SelectionCard } from "./components/SelectionCard"
+import SideBar from "@/components/ui/SideBar"
 
 
+/** Map page: heat map with the filter menu, the selection card and the color legend */
 const HeatMapPage = () => {
   const state = useHeatMap()
 
@@ -21,6 +23,9 @@ const HeatMapPage = () => {
     // the map fills the screen and the rest floats over it
     <div className="relative h-screen w-screen">
       <div className="h-full w-full">
+        <div className="md:fixed md:left-0 md:top-0 md:z-10 md:h-screen md:w-60 md:p-4">
+                        <SideBar />
+                    </div>
       { state.loading ? 
         <Loading />
       :

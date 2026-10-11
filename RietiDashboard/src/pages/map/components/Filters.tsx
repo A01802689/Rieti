@@ -24,6 +24,11 @@ import {
   type HeatMapState,
 } from "../useHeatMap";
 
+/**
+ * Filter panel of the map: layer visibility, color scheme and data filters
+ *
+ * @param state - View model returned by useHeatMap
+ */
 export const Filters = ({ state: s }: { state: HeatMapState }) => (
   <div className="flex h-full w-full flex-col gap-6">
     <h1 className="w-full">Filtros</h1>

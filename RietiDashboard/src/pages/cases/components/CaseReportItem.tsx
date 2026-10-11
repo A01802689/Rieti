@@ -4,9 +4,14 @@ import { detachReport, setReportStatus } from '@/lib/api/workflow';
 import { statusStyle } from '@/lib/utilities/reportStyles';
 import { isAdmin, useRole } from '@/lib/utilities/useRole';
 
+/** Statuses a report of a case can move through */
 const FOLLOW_UP: EstatusSeguimiento[] = ['Canalizado', 'En atención', 'Concluido'];
 
-// A report that belongs to the case: full data + follow-up controls
+/**
+ * Report that belongs to the case, with its full data and the follow-up controls
+ *
+ * @param report - Report shown
+ */
 export function CaseReportItem({ report }: { report: Reporte }) {
     const role = useRole();
     const style = statusStyle(report.estatus_seguimiento);

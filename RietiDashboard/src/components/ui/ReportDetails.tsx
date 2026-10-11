@@ -3,24 +3,36 @@ import { formatDateTime, formatMinorDetails, isUnknown } from '@/lib/utilities/r
 import { LocationMap } from './LocationMap';
 import { ReportImage } from './ReportImage';
 
+/**
+ * Tile with a label and its value, used inside a description list
+ *
+ * @param label - Name of the field
+ * @param children - Value of the field
+ */
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="min-w-0 rounded-lg bg-component px-3 py-2">
             <dt className="text-xs font-diffuse">{label}</dt>
-            <dd className="mt-0.5 break-words text-sm font-medium font-clear">{children}</dd>
+            <dd className="mt-0.5 wrap-break-words text-sm font-medium font-clear">{children}</dd>
         </div>
     );
 }
 
+/**
+ * Muted italic text for a missing value
+ *
+ * @param text - Message shown instead of the value
+ */
 export const Empty = ({ text }: { text: string }) => <em className="font-diffuse">{text}</em>;
 
 interface Props {
+    /** Report to show */
     report: Reporte;
-    // the case page already shows a map, so it hides the one of each report
+    /** Show the location map; the case page already has one, so it turns it off */
     withMap?: boolean;
 }
 
-// Every field of a report, in tiles. Used expanded inside ReportCard and in the case page.
+/** Every field of a report in tiles, with its location and photo. Used inside the report card and the case page */
 export function ReportDetails({ report, withMap = true }: Props) {
     const { ubicacion } = report;
 

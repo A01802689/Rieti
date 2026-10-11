@@ -3,6 +3,22 @@ import type { Ubicacion, Reporte } from "../types/Report"
 // this one works as api fetcher
 // here will be the fetch done
 // export async function getReports(): Promise<Reporte[]> {
+
+
+export class ApiError extends Error {
+  status: number
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+const API_URL = import.meta.env.VITE_API_URL
+// export const fecthReports
+/**
+ * Simulates the reports endpoint; it will become a fetch
+ *
+ * @returns The reports
+ */
 export function getReports():Reporte[] {
 let  reports: Reporte[] = []
   // fetch
@@ -14,8 +30,8 @@ let  reports: Reporte[] = []
   }
   return reports
 }
-// ---------- Locations (Atizapán de Zaragoza, coordenadas aproximadas) ----------
 
+/** Hardcoded locations referenced by the mock reports */
 export const ubicaciones: Ubicacion[] = [
   { municipio: "Atizapán de Zaragoza", colonia: "Centro", calle: "Av. Adolfo López Mateos", lat: 19.5631, lng: -99.2538 },
   { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Bellavista", calle: "Blvd. Manuel Ávila Camacho", lat: 19.553, lng: -99.231 },
@@ -48,14 +64,15 @@ export const ubicaciones: Ubicacion[] = [
   { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Bellavista", calle: "Calle 9 de Bellavista", lat: 19.5538, lng: -99.2318 },
 ];
 
-// ---------- Reportes ----------
+// 
 // Reglas de consistencia usadas:
-// - "Recibido" / "En revisión" -> id_caso null (aún sin caso)
+// - "Recibido" / "En revisión" -> id_caso null (sin caso)
 // - "Canalizado" / "En atención" / "Concluido" -> con id_caso
 // - id_usuario null = reporte anónimo
 // - Hay reportes repetidos en el mismo lugar/caso para probar agrupación
 // - ubicacion apunta a ubicaciones[n] (id_ubicacion anterior = n + 1)
 
+/** Hardcoded reports used while the endpoint does not exist */
 export const reportes: Reporte[] = [
   {
     id_reporte: 1, id_usuario: 12, id_caso: 1, ubicacion: ubicaciones[0],

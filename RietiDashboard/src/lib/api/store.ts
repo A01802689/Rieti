@@ -5,6 +5,7 @@ import { useSyncExternalStore } from 'react';
 let version = 0;
 const listeners = new Set<() => void>();
 
+/** Tells the subscribed hooks that the mock data changed */
 export const notify = () => {
   version++;
   listeners.forEach((l) => l());
@@ -17,4 +18,9 @@ const subscribe = (l: () => void) => {
   };
 };
 
+/**
+ * Re-renders the component each time the mock data changes
+ *
+ * @returns The current version number
+ */
 export const useStoreVersion = () => useSyncExternalStore(subscribe, () => version);

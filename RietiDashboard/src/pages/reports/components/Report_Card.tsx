@@ -14,10 +14,13 @@ const iconClass = 'mt-0.5 h-4 w-4 shrink-0 font-diffuse';
 const labelClass = 'font-semibold';
 
 interface Props {
+    /** Report shown */
     report: Reporte;
+    /** Called with the id of the case created when the report is accepted */
     onCaseCreated: (caseId: number) => void;
 }
 
+/** Card of a report with its summary, an expandable detail and the triage actions */
 export function ReportCard({ report, onCaseCreated }: Props) {
     const [expanded, setExpanded] = useState(false);
     const style = statusStyle(report.estatus_seguimiento);

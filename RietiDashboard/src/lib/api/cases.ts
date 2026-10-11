@@ -4,10 +4,13 @@ import { ubicaciones } from "./reports"
 // this one works as api fetcher
 // here will be the fetch done
 
+
+/** Simulates the cases endpoint; it will become a fetch */
 export const getCases = async (): Promise<Caso[]> => cases
 
 const municipio: Municipio = { nombre: "Atizapán de Zaragoza" }
 
+/** Hardcoded cases used while the endpoint does not exist */
 export const cases: Caso[] = [
   {
     id_caso: 1, municipio: municipio, ubicacion: ubicaciones[0],

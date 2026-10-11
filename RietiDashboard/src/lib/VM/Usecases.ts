@@ -5,12 +5,23 @@ import { cases } from '../api/cases';
 import { getReports } from '../api/reports';
 import { useStoreVersion } from '../api/store';
 
+/** Filter option that shows every case */
 export const ALL_OPTION = 'Todos';
 const STATE_ORDER = ['Abierto', 'En desarrollo', 'Cerrado'];
 
+/**
+ * Lowercases a text and removes its accents for searching
+ *
+ * @param text - Text to normalize
+ */
 const normalize = (text: string | null | undefined) =>
   (text ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
+/**
+ * View model of the cases list: filters by state, searches by id, colonia or calle, and counts the reports of each case
+ *
+ * @returns The visible cases, report counts, filter options and their setters
+ */
 export function useCasesViewModel() {
   const version = useStoreVersion();
   const [selectedFilter, setSelectedFilter] = useState<string>(ALL_OPTION);
@@ -60,6 +71,12 @@ export function useCasesViewModel() {
   };
 }
 
+/**
+ * View model of the case page
+ *
+ * @param id - id_caso to show
+ * @returns The case and its reports, oldest first
+ */
 export function useCaseDetail(id: number): { caso: Caso | undefined; reports: Reporte[] } {
   const version = useStoreVersion();
   return useMemo(

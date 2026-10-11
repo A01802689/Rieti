@@ -2,7 +2,11 @@ import { useSyncExternalStore } from "react"
 
 const q = "(prefers-color-scheme: dark)"
 
-// use this function to get the darkmode state 
+/**
+ * Tells if the system dark mode is on and re-renders when it changes
+ *
+ * @returns true in dark mode
+ */
 const useIsDark = () : boolean =>
   useSyncExternalStore(
     (cb) => {

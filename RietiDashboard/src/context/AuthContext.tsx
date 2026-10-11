@@ -1,65 +1,49 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { login as loginRequest, logout as logoutRequest, getMe } from '@/lib/api/auth';
+import { setUnauthorizedHandler } from '@/lib/api/client';
+import type { Role, SessionUser } from '@/lib/types/User';
+import { AuthContext } from './auth';
 
-interface User {
-  userId: string;
-  role: string;
-  name: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+/**
+ * Keeps the session: restores session from the cookie, signs in and out, and clears it when the API respoonses 401
+ *
+ * @param children - Encapsulated components that can read the session with useAuth
+ */
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<SessionUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // restore the session from the cookie
   useEffect(() => {
-    fetch(`${API_URL}/me`, { credentials: 'include' })
-      .then((res) => (res.ok ? res.json() : null))
+    getMe()
       .then(setUser)
       .catch(() => setUser(null))
       .finally(() => setIsLoading(false));
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const res = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', 
-      body: JSON.stringify({ email, password }),
-    });
-    if (!res.ok) throw new Error('Login fallido');
-    else{
-      const resData = await res.json()
-      if (resData.error == 'Credenciales inválidas') throw new Error(resData.error)
-    }
-    const me = await fetch(`${API_URL}/me`, { credentials: 'include' }).then((r) => r.json());
-    setUser(me);
+  // clear the user when the API answers unauthrorized
+  useEffect(() => {
+    setUnauthorizedHandler(() => setUser(null));
+    return () => setUnauthorizedHandler(undefined);
+  }, []);
+
+  const login = async (correo: string, contrasena: string) => {
+    setUser(await loginRequest(correo, contrasena));
   };
 
   const logout = async () => {
-    await fetch(`${API_URL}/logout`, { method: 'POST', credentials: 'include' });
-    setUser(null);
+    try {
+      await logoutRequest();
+    } finally {
+      setUser(null);
+    }
   };
 
+  const hasRole = (role: Role) => user?.rol === role;
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, isAdmin: hasRole('Administrador'), hasRole, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth debe usarse dentro de un AuthProvider');
-  return context;
 };

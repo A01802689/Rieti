@@ -1,8 +1,4 @@
 /* 
-* Endpoints del dashboard para reportes.
-* Hoy la API solo tiene POST /reportes/; todos los de /dashboard/* son PROPUESTOS por el dashboard
-* (el front los simula con lib/api/reports.ts y lib/api/workflow.ts). El "autor" de cualquier acción sale de la sesión.
-
 * JSON de Reporte, endpoint GET (/dashboard/reportes/{id})
 {
   "id_reporte": "number",
@@ -96,7 +92,7 @@ sin cuerpo; respuesta:
 
 import type { FeatureCollection, Point } from "geojson";
 
-/** Follow-up status of a report. */
+/** Follow-up status of a report */
 export type EstatusSeguimiento =
   | "Recibido"
   | "En revisión"
@@ -105,10 +101,10 @@ export type EstatusSeguimiento =
   | "Concluido"
   | "Rechazado";
 
-/** Number of minors in a report. */
+/** Number of minors in a report */
 export type CantidadNNA = 1 | 2 | 3 | 4 | "5 o más" | "No sé";
 
-/** Approximate age range of the minors. */
+/** Approximate age range of the minors */
 export type EdadAproximada = "0-5" | "6-11" | "12-14" | "15-17" | "No sé";
 
 // lists also used as dropdown options
@@ -132,7 +128,7 @@ export const RISK_LEVELS = ["Bajo", "Medio", "Alto"] as const;
 
 export type Riesgo = (typeof RISK_LEVELS)[number];
 
-/** Report as the API returns it. */
+/** Report as the API returns it */
 export interface Reporte {
   id_reporte: number;
   id_usuario: number | null;
@@ -150,7 +146,7 @@ export interface Reporte {
 }
 
 
-/** Place of a report or case. */
+/** Place of a report or case */
 export interface Ubicacion {
   municipio: string;
   colonia: string;
@@ -160,7 +156,7 @@ export interface Ubicacion {
 }
 
 
-/** Properties of each report point of the map. Only flat and minimal data is sent; the detail is requested on selection. */
+/** Properties of each report point of the map. Only flat and minimal data is sent; the detail is requested on selection */
 export type FeatureReportProps = {
   id: string;
   risk: Riesgo | null;
@@ -176,14 +172,14 @@ export type FeatureReportProps = {
 // property of FeatureReportProps used to color the report circles
 export type ReportVisual = "risk" | "nna" | "approx_age" | "days_unattended";
 
-/** Milliseconds in a day. */
+/** Milliseconds in a day */
 export const MS_DAY = 1000 * 60 * 60 * 24;
 
 /**
- * Converts reports to GeoJSON points for the map.
+ * Converts reports to GeoJSON points for the map
  *
- * @param reports - Reports to draw.
- * @param currDate - Date used to count the days unattended.
+ * @param reports - Reports to draw
+ * @param currDate - Date used to count the days unattended
  */
 export const reports2GeoJSON = (
   reports: Reporte[],

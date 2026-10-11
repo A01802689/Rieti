@@ -2,10 +2,12 @@ import * as React from "react"
 import { cn } from "@/lib/utilities/utils"
 import { ChevronDownIcon } from "lucide-react"
 
+/** Props of the native `select` plus the `size` of the control */
 type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
   size?: "sm" | "default"
 }
 
+/** Native select with the shared look and a chevron icon */
 function NativeSelect({
   className,
   size = "default",
@@ -35,6 +37,7 @@ function NativeSelect({
   )
 }
 
+/** Option of a {@link NativeSelect} */
 function NativeSelectOption({
   className,
   ...props
@@ -48,6 +51,7 @@ function NativeSelectOption({
   )
 }
 
+/** Group of options of a {@link NativeSelect} */
 function NativeSelectOptGroup({
   className,
   ...props

@@ -2,17 +2,25 @@ import { Slider } from "@/components/ui/Slider"
 import type { Dispatch, SetStateAction } from "react"
 
 
+/** Range of a slider as [min, max, step] */
 export type rangeType = [number, number, number]
 
 interface SliderControlledProps {
+  /** Title of the filter */
   text: string
+  /** Current values, one per thumb */
   value: number[]
+  /** Receives the new values when a thumb moves */
   setValue: Dispatch<SetStateAction<number[]>>
+  /** Minimum, maximum and step */
   range: rangeType
+  /** Blocks the slider and dims it */
   disabled?: boolean
-  note?: string // small text next to the title
+  /** Small text next to the title */
+  note?: string
 }
 
+/** Slider with a title and its current values, used as a filter */
 export function SliderControlled( {text, value, range, setValue, disabled = false, note}: SliderControlledProps) {
 
   return (

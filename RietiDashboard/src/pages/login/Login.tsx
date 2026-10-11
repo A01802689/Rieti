@@ -1,6 +1,7 @@
 import { InfoCard } from "./InfoCard"
 import { LoginCard } from "./LoginCard"
 
+/** Login page: presentation panel next to the sign-in card */
 const Login = () => (
     <div className="flex flex-col md:flex-row h-screen w-screen ">
       <div className="flex-2 flex flex-col bg-blue-600 dark:bg-[#1d4ed8] justify-between p-2">

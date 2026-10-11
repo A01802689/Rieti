@@ -4,8 +4,10 @@ from app.api.deps import get_db, get_current_user
 from app.services import usuario_service
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioLogin, UsuarioCreateAdmin
 from app.models.usuario import Usuario
-from app.core.security import create_access_token
+from app.core.security import create_access_token, settings
 from app.core.limiter import limiter
+
+
 router = APIRouter()
 
 
@@ -27,6 +29,8 @@ def crear_usuario(request: Request, datos: UsuarioCreate, db: Session = Depends(
 @limiter.limit("5/minute")
 def login(request: Request, datos: UsuarioLogin,response: Response ,db: Session = Depends(get_db)):
     usuario = usuario_service.login(db, datos.correo, datos.contrasena)
+    samesite = "lax" if not settings.PRODUCTION else "none"
+    secure = False if not settings.PRODUCTION else True
     if usuario is None:
         raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos")
     token = create_access_token({"sub": str(usuario.id_usuario), "rol": usuario.rol})
@@ -34,8 +38,8 @@ def login(request: Request, datos: UsuarioLogin,response: Response ,db: Session 
             key="access_token",
             value=token,
             httponly=True,
-            secure=False,
-            samesite="lax"
+            secure=secure,
+            samesite=samesite
         )
     return usuario
 

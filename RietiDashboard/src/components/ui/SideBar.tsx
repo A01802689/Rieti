@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/auth';
 
+/** Links of the Dashboard submenu */
 const dashboardLinks = [
     { label: 'Mapa de Calor', path: '/map' },
     { label: 'Reportes', path: '/reports' },
@@ -33,6 +35,11 @@ function HomeIcon() {
     );
 }
 
+/**
+ * Arrow of the Dashboard submenu
+ *
+ * @param isOpen - Rotates the arrow when the submenu is open
+ */
 function ChevronIcon({ isOpen }: { isOpen: boolean }) {
     return (
         <svg
@@ -97,11 +104,16 @@ function CloseIcon() {
     );
 }
 
+/**
+ * Navigation menu: a fixed column from md and a drawer on mobile
+ * The Users entry only shows to admins, and Log Out closes the session
+ */
 export default function SideBar() {
     const [isDashboardOpen, setIsDashboardOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const { isAdmin, logout } = useAuth();
 
     const goTo = (path: string) => {
         navigate(path);
@@ -208,16 +220,18 @@ export default function SideBar() {
                             Casos
                         </button>
 
-                        {/* Users */}
-                        <button type="button" onClick={() => goTo('/users')} className={`${itemBaseClass} ${activeClass('/users')}`}>
-                            <span className="mr-4 grid place-items-center">
-                                <UsersIcon />
-                            </span>
-                            Usuarios
-                        </button>
+                        {/* Users (admins only) */}
+                        {isAdmin && (
+                            <button type="button" onClick={() => goTo('/users')} className={`${itemBaseClass} ${activeClass('/users')}`}>
+                                <span className="mr-4 grid place-items-center">
+                                    <UsersIcon />
+                                </span>
+                                Usuarios
+                            </button>
+                        )}
 
                         {/* Log out */}
-                        <button type="button" onClick={() => goTo('/')} className={`${itemBaseClass} text-blue-gray-700`}>
+                        <button type="button" onClick={async () => { await logout(); goTo('/login') }} className={`${itemBaseClass} text-blue-gray-700`}>
                             <span className="mr-4 grid place-items-center">
                                 <LogOutIcon />
                             </span>

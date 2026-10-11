@@ -3,12 +3,15 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import useIsDark from '@/lib/utilities/useTheme';
 
 interface Props {
+    /** Latitude of the marker */
     lat: number;
+    /** Longitude of the marker */
     lng: number;
+    /** Classes of the container; the default sets the height */
     className?: string;
 }
 
-// Small static map with a single marker (case / report location)
+/** Small map with a single marker that shows the location of a case or report */
 export function LocationMap({ lat, lng, className = 'h-52' }: Props) {
     const style = useIsDark() ? 'dark' : 'positron';
 

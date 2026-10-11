@@ -8,6 +8,14 @@ import { formatDateTime, isUnknown } from '@/lib/utilities/reportStyles';
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 
+/**
+ * Titled card of the case page
+ *
+ * @param title - Heading of the card
+ * @param icon - Icon next to the title
+ * @param tone - Classes that color the icon badge
+ * @param children - Content of the card
+ */
 export function Card({ title, icon, tone, children }: { title: string; icon: React.ReactNode; tone: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-4 rounded-xl border border-card bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
@@ -23,6 +31,11 @@ export function Card({ title, icon, tone, children }: { title: string; icon: Rea
 }
 
 // "Información del denunciante": built from the case's first report (reports carry no contact data)
+/**
+ * Card with the data of the people who reported the case
+ *
+ * @param reports - Reports of the case
+ */
 export function ReporterCard({ reports }: { reports: Reporte[] }) {
     const first = reports[0];
     return (
@@ -42,6 +55,12 @@ export function ReporterCard({ reports }: { reports: Reporte[] }) {
     );
 }
 
+/**
+ * Card with the main data of the case: location, minors and notes
+ *
+ * @param caso - Case shown
+ * @param reports - Reports of the case
+ */
 export function CaseDataCard({ caso, reports }: { caso: Caso; reports: Reporte[] }) {
     const counts = reports.map((r) => r.cantidad_nna);
     const numeric = counts.filter((c): c is 1 | 2 | 3 | 4 => typeof c === 'number');

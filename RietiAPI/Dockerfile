@@ -5,7 +5,9 @@ COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.0.0 /lambda-adapter /opt
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    AWS_LWA_PORT=3000
+    AWS_LWA_PORT=3000 \
+    DASHBOARD_ORIGIN="https://dominio/dash.com" \
+    PRODUCTION=True
 
 WORKDIR /app
 

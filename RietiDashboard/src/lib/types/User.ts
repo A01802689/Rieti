@@ -47,7 +47,7 @@
 }
 
 * Respuesta del alta de Usuario, endpoint POST (/dashboard/usuarios)
-el Usuario creado (mismo JSON que un elemento de la lista).
+el Usuario creado (mismo JSON que un elemento de la lista)
 
 * JSON de Usuario de la sesión, endpoint GET (/usuarios/me) (propuesto: hoy la sesión se pierde al recargar)
 {
@@ -64,10 +64,10 @@ cuerpo:
 {
   "permisos": "PermissionKey[]"
 }
-respuesta: el Usuario completo (JSON de GET /dashboard/usuarios/{id}).
+respuesta: el Usuario completo (JSON de GET /dashboard/usuarios/{id})
 
 * Eliminar un Usuario, endpoint DELETE (/dashboard/usuarios/{id}) (propuesto)
-sin cuerpo; respuesta 204 sin contenido.
+sin cuerpo; respuesta 204 sin contenido
 
 * Cerrar la sesión, endpoint POST (/usuarios/logout) (ya existe en la API)
 sin cuerpo; respuesta:
@@ -79,12 +79,12 @@ sin cuerpo; respuesta:
 import type { Municipio } from "./Municipio";
 import type { PermissionKey } from "@/lib/types/Permission";
 
-/** Roles of the API. */
+/** Roles of the API */
 export const ROLES = ["Administrador", "Alimentador"] as const;
 
 export type Role = (typeof ROLES)[number];
 
-/** User of the session, as the API login returns it. */
+/** User of the session, as the API login returns it */
 export interface SessionUser {
   id_usuario: number
   nombre: string
@@ -94,14 +94,14 @@ export interface SessionUser {
   id_municipio: number | null
 }
 
-/** Work done by a user. */
+/** Work done by a user */
 export interface UserActivity {
   reportes_atendidos: number
   casos_revisados: number
   notas_registradas: number
 }
 
-/** User shown in the users page; municipio, ultimo_acceso, permisos and actividad exist only in the front for now. */
+/** User shown in the users page; municipio, ultimo_acceso, permisos and actividad exist only in the front for now */
 export interface User extends SessionUser {
   municipio: Municipio | null
   ultimo_acceso: string | null // ISO 8601 TIMESTAMP
@@ -109,7 +109,7 @@ export interface User extends SessionUser {
   actividad: UserActivity // omitted by the list endpoint in the real API
 }
 
-/** Payload to create a user (the API also needs contrasena). */
+/** Payload to create a user (the API also needs contrasena) */
 export interface UserCreate {
   nombre: string
   apellido: string
@@ -119,7 +119,7 @@ export interface UserCreate {
   permisos: PermissionKey[]
 }
 
-/** State of the create form while it is being filled. */
+/** State of the create form while it is being filled */
 export interface UserCreateForm {
   nombre: string
   apellido: string

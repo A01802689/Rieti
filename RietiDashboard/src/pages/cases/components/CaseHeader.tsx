@@ -7,15 +7,27 @@ import { caseFolio } from '@/lib/utilities/caseTimeline';
 import { URGENCY_STYLES, formatDateTime, statusStyle } from '@/lib/utilities/reportStyles';
 import { roleLabel, useRole } from '@/lib/utilities/useRole';
 
+/** States a case can move to */
 const STATES: CaseState[] = ['Abierto', 'En desarrollo', 'Cerrado'];
 // TODO: load from the API (municipios endpoint)
 const MUNICIPIOS = ['Atizapán de Zaragoza', 'Naucalpan de Juárez', 'Tlalnepantla de Baz', 'Nicolás Romero', 'Cuautitlán Izcalli'];
 
+/**
+ * Describes who started the case
+ *
+ * @param first - First report of the case
+ */
 function origin(first: Reporte | undefined) {
     if (!first) return 'Sin reporte asociado';
     return first.id_usuario === null ? 'Reporte ciudadano anónimo' : `Reporte del usuario #${first.id_usuario}`;
 }
 
+/**
+ * Header of the case page: folio, state, urgency, origin and the controls to change the state or transfer it
+ *
+ * @param caso - Case shown
+ * @param firstReport - Oldest report of the case, used to describe the origin
+ */
 export function CaseHeader({ caso, firstReport }: { caso: Caso; firstReport: Reporte | undefined }) {
     const navigate = useNavigate();
     const autor = roleLabel(useRole());

@@ -8,15 +8,18 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 
+/** One point of the line chart */
 interface GraphData {
     name: string;
     value: number;
 }
 
 interface LineGraphProps {
+    /** Points to draw, in order */
     data: GraphData[];
 }
 
+/** Line chart of the cases registered over time */
 const LineGraph = ({ data }: LineGraphProps) => {
 
     return (

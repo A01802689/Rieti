@@ -4,6 +4,7 @@ import type { Reporte } from '../types/Report';
 import { getReports } from '../api/reports';
 import { useStoreVersion } from '../api/store';
 
+/** Filter option that shows every report */
 export const ALL_OPTION = 'Todos';
 
 const STATUS_WORKFLOW_ORDER = [
@@ -14,6 +15,11 @@ const STATUS_WORKFLOW_ORDER = [
   'Concluido',
 ];
 
+/**
+ * Lowercases a text and removes its accents for searching
+ *
+ * @param text - Text to normalize
+ */
 function normalizeString(text: string | null | undefined): string {
   return (text ?? '')
     .normalize('NFD')
@@ -21,6 +27,11 @@ function normalizeString(text: string | null | undefined): string {
     .toLowerCase();
 }
 
+/**
+ * View model of the reports list: filters by status, searches by folio, colonia, calle or work type, and sorts by newest
+ *
+ * @returns The visible reports, filter options and their setters
+ */
 export function useReportsViewModel() {
   const [selectedFilter, setSelectedFilter] = useState<string>(ALL_OPTION);
   const [searchQuery, setSearchQuery] = useState('');

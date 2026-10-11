@@ -1,10 +1,15 @@
 interface InfoKpiProp{
+    /** Name of the indicator */
     label: string;
+    /** Main number */
     value: string;
+    /** Small clarification under the label */
     note: string;
+    /** Background class of the colored side bar */
     tone: string;
 }
 
+/** Card with one indicator of the home summary */
 const InfoKpis =({label, value, note,  tone,}: InfoKpiProp) =>{
     return (
         <div className="flex overflow-hidden rounded-xl bg-card shadow-sm transition-colors duration-300">

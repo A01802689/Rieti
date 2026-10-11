@@ -4,6 +4,11 @@ import { timelineOf } from '@/lib/utilities/caseTimeline';
 import { formatDateTime } from '@/lib/utilities/reportStyles';
 import { Card } from './CaseInfo';
 
+/**
+ * Card with the follow-up entries of a case, in order
+ *
+ * @param caso - Case shown
+ */
 export function CaseTimeline({ caso }: { caso: Caso }) {
     const entries = timelineOf(caso);
 

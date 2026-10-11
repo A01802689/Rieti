@@ -1,8 +1,10 @@
 import SideBar from '../../components/ui/SideBar';
+import SearchInput from '@/components/ui/SearchInput';
 import { useNavigate } from 'react-router-dom';
 import { ReportCard } from './components/Report_Card';
 import { useReportsViewModel } from '@/lib/VM/Usereportescm';
 
+/** Reports list with a status filter and a search box */
 const ReportPage = () => {
     const navigate = useNavigate();
     const vm = useReportsViewModel();
@@ -39,27 +41,12 @@ const ReportPage = () => {
 
                 <main className="mt-4 rounded-xl bg-panel p-4 transition-colors duration-300 sm:mt-6 sm:p-8">
                     <div className="flex flex-col gap-4 sm:gap-6">
-                        <div className="relative">
-                            <svg
-                                className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 font-diffuse"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                                aria-hidden
-                            >
-                                <circle cx="11" cy="11" r="7" />
-                                <path d="m20 20-3.5-3.5" />
-                            </svg>
-                            <input
-                                type="search"
-                                value={vm.searchQuery}
-                                onChange={(e) => vm.setSearchQuery(e.target.value)}
-                                placeholder="Buscar por folio, colonia o calle..."
-                                aria-label="Buscar reportes"
-                                className="input-field w-full rounded-xl py-3 pl-12 pr-4 text-sm sm:text-base"
-                            />
-                        </div>
+                        <SearchInput
+                            value={vm.searchQuery}
+                            onChange={vm.setSearchQuery}
+                            placeholder="Buscar por folio, colonia o calle..."
+                            label="Buscar reportes"
+                        />
 
                         <section aria-label="Lista de reportes" className="flex flex-col gap-4">
                             {vm.reports.length === 0 ? (

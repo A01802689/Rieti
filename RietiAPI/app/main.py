@@ -6,11 +6,20 @@ from app.models import municipio, usuario
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
-
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
 
 app = FastAPI(
     title="Rieti API",
     version="0.1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.DASHBOARD_ORIGIN, "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(usuario_routes.router)

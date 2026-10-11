@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CaseCard } from './components/CaseCard';
 import { useCasesViewModel } from '@/lib/VM/Usecases';
 
+/** List of cases with a state filter and a search box; each card opens the case page */
 const CasesPage = () => {
     const navigate = useNavigate();
     const vm = useCasesViewModel();

@@ -10,14 +10,24 @@ import { getCases } from "@/lib/api/cases"
 
 
 // build options from a list of values
+/**
+ * Turns a list of values into dropdown options
+ *
+ * @param values - Values that become label and value of each option
+ */
 const toOptions = (values: readonly string[]): option[] =>
   values.map((v, i) => ({ id: i + 1, label: v, value: v }))
 
+/** Range of the age slider as [min, max, step] */
 export const AGE_RANGE: rangeType = [0, 18, 0.1]
+/** Range of the days-unattended slider as [min, max, step] */
 export const DAYS_RANGE: rangeType = [0, 365, 1]
+/** Range of the work-hour slider as [min, max, step] */
 export const HOUR_RANGE: rangeType = [0, 23, 1]
 
+/** Options of the risk level filter */
 export const RISK_OPTIONS = toOptions(RISK_LEVELS)
+/** Options of the work type filter */
 export const WORK_TYPE_OPTIONS = toOptions(WORK_TYPES)
 
 // use the weekday number as id (0 = sunday)
@@ -25,6 +35,7 @@ export const WEEKDAY_OPTIONS: option[] = ["Domingo", "Lunes", "Martes", "Miérco
   .map((day, i) => ({ id: i, label: day, value: day }))
 
 // value is the property used to color
+/** Properties the reports can be colored by */
 export const REPORT_VISUAL_OPTIONS: option[] = [
   { id: 1, label: "Nivel de riesgo", value: "risk" },
   { id: 2, label: "Niños, niñas y adolescentes", value: "nna" },
@@ -32,6 +43,7 @@ export const REPORT_VISUAL_OPTIONS: option[] = [
   { id: 4, label: "Días sin atender", value: "days_unattended" },
 ]
 
+/** Properties the cases can be colored by */
 export const CASE_VISUAL_OPTIONS: option[] = [
   { id: 1, label: "Urgencia", value: "urgency" },
   { id: 2, label: "Niños, niñas y adolescentes", value: "nna" },
@@ -41,25 +53,81 @@ export const CASE_VISUAL_OPTIONS: option[] = [
 // Filter states:  hook / filter 
 
 // choose the visible layers
+/**
+ * State of the reports layer visibility
+ *
+ * @param initial - Starting value
+ */
 export const useShowReports = (initial: boolean) => useState(initial)
+/**
+ * State of the cases layer visibility
+ *
+ * @param initial - Starting value
+ */
 export const useShowCases = (initial: boolean) => useState(initial)
 
 // choose the color schemes
+/**
+ * State of the property that colors the reports
+ *
+ * @param initial - Starting option
+ */
 export const useReportVisual = (initial?: option) => useState<option | undefined>(initial)
+/**
+ * State of the property that colors the cases
+ *
+ * @param initial - Starting option
+ */
 export const useCaseVisual = (initial?: option) => useState<option | undefined>(initial)
 
 // store the filter values
+/**
+ * State of the age range filter
+ *
+ * @param initial - [min, max]
+ */
 export const useAgeRange = (initial: number[]) => useState(initial)
+/**
+ * State of the days-unattended filter
+ *
+ * @param initial - [min, max]
+ */
 export const useDaysRange = (initial: number[]) => useState(initial)
+/**
+ * State of the work-hour filter
+ *
+ * @param initial - [min, max]
+ */
 export const useHourRange = (initial: number[]) => useState(initial)
+/**
+ * State of the risk level filter; empty means all
+ *
+ * @param initial - Starting options
+ */
 export const useRiskLevels = (initial: option[]) => useState(initial)
+/**
+ * State of the work type filter; empty means all
+ *
+ * @param initial - Starting options
+ */
 export const useWorkTypes = (initial: option[]) => useState(initial)
+/**
+ * State of the weekday filter; empty means all
+ *
+ * @param initial - Starting options
+ */
 export const useWeekdays = (initial: option[]) => useState(initial)
 
 // keep the selected report or case
+/**
+ * State of the selected report or case
+ *
+ * @param initial - Starting selection
+ */
 export const useSelected = (initial: Selected | null) => useState(initial)
 
 
+/** Values of every filter of the map */
 export type HeatMapFilters = {
   ageRange: number[]
   daysRange: number[]
@@ -70,6 +138,12 @@ export type HeatMapFilters = {
 }
 
 // a range is inactive when it covers all the values
+/**
+ * Tells if a range covers every value, so its filter is inactive
+ *
+ * @param range - Current [min, max]
+ * @param full - Full range of the slider
+ */
 const isFull = (range: number[], full: rangeType) => range[0] <= full[0] && range[1] >= full[1]
 
 const hasValue = (list: option[], value: unknown) => list.some((o) => o.value === value)
@@ -85,6 +159,13 @@ const AGE_BANDS: Record<string, [number, number]> = {
 const URGENCY_TO_RISK = { Baja: "Bajo", Media: "Medio", Alta: "Alto" } as const
 
 // filter the reports with every active filter
+/**
+ * Keeps the reports that pass every active filter
+ *
+ * @param reports - Reports to filter
+ * @param f - Filter values
+ * @param now - Date used to count the days unattended
+ */
 export const filterReports = (reports: Reporte[], f: HeatMapFilters, now: Date = new Date()): Reporte[] =>
   reports.filter((r) => {
     const date = new Date(r.fecha_reporte)
@@ -115,6 +196,12 @@ export const filterReports = (reports: Reporte[], f: HeatMapFilters, now: Date =
   })
 
 // filter the cases (only the risk level applies to them)
+/**
+ * Keeps the cases that pass the filters that apply to them (only the risk level)
+ *
+ * @param cases - Cases to filter
+ * @param f - Filter values
+ */
 export const filterCases = (cases: Caso[], f: HeatMapFilters): Caso[] =>
   cases.filter((c) => {
     if (f.riskLevels.length > 0) {
@@ -126,6 +213,11 @@ export const filterCases = (cases: Caso[], f: HeatMapFilters): Caso[] =>
 
 // ---------- View model ----------
 
+/**
+ * View model of the map page: fetches reports and cases once, keeps a copy and filters it
+ *
+ * @returns The loading flag, all and filtered reports and cases, every filter with its setter, the selected point and the color properties
+ */
 export const useHeatMap = () => {
   // keep a copy of the fetched data, the filters work over it
   const [allReports, setAllReports] = useState<Reporte[]>([])

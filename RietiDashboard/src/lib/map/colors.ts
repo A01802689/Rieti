@@ -8,8 +8,14 @@ const REPORT_RAMP = ['#2dd4bf', '#38bdf8', '#6366f1', '#7c3aed', '#4c1d95']
 const CASE_RAMP = ['#f9a8d4', '#f472b6', '#ec4899', '#be185d', '#831843']
 const NO_DATA = '#9ca3af'
 
+/** Border color of the selected circle */
 export const SELECTED_STROKE = '#111827'
 
+/**
+ * Builds the `circle-color` expression of the reports
+ *
+ * @param visual - Property used to color
+ */
 export const reportColor = (visual: ReportVisual): ExpressionSpecification => {
   const c = REPORT_RAMP
   switch (visual) {
@@ -29,7 +35,11 @@ export const reportColor = (visual: ReportVisual): ExpressionSpecification => {
   }
 }
 
-// MapLibre expression used as `circle-color` of the cases layer
+/**
+ * Builds the `circle-color` expression of the cases
+ *
+ * @param visual - Property used to color
+ */
 export const caseColor = (visual: CaseVisual): ExpressionSpecification => {
   const c = CASE_RAMP
   switch (visual) {
@@ -45,6 +55,7 @@ export const caseColor = (visual: CaseVisual): ExpressionSpecification => {
   }
 }
 
+/** Description of a color scale: its title, gradient colors and end labels */
 export type Legend = {
   title: string    // category used to color
   colors: string[] // gradient stops, lightest to darkest
@@ -52,7 +63,11 @@ export type Legend = {
   to: string       // label of the darkest end
 }
 
-// describe the colors of reportColor
+/**
+ * Describes the scale of reportColor
+ *
+ * @param visual - Property used to color
+ */
 export const reportLegend = (visual: ReportVisual): Legend => {
   const c = REPORT_RAMP
   switch (visual) {
@@ -67,7 +82,11 @@ export const reportLegend = (visual: ReportVisual): Legend => {
   }
 }
 
-// describe the colors of caseColor
+/**
+ * Describes the scale of caseColor
+ *
+ * @param visual - Property used to color
+ */
 export const caseLegend = (visual: CaseVisual): Legend => {
   const c = CASE_RAMP
   switch (visual) {
@@ -80,11 +99,11 @@ export const caseLegend = (visual: CaseVisual): Legend => {
   }
 }
 
-// color the zones by the number of points (0 = no color)
+/** Colors the zones by their number of points (0 is not colored) */
 export const ZONE_FILL_COLOR: ExpressionSpecification =
   ['step', ['get', 'count'], '#ffffff', 1, '#fbbf24', 10, '#ff4626', 20, '#b00323']
 
-// describe the colors of ZONE_FILL_COLOR
+/** Describes the scale of ZONE_FILL_COLOR */
 export const zoneLegend = (): Legend => ({
   title: 'Concentración',
   colors: ['#fbbf24', '#ff4626', '#b00323'],

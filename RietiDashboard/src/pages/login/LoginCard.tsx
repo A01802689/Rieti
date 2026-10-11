@@ -1,15 +1,19 @@
-import { useForm } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Eye, EyeClosed } from 'lucide-react'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/auth';
+import { ApiError } from '@/lib/api/client';
 
+/** Fields of the login form */
 interface LoginInputs {
   email: string;
   password: string;
 }
 
+/** Sign-in form: validates the fields, logs in with the API and goes home, or shows the error */
 export const LoginCard = () => {
-  // const { login } = useAuth();
+  const { login } = useAuth();
   const go = useNavigate();
 
   // // const [passwordChange, setPasswordChange] = useState(false);
@@ -17,6 +21,7 @@ export const LoginCard = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<LoginInputs>({
     defaultValues: { email: '', password: '' },
@@ -24,49 +29,14 @@ export const LoginCard = () => {
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
-  // const changePassword = async (email: string) => {
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_URL}/dash/recuperacionContrasena`,
-  //       {
-  //         method: 'POST',
-  //         headers: { 'Content-Type': 'application/json' },
-  //         body: JSON.stringify({ correoRecuperacion: email }),
-  //       }
-  //     );
-
-  //     if (!response.ok) throw new Error('Error: Cambio de contraseña');
-
-  //     // setPasswordChange(true);
-  //     setAttempts(0);
-  //   } catch (error) {
-  //     console.error(`Error: ${error}`);
-  //   }
-  // };
-
-  // const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
-  //   try {
-  //     await login(email, password); // login debe RETORNAR el usuario (ver nota abajo)
-  //     const { user } = useAuth()
-  //     const role = user?.role ?? '';
-  //     const route = getRoute(role);
-
-  //     if (route === '/login') {
-  //       setError('root', { message: `Rol inválido: ${role}` });
-  //       return;
-  //     }
-  //     go(route);
-  //   } catch (err) {
-  //     const message = err instanceof Error ? err.message : 'Error desconocido';
-  //     if (message === 'Credenciales inválidas') {
-  //       setAttempts((prev) => prev + 1);
-  //     }
-  //     setError('root', { message: `Error en inicio de sesión: ${message}` });
-  //   }
-  // };
-
-  const onSubmit = () => {
-    go('/dash')
+  // log in and go home
+  const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
+    try {
+      await login(email, password)
+      go('/home')
+    } catch (err) {
+      setError('root', { message: err instanceof ApiError ? err.message : 'No se pudo iniciar sesión' })
+    }
   }
 
 return (

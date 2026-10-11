@@ -5,15 +5,28 @@ import type { Reporte } from "@/lib/types/Report"
 import type { Caso } from "@/lib/types/Case"
 import type { Selected } from "@/lib/types/Selected"
 
+/** Formats dates in Mexico City time */
 const dateFormat = new Intl.DateTimeFormat("es-MX", {
   day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
   timeZone: "America/Mexico_City",
 })
 
+/**
+ * Route of the detail page of a report or case
+ *
+ * @param type - Whether it is a report or a case
+ * @param id - Id of the item
+ */
 //! update these routes when the detail pages exist
 const detailRoute = (type: Selected["type"], id: string) =>
   type === "report" ? `/reports/id=${id}` : `/cases/id=${id}`
 
+/**
+ * Line with a label and its value
+ *
+ * @param label - Name of the field
+ * @param value - Value of the field
+ */
 const Row = ({ label, value }: { label: string; value: ReactNode }) => (
   <div className="flex justify-between gap-3 text-sm">
     <span className="font-diffuse">{label}</span>
@@ -22,13 +35,17 @@ const Row = ({ label, value }: { label: string; value: ReactNode }) => (
 )
 
 interface SelectionCardProps {
+  /** Selected report or case; the card is hidden when null */
   selected: Selected | null
+  /** Reports where the selected report is looked up */
   reports?: Reporte[]
+  /** Cases where the selected case is looked up */
   cases?: Caso[]
+  /** Called when the card is closed */
   onClose: () => void
 }
 
-// show only the fields that the list endpoints return
+/** Card with the summary of the selected report or case and a link to its page; it only shows the fields that the list endpoints return */
 export const SelectionCard = ({ selected, reports, cases, onClose }: SelectionCardProps) => {
   const navigate = useNavigate()
 

@@ -13,6 +13,11 @@ import { ColorLegend } from "@/components/ui/ColorLegend"
 
 
 
+/**
+ * Hexagon zones colored by the number of points inside
+ *
+ * @param data - Zones with their `count`
+ */
 const ZonesLayer = ({ data }: { data: ZoneCollection }) => (
   <Source id="zonas" type="geojson" data={data}>
     <Layer
@@ -32,11 +37,18 @@ const ZonesLayer = ({ data }: { data: ZoneCollection }) => (
 )
 
 interface PointsLayerProps<P> {
+  /** Points of the layer */
   data: FeatureCollection<Point, P>
+  /** Id of the highlighted point, null when none */
   selectedId: string | null
 }
 
 // selected report/case styling
+/**
+ * Circle layer of the reports
+ *
+ * @param visual - Property used to color the circles
+ */
 const ReportsLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureReportProps> & { visual: ReportVisual }) => (
   <Source id="reportes" type="geojson" data={data}>
     <Layer
@@ -53,6 +65,11 @@ const ReportsLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureRepo
   </Source>
 )
 
+/**
+ * Circle layer of the cases
+ *
+ * @param visual - Property used to color the circles
+ */
 const CasesLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureCaseProps> & { visual: CaseVisual }) => (
   <Source id="casos" type="geojson" data={data}>
     <Layer
@@ -69,8 +86,12 @@ const CasesLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureCasePr
 )
 
 
-// Default preview: only runs when HeatMap is rendered without reports or cases.
-// Promise.resolve lets getReports be sync (mock) or async (real fetch).
+/**
+ * Fetches the reports of the default preview
+ *
+ * @param enabled - Only fetches when true (HeatMap received neither reports nor cases)
+ * @returns The reports, or undefined while they load
+ */
 const useDefaultReports = (enabled: boolean): Reporte[] | undefined => {
   const [data, setData] = useState<Reporte[]>()
 
@@ -88,23 +109,39 @@ const useDefaultReports = (enabled: boolean): Reporte[] | undefined => {
 
 
 
-// If reports and cases are undefined, the def preview (unfiltered reports) is loaded.
-// Zones count the reports (or cases when there r no reports).
 interface HeatMapProps {
+  /** Reports to draw. Undefined hides the layer */
   reportsArr?: Reporte[]
+  /** Cases to draw. Undefined hides the layer */
   casesArr?: Caso[]
+  /** Turn the reports layer on or off */
   showReports?: boolean
+  /** Turn the cases layer on or off */
   showCases?: boolean
+  /** Property that colors the reports */
   reportVisual?: ReportVisual
+  /** Property that colors the cases */
   caseVisual?: CaseVisual
+  /** Draw the density zones */
   showZones?: boolean
+  /** Side of each zone hexagon, in km */
   zoneCellKm?: number
+  /** Draw the color legend */
   showLegend?: boolean
-  legendClassName?: string // position of the legend
+  /** Classes that position the legend */
+  legendClassName?: string
+  /** Highlighted report or case */
   selected?: Selected | null
+  /** Receives the clicked report or case, or null when the map is clicked */
   setSelected?: Dispatch<SetStateAction<Selected | null>>
 }
 
+/**
+ * Heat map of reports and cases with density zones
+ *
+ * Without reportsArr and casesArr it loads and shows all the reports (default preview)
+ * Zones count the reports, or the cases when there are no reports
+ */
 const HeatMap = ({
   reportsArr,
   casesArr,

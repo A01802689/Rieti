@@ -1,6 +1,7 @@
 import { Slider as SliderPrimitive } from "@base-ui/react/slider"
 import { cn } from "@/lib/utilities/utils"
 
+/** Range slider with one thumb per value; pass two values for a min-max range */
 function Slider({
   className,
   defaultValue,

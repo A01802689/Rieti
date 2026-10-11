@@ -8,8 +8,14 @@ import { formatDateTime } from '@/lib/utilities/reportStyles';
 import { isAdmin, roleLabel, useRole } from '@/lib/utilities/useRole';
 import { Card } from './CaseInfo';
 
+/** Urgencies a case can have */
 const URGENCIES: CaseUrgency[] = ['Baja', 'Media', 'Alta'];
 
+/**
+ * Card to write a note in the timeline of a case
+ *
+ * @param caso - Case that receives the note
+ */
 export function AddNoteCard({ caso }: { caso: Caso }) {
     const autor = roleLabel(useRole());
     const [note, setNote] = useState('');
@@ -39,6 +45,12 @@ export function AddNoteCard({ caso }: { caso: Caso }) {
     );
 }
 
+/**
+ * Card with the folio, dates and counters of the case; admins can change the urgency
+ *
+ * @param caso - Case shown
+ * @param reports - Reports of the case
+ */
 export function MetadataCard({ caso, reports }: { caso: Caso; reports: Reporte[] }) {
     const role = useRole();
 

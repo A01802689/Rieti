@@ -5,9 +5,14 @@ import { cases } from '@/lib/api/cases';
 import { acceptReport, mergeReport, rejectReport } from '@/lib/api/workflow';
 import { isAdmin, useRole } from '@/lib/utilities/useRole';
 
+/** Step of the triage controls */
 type Mode = 'idle' | 'merge' | 'reject';
 
-// open cases first, same colonia first
+/**
+ * Lists the cases a report can be merged into: open ones only, the same colonia first
+ *
+ * @param report - Report to merge
+ */
 function mergeCandidates(report: Reporte): Caso[] {
     return cases
         .filter((c) => c.estado !== 'Cerrado')
@@ -19,11 +24,13 @@ function mergeCandidates(report: Reporte): Caso[] {
 }
 
 interface Props {
+    /** Report to triage */
     report: Reporte;
+    /** Called with the id of the new case when the report is accepted */
     onAccepted: (caseId: number) => void;
 }
 
-// Triage controls: only for reports that do not have a case yet. Admin only.
+/** Triage controls (accept, merge or reject), only for reports without a case and only for admins */
 export function ReportActions({ report, onAccepted }: Props) {
     const role = useRole();
     const [mode, setMode] = useState<Mode>('idle');

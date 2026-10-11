@@ -2,11 +2,15 @@ import type { Caso } from '@/lib/types/Case';
 import { URGENCY_STYLES, formatDateTime, statusStyle } from '@/lib/utilities/reportStyles';
 
 interface Props {
+    /** Case to show */
     caso: Caso;
+    /** Number of reports attached to the case */
     reportCount: number;
+    /** Called when the card is clicked */
     onOpen: () => void;
 }
 
+/** Summary card of a case in the cases list */
 export function CaseCard({ caso, reportCount, onOpen }: Props) {
     const style = statusStyle(caso.estado);
 

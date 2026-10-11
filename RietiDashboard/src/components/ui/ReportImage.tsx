@@ -1,12 +1,15 @@
 import { useState } from 'react';
 
 interface Props {
+    /** URL of the photo, null when the report has none */
     src: string | null;
+    /** Alternative text of the image */
     alt: string;
+    /** Classes of the image or placeholder; the default sets the height */
     className?: string;
 }
 
-// Report photo with a placeholder when there is none or it fails to load
+/** Report photo, with a placeholder when there is none or it fails to load */
 export function ReportImage({ src, alt, className = 'h-48' }: Props) {
     const [failed, setFailed] = useState(false);
 

@@ -4,13 +4,19 @@ import type { Dispatch, SetStateAction } from "react"
 import type { option } from "@/components/ui/DropdownSelect"
 
 interface DropdownMultiSelectProps {
+  /** All the options of the list */
   options: option[]
+  /** Options currently chosen */
   selected: option[]
+  /** Receives the new chosen options */
   setSelected: Dispatch<SetStateAction<option[]>>
+  /** Text shown next to the dropdown */
   label: string
+  /** Text shown when nothing is chosen */
   placeholder?: string
 }
 
+/** Dropdown that lets the user choose several options, each one with a checkbox */
 export function DropdownMultiSelect({
   options,
   selected,

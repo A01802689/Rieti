@@ -22,6 +22,12 @@ const patchCase = (id: number, patch: Partial<Caso>) => {
 };
 
 // Accept: the report becomes a new case
+/**
+ * Turns a report into a new case
+ *
+ * @param reportId - Report to accept
+ * @returns Id of the new case
+ */
 export function acceptReport(reportId: number): number {
   const report = reportes.find((r) => r.id_reporte === reportId);
   if (!report) throw new Error(`Reporte ${reportId} no existe`);
@@ -53,23 +59,45 @@ export function acceptReport(reportId: number): number {
 }
 
 // Merge: the report is attached to an existing case
+/**
+ * Attaches a report to an existing case
+ *
+ * @param reportId - Report to attach
+ * @param caseId - Case that receives it
+ */
 export function mergeReport(reportId: number, caseId: number) {
   patchReport(reportId, { id_caso: caseId, estatus_seguimiento: 'Canalizado' });
   notify();
 }
 
+/**
+ * Rejects a report
+ *
+ * @param reportId - Report to reject
+ */
 export function rejectReport(reportId: number) {
   patchReport(reportId, { id_caso: null, estatus_seguimiento: 'Rechazado' });
   notify();
 }
 
 // Procurator / admin: follow-up on a report that already belongs to a case
+/**
+ * Changes the follow-up status of a report
+ *
+ * @param reportId - Report to update
+ * @param status - New status
+ */
 export function setReportStatus(reportId: number, status: EstatusSeguimiento) {
   patchReport(reportId, { estatus_seguimiento: status });
   notify();
 }
 
 // Admin only: take a report out of its case (goes back to review)
+/**
+ * Takes a report out of its case and sends it back to review
+ *
+ * @param reportId - Report to detach
+ */
 export function detachReport(reportId: number) {
   patchReport(reportId, { id_caso: null, estatus_seguimiento: 'En revisión' });
   notify();
@@ -88,11 +116,25 @@ const logEntry = (caseId: number, tipo: string, autor: string, nota: string | nu
   };
 };
 
+/**
+ * Changes the state of a case and logs it in the timeline
+ *
+ * @param caseId - Case to update
+ * @param estado - New state
+ * @param autor - Who made the change
+ */
 export function setCaseState(caseId: number, estado: CaseState, autor: string) {
   patchCase(caseId, { estado, ...logEntry(caseId, 'Cambio de estado', autor, `Estado: ${estado}`) });
   notify();
 }
 
+/**
+ * Moves a case to another municipality and logs it in the timeline
+ *
+ * @param caseId - Case to transfer
+ * @param municipio - Name of the new municipality
+ * @param autor - Who made the change
+ */
 export function transferCase(caseId: number, municipio: string, autor: string) {
   patchCase(caseId, {
     municipio: { nombre: municipio },
@@ -101,11 +143,24 @@ export function transferCase(caseId: number, municipio: string, autor: string) {
   notify();
 }
 
+/**
+ * Adds a note to the timeline of a case
+ *
+ * @param caseId - Case that receives the note
+ * @param nota - Text of the note
+ * @param autor - Who wrote it
+ */
 export function addCaseNote(caseId: number, nota: string, autor: string) {
   patchCase(caseId, logEntry(caseId, 'Nota', autor, nota));
   notify();
 }
 
+/**
+ * Changes the urgency of a case
+ *
+ * @param caseId - Case to update
+ * @param urgencia - New urgency
+ */
 export function setCaseUrgency(caseId: number, urgencia: CaseUrgency) {
   patchCase(caseId, { urgencia });
   notify();

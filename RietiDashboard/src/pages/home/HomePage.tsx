@@ -26,6 +26,7 @@ const riskLevels = [
     { label: 'Nivel alto de índice de reportes', color: 'bg-red-600' },
 ];
 
+/** Home page: KPI cards, cases chart and a preview of the heat map */
 const HomePage = () => {
     const navigate = useNavigate();
 

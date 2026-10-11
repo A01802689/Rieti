@@ -8,6 +8,7 @@ import { AddNoteCard, MetadataCard } from './components/CaseSidePanel';
 import { CaseReportItem } from './components/CaseReportItem';
 import { useCaseDetail } from '@/lib/VM/Usecases';
 
+/** Page of one case (id from the URL): header, reporter and case data, timeline, its reports and the side panel */
 const CaseDetailPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();

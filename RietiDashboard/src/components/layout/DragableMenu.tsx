@@ -5,7 +5,7 @@ const PEEK = 60        // px visible when collapsed (keep it in sync with h-22 /
 const THRESHOLD = 60   // px of dragging needed to change the state
 const MD = "(min-width: 768px)"   // Tailwind md breakpoint
 
-// ms screens dragged horizontally
+/** Screen size state */
 const useIsMd = () =>
   useSyncExternalStore(
     (cb) => {
@@ -17,6 +17,11 @@ const useIsMd = () =>
     () => false,
   )
 
+/**
+ *  Floating menu over the page, when is dragged to expand or collapse: a bottom sheet on mobile and a right side panel from md
+ *
+ * @param children - Content shown inside the menu
+ */
 export function DragableMenu({ children }: { children: ReactNode }) {
   const horizontal = useIsMd()
   const [expanded, setExpanded] = useState(false)
