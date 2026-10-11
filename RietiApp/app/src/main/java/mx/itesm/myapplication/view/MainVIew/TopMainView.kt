@@ -17,6 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+/**
+ * Barra superior de la pantalla principal.
+ *
+ * Al tocar el botón se navega a la ruta `"login"` con [NavController.navigate]. Por ahora
+ * solo se cambia de pantalla: no se cierra ninguna sesión ni se limpia la pila de navegación,
+ *  por lo que el usuario podría volver a la pantalla principal con el botón de atrás.
+ *
+ *  @param navController Controlador de navegación para manejar la navegación entre pantallas.
+ *  @param modifier [Modifier] opcional para personalizar el diseño.
+ */
+
 @Composable
 fun TopMainView(navController: NavController, modifier: Modifier = Modifier): Unit {
     Row(

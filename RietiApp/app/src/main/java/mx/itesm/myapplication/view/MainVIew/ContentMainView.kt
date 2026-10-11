@@ -28,11 +28,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Vista principal con la lista de reportes, mostrados como tarjetas de resumen.
+ *
+ * Por ahora los datos son de ejemplo: las tres tarjetas están escritas a mano y tienen
+ * exactamente los mismos valores (incluido el folio). No provienen del backend ni de un
+ * ViewModel.
+ *
+ * @param modifier [Modifier] aplicado a la columna raíz. Se le añade internamente
+ * `verticalScroll(rememberScrollState())`, por lo que el contenido se desplaza si no cabe
+ */
+
 @Composable
 fun ContentMainView(modifier: Modifier = Modifier){
     Column (verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally) {
+        // Tarjetas de ejemplo (datos de prueba repetidos).
         ReportSummaryCard(
             folio = "R-2408-001",
             city = "Guadalajara",

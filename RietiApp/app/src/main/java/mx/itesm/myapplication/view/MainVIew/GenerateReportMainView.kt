@@ -23,6 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import mx.itesm.myapplication.view.Pantalla
 
+/**
+ * Vista principal para elegir el tipo de reporte que se quiere enviar.
+ *
+ * @param navController Controlador de navegación que se pasa a [ReportsOptions] para que cada
+ *  opción pueda navegar a su flujo.
+ *
+ *
+ */
+
 @Composable
 fun GenerateReportMainView(navController: NavController, modifier: Modifier = Modifier) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -35,6 +44,14 @@ fun GenerateReportMainView(navController: NavController, modifier: Modifier = Mo
     }
 }
 
+/**
+ * Fila con las dos opciones de reporte, una junto a la otra y con el mismo ancho.
+ *
+ * Muestra dos [ReportCard]: la primera para el reporte anónimo (`anonymous = true`) y la
+ * segunda para el reporte con seguimiento (`anonymous = false`). Cada tarjeta ocupa la mitad
+ * del ancho disponible gracias a `weight(1f)`, y las dos se separan por 4 dp.
+ */
+
 @Composable
 fun ReportsOptions(navController: NavController, modifier: Modifier = Modifier) {
     Box(modifier = Modifier, contentAlignment = Alignment.Center){
@@ -46,6 +63,16 @@ fun ReportsOptions(navController: NavController, modifier: Modifier = Modifier) 
         }
     }
 }
+
+/**
+ * Tarjeta seleccionable que representa una opción de tipo de reporte.
+ *
+ * Su apariencia y destino dependen de [anonymous]
+ *
+ * @param anonymous `true` para la opción de reporte anónimo; `false` para la opción de reporte
+ * con seguimiento.
+ * @param navController Controlador de navegación usado para ir a la pantalla de la opción elegida.
+ */
 
 @Composable
 fun ReportCard(anonymous: Boolean, navController: NavController, modifier: Modifier = Modifier) {
