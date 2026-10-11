@@ -18,13 +18,29 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import mx.itesm.myapplication.view.seguimiento.MapaInteractivo
 
+
+/**
+ * Paso de selección de ubicación de un reporte.
+ *
+ * Ofrece dos formas de indicar dónde se observó la situación:
+ * 1. Un [MapaInteractivo] en la parte superior.
+ * 2. Tres campos de texto para escribir la ubicación manualmente: municipio, colonia y calle.
+ *
+ *  @param navController Controlador de navegación usado para moverse entre pantallas.
+ *  @param modifier [Modifier] aplicado al contenedor raíz ([Column]) de la pantalla.
+ */
 @Composable
 fun Ubicacion(
     navController: NavController,
     modifier: Modifier = Modifier
 ){
+    /** Municipio escrito por el usuario. Vacío si no se ha capturado. */
     var municipio by remember { mutableStateOf("") }
+
+    /** Colonia escrita por el usuario. Vacía si no se ha capturado. */
     var colonia by remember { mutableStateOf("") }
+
+    /** Calle escrita por el usuario. Vacía si no se ha capturado. */
     var calle by remember { mutableStateOf("") }
 
     Column(

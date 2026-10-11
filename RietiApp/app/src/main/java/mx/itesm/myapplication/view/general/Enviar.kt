@@ -17,11 +17,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+/**
+ * Pantalla para redactar y enviar un reporte.
+ *
+ * Muestra un formulario con tres elementos principales:
+ * - Un campo de texto multilínea para describir la situación a reportar.
+ * - Un botón para adjuntar una fotografía (pendiente de implementar: abrirá la galería).
+ * - Un botón para enviar el reporte (pendiente de implementar: enviará los datos).
+ *
+ * @param navController Controlador de navegación usado para moverse entre pantallas.
+ * @param modifier [Modifier] aplicado al contenedor raíz ([Column]) de la pantalla.
+ */
 @Composable
 fun Enviar(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+    /** Texto que el usuario escribe para describir la situación del reporte. */
     var descripcion by remember { mutableStateOf("") }
 
     Column(

@@ -19,11 +19,23 @@ import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.compose.style.MapStyle
 
+/**
+ * Mapa interactivo de Mapbox con esquinas redondeadas y altura fija de 250 dp.
+ *
+ * Cuando el composable se renderiza en el modo de inspección de Android Studio
+ * ([LocalInspectionMode], por ejemplo en `@Preview`), no se carga el mapa real: se muestra
+ * en su lugar un recuadro con el texto "Mapa Interactivo (Vista Previa)". Esto evita los
+ * problemas de renderizado que tiene [MapboxMap] en las vistas previas.
+ *
+ * @param modifier Modificador opcional de diseño.
+ */
+
 @Composable
 fun MapaInteractivo(
     modifier: Modifier = Modifier
 ) {
     if (LocalInspectionMode.current) {
+        // Marcador de posición para la vista previa de Android Studio.
         Box(
             modifier = modifier
                 .fillMaxWidth()
@@ -38,6 +50,7 @@ fun MapaInteractivo(
             )
         }
     } else {
+        /** Estado de la cámara del mapa, con la posición y el zoom iniciales. */
         val mapViewportState = rememberMapViewportState {
             setCameraOptions {
                 center(Point.fromLngLat(-99.2152, 19.5598))
