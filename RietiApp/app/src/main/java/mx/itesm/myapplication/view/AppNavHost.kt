@@ -15,6 +15,14 @@ import mx.itesm.myapplication.view.seguimiento.SeguimientoEnviar
 import mx.itesm.myapplication.view.seguimiento.SeguimientoFormulario
 import mx.itesm.myapplication.view.seguimiento.SeguimientoUbicacion
 
+/**
+ * Grafo de navegación principal de la aplicación.
+ *
+ * Mapea cada constante de ruta definida en [Pantalla] con su respectivo componente Composable de pantalla.
+ *
+ * @param navController Controlador [NavHostController] para manejar las transiciones entre pantallas.
+ * @param modifier Modificador opcional de diseño para ajustar el contenedor [NavHost].
+ */
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(

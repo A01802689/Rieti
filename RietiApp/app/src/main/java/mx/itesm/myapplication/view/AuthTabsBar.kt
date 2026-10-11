@@ -14,6 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
+/**
+ * Barra de pestañas interactiva para alternar entre la pantalla de Inicio de Sesión y la de Registro.
+ *
+ * @param navController Controlador [NavHostController] para consultar la ruta actual y navegar.
+ * @param modifier Modificador opcional de diseño.
+ */
 @Composable
 fun AuthTabsBar(navController: NavHostController, modifier: Modifier = Modifier) {
     val pilaNavegacion by navController.currentBackStackEntryAsState()
@@ -24,11 +30,10 @@ fun AuthTabsBar(navController: NavHostController, modifier: Modifier = Modifier)
             .fillMaxWidth()
             .padding(top = 60.dp)
     ) {
-        val AuthScreens =
-            Pantalla.listaPantallas.filter {
-                it.ruta == Pantalla.RUTA_LOGIN || it.ruta == Pantalla.RUTA_REGISTER
-            }
-        AuthScreens.forEach { pantalla ->
+        val authScreens = Pantalla.listaPantallas.filter {
+            it.ruta == Pantalla.RUTA_LOGIN || it.ruta == Pantalla.RUTA_REGISTER
+        }
+        authScreens.forEach { pantalla ->
             val seleccionada = pantallaActual?.route == pantalla.ruta
 
             TextButton(

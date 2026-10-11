@@ -9,29 +9,39 @@ import java.net.CookieManager
 import java.net.CookiePolicy
 import java.util.concurrent.TimeUnit
 
+/**
+ * Cliente HTTP Singleton configurado con Retrofit y OkHttp para la comunicación con el API REST backend.
+ *
+ * Administra la URL base del servicio, el manejo automático de cookies de sesión (`access_token`) mediante
+ * [CookieManager] y [JavaNetCookieJar], así como el interceptor de registros HTTP para depuración.
+ */
 object ApiClient {
 
-    // 127.0.0.1 con adb reverse en el emulador redirecciona el puerto 8000 directamente a localhost de la PC.
+    /** URL base por defecto pointing a localhost a través de `adb reverse` en emulador. */
     private const val DEFAULT_BASE_URL = "http://127.0.0.1:8000/"
 
     private var baseUrl: String = DEFAULT_BASE_URL
 
-    // CookieManager con política ACCEPT_ALL para almacenar y gestionar las cookies del servidor (como access_token)
+    /**
+     * Gestor de cookies para almacenar y enviar cookies de sesión HTTP automáticamente entre peticiones.
+     */
     val cookieManager: CookieManager by lazy {
         CookieManager().apply {
             setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         }
     }
 
+    /** Interceptor para registrar en Logcat las peticiones y respuestas HTTP. */
     private val loggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
     }
 
+    /** Cliente OkHttp configurado con tiempos de espera, almacenamiento de cookies e interceptor de logs. */
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager)) // Guarda las cookies (Set-Cookie) y las envía en peticiones posteriores
+            .cookieJar(JavaNetCookieJar(cookieManager))
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -41,6 +51,9 @@ object ApiClient {
 
     private var retrofit: Retrofit? = null
 
+    /**
+     * Instancia singleton del servicio REST [ApiService] generado por Retrofit.
+     */
     val apiService: ApiService
         get() {
             if (retrofit == null) {
@@ -53,13 +66,18 @@ object ApiClient {
             return retrofit!!.create(ApiService::class.java)
         }
 
+    /**
+     * Actualiza la URL base del cliente de red y reinicia la instancia de Retrofit.
+     *
+     * @param newUrl Nueva dirección IP o dominio para el servicio backend.
+     */
     fun setBaseUrl(newUrl: String) {
         baseUrl = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
-        retrofit = null // Forzar la recreación de Retrofit con la nueva URL base
+        retrofit = null
     }
 
     /**
-     * Limpia todas las cookies guardadas localmente (por ejemplo, al cerrar sesión manualmente en el cliente)
+     * Limpia todas las cookies guardadas localmente (por ejemplo, al cerrar sesión del usuario).
      */
     fun clearCookies() {
         cookieManager.cookieStore.removeAll()
