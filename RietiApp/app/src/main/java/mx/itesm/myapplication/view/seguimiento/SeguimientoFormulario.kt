@@ -23,6 +23,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.view.general.Formulario
 
+/**
+ * Pantalla del paso del formulario dentro del flujo de reporte con seguimiento.
+ *
+ * Muestra una fila superior con un botón para regresar, el título "Reporte con Seguimiento",
+ * un texto que indica que el folio se recibirá por correo o WhatsApp, el formulario de
+ * preguntas [Formulario] y, al final, un botón "Continuar" que avanza al siguiente paso.
+ *
+ * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ */
+
 @Composable
 fun SeguimientoFormulario(navController: NavController) {
     Column(
@@ -30,6 +40,7 @@ fun SeguimientoFormulario(navController: NavController) {
             .fillMaxSize()
             .padding(20.dp)
     ) {
+        // Fila de encabezado con el botón para regresar.
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {

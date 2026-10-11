@@ -23,12 +23,24 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.view.general.Ubicacion
 
+/**
+ * Pantalla del paso de ubicación dentro del flujo de reporte con seguimiento.
+ *
+ * Muestra una fila superior con un botón para regresar, el título "Reporte con Seguimiento",
+ * un texto que indica que el folio se recibirá por correo o WhatsApp, el componente
+ * [Ubicacion] (mapa y campos de texto para indicar dónde se observó la situación) y, al
+ * final, un botón "Continuar" que avanza al siguiente paso.
+ *
+ * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ */
+
 @Composable
 fun SeguimientoUbicacion(navController: NavController) {
 
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
+        // Fila de encabezado con el botón para regresar.
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {

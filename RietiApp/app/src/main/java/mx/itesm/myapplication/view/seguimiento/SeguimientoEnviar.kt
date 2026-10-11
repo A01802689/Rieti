@@ -21,14 +21,21 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.view.general.Enviar
 
+/**
+ * Pantalla final del flujo de reporte con seguimiento, donde se redacta y se envía el reporte.
+ *
+ * Esta pantalla es el equivalente de [AnonimoEnviar] para el flujo con seguimiento: solo
+ * cambia el título.
+ *
+ * @param navController Controlador de navegación para manejar la navegación entre pantallas.
+ */
+
 @Composable
 fun SeguimientoEnviar(navController: NavController){
-
-
-
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
+        // Fila de encabezado con el botón para regresar.
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {

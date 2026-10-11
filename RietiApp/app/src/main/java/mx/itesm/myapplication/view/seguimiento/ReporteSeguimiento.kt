@@ -32,16 +32,36 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
+/**
+ * Pantalla de datos de contacto para un reporte con seguimiento.
+ *
+ * Es el primer paso del flujo de reporte con seguimiento. Muestra:
+ * - Una fila superior con un botón para regresar.
+ * - El título "Reporte con Seguimiento" y un texto que indica que el folio se recibirá por
+ *   correo o WhatsApp.
+ * - Una tarjeta informativa que explica para qué se piden los datos.
+ * - Tres campos de texto: nombre(s), apellidos y número de teléfono. Los tres están marcados
+ *   como obligatorios con un asterisco en su etiqueta.
+ * - Un botón "Continuar" anclado en la parte inferior mediante un [Spacer] con peso.
+ *
+ * @param navController Controlador de navegación para manejar la navegación entre pantallas.
+ */
 
 @Composable
 fun ReporteSeguimiento(navController: NavController)
 {
+    /** Nombre(s) del usuario. Vacío si no se ha capturado. */
     var nombre by remember { mutableStateOf("") }
+
+    /** Apellidos del usuario. Vacío si no se han capturado. */
     var apellidos by remember { mutableStateOf("") }
+
+    /** Número de teléfono del usuario. Vacío si no se ha capturado. */
     var numero by remember { mutableStateOf("") }
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
+        // Fila de encabezado con el botón para regresar.
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -67,6 +87,7 @@ fun ReporteSeguimiento(navController: NavController)
 
         Spacer(modifier = Modifier.height(15.dp))
 
+        // Tarjeta informativa sobre el uso de los datos solicitados.
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
