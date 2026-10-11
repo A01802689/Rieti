@@ -3,22 +3,7 @@ import InfoKpis from './components/KpiHome/InfoKpi';
 import LineGraph from './components/Graph/Graph';
 import HeatMap from '@/components/ui/HeatMap';
 import { useNavigate } from 'react-router-dom';
-
-const graphData = [
-    { name: 'Enero', value: 20 },
-    { name: 'Febrero', value: 35 },
-    { name: 'Marzo', value: 28 },
-    { name: 'Abril', value: 50 },
-    { name: 'Mayo', value: 65 },
-    { name: 'Junio', value: 80 },
-];
-
-const stats = [
-    { label: 'Municipios participantes', value: '12', note: 'en la ruta', tone: 'bg-teal-600' },
-    { label: 'Casos identificados', value: '148', note: 'este año', tone: 'bg-amber-500' },
-    { label: 'Casos en seguimiento', value: '63', note: 'activos', tone: 'bg-blue-600' },
-    { label: 'Casos cerrados', value: '85', note: 'Con restitución de derechos', tone: 'bg-emerald-600' },
-];
+import { useHomeViewModel } from '@/lib/VM/Usehome';
 
 const riskLevels = [
     { label: 'Nivel bajo de índice de reportes', color: 'bg-green-600' },
@@ -29,6 +14,7 @@ const riskLevels = [
 /** Home page: KPI cards, cases chart and a preview of the heat map */
 const HomePage = () => {
     const navigate = useNavigate();
+    const { stats, graphData } = useHomeViewModel();
 
     return (
         <div className="min-h-screen bg-page transition-colors duration-300">
