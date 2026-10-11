@@ -28,6 +28,15 @@ import androidx.navigation.NavHostController
 import mx.itesm.myapplication.viewModel.AuthUiState
 import mx.itesm.myapplication.viewModel.AuthViewModel
 
+/**
+ * Formulario de inicio de sesión de usuario.
+ *
+ * Muestra los campos de texto para correo electrónico y contraseña, gestiona la validación local
+ * de campos requeridos y reacciona a las emisiones de estado emitidas por [AuthViewModel].
+ *
+ * @param navController Controlador de navegación [NavHostController].
+ * @param authViewModel Instancia de [AuthViewModel] inyectada o proveída.
+ */
 @Composable
 fun LoginForm(
     navController: NavHostController,
@@ -118,6 +127,15 @@ fun LoginForm(
     }
 }
 
+/**
+ * Formulario para el registro de nuevos usuarios en la plataforma.
+ *
+ * Captura el nombre completo (dividiéndolo automáticamente en nombre y apellido), el correo electrónico
+ * y la contraseña. Se conecta con [AuthViewModel] para ejecutar el alta en el servidor.
+ *
+ * @param navController Controlador de navegación [NavHostController].
+ * @param authViewModel Instancia de [AuthViewModel] inyectada o proveída.
+ */
 @Composable
 fun RegisterForm(
     navController: NavHostController,

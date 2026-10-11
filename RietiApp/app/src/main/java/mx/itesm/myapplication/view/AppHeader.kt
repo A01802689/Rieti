@@ -1,4 +1,5 @@
 package mx.itesm.myapplication.view
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * Componente Composable que muestra el encabezado oficial de la aplicación RIETI,
+ * incluyendo el nombre del proyecto y el subtítulo representativo.
+ */
 @Composable
 fun AppHeader() {
     Column(
