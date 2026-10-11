@@ -22,7 +22,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.view.general.Ubicacion
 
-
+/**
+ * Pantalla del paso de ubicación dentro del flujo de reporte anónimo.
+ *
+ * Muestra una fila superior con un botón para regresar, el título "Reporte Anónimo", el
+ * componente [Ubicacion] (mapa y campos de texto para indicar dónde se observó la situación)
+ * y, al final, un botón "Continuar" que avanza al siguiente paso del flujo.
+ *
+ * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ */
 @Composable
 fun AnonimoUbicacion(navController: NavController) {
     Column(
@@ -31,6 +39,7 @@ fun AnonimoUbicacion(navController: NavController) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ){
+            // Fila de encabezado con el botón para regresar.
             IconButton(onClick = {
                 navController.popBackStack()
             })

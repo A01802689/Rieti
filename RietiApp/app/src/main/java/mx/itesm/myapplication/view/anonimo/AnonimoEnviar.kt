@@ -22,12 +22,22 @@ import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.view.Pantalla
 import mx.itesm.myapplication.view.general.Enviar
 
+
+/**
+ * Pantalla para crear un reporte anónimo.
+ *
+ * Muestra una barra superior simple con un botón para regresar a la pantalla anterior,
+ * el título "Reporte Anónimo" y, debajo, el formulario de envío [Enviar].
+ *
+ * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ */
 @Composable
 fun AnonimoEnviar(navController: NavController){
 
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
+        // Fila de encabezado con el botón para regresar.
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {

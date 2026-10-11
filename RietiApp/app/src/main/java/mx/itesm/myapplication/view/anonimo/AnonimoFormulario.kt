@@ -23,6 +23,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.view.general.Formulario
 
+/**
+ * Pantalla del paso del formulario dentro del flujo de reporte anónimo.
+ *
+ * Muestra una fila superior con un botón para regresar, el título "Reporte Anónimo", el
+ * formulario de preguntas [Formulario] y, al final, un botón "Continuar" que avanza al
+ * siguiente paso del flujo.
+ *
+ * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ */
+
 @Composable
 fun AnonimoFormulario(navController: NavController) {
 
@@ -31,6 +41,7 @@ fun AnonimoFormulario(navController: NavController) {
             .fillMaxSize()
             .padding(20.dp)
     ){
+        // Fila de encabezado con el botón para regresar.
         Row(
             verticalAlignment = Alignment.CenterVertically
         ){
