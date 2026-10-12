@@ -1,6 +1,7 @@
 import SideBar from '../../components/ui/SideBar';
 import { useNavigate } from 'react-router-dom';
 import { CaseCard } from './components/CaseCard';
+import { StatusChart } from '@/components/ui/StatusChart';
 import { useCasesViewModel } from '@/lib/VM/Usecases';
 
 /** List of cases with a state filter and a search box; each card opens the case page */
@@ -36,6 +37,14 @@ const CasesPage = () => {
                             </button>
                         ))}
                     </div>
+
+                    <StatusChart
+                        title="Casos por estado"
+                        options={vm.filterOptions}
+                        allValue="Todos"
+                        selected={vm.selectedFilter}
+                        onSelect={vm.setSelectedFilter}
+                    />
                 </header>
 
                 <main className="mt-4 rounded-xl bg-panel p-4 transition-colors duration-300 sm:mt-6 sm:p-8">

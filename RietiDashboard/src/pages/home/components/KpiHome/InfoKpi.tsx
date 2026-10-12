@@ -13,11 +13,13 @@ interface InfoKpiProp{
 const InfoKpis =({label, value, note,  tone,}: InfoKpiProp) =>{
     return (
         <div className="flex overflow-hidden rounded-xl bg-card shadow-sm transition-colors duration-300">
-            <div className={`w-1.5 ${tone}`}/>
-            <div className="p-5">
-                <h1 className="text-2xl py-0">{value}</h1>
-                <p className="font-medium">{label}</p>
-                <p className="text-xs font-diffuse">{note}</p>
+            <div className={`w-1 shrink-0 ${tone}`}/>
+            <div className="flex min-w-0 items-center gap-3 px-3 py-2.5">
+                <h1 className="p-0 text-2xl leading-none">{value}</h1>
+                <div className="min-w-0">
+                    <p className="truncate p-0 text-sm font-medium leading-tight">{label}</p>
+                    <p className="truncate p-0 text-xs font-diffuse leading-tight">{note}</p>
+                </div>
             </div>
         </div>
     )

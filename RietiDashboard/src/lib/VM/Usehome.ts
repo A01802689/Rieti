@@ -1,13 +1,15 @@
 import { useMemo } from 'react';
 import { cases } from '../api/cases';
-import { municipios } from '../api/municipios';
+import { getReports } from '../api/reports';
 import { useStoreVersion } from '../api/store';
 
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const GRAPH_MONTHS = 6;
+const CASE_STATES = ['Abierto', 'En desarrollo', 'Cerrado'];
+const REPORT_STATUSES = ['Recibido', 'En revisión', 'Canalizado', 'En atención', 'Concluido', 'Rechazado'];
 
 /**
- * Numbers of the home page, computed from the cases and municipios data.
+ * Numbers of the home page, computed from the cases and reports data.
  *
  * @returns The KPI cards and the points of the "cases per month" chart
  */
@@ -16,22 +18,22 @@ export function useHomeViewModel(now: Date = new Date()) {
 
   return useMemo(() => {
     const year = now.getFullYear();
-    const thisYear = cases.filter((c) => new Date(c.fecha_caso).getFullYear() === year);
+    const reports = getReports();
 
     const stats = [
-      { label: 'Municipios participantes', value: String(municipios.length), note: 'en la ruta', tone: 'bg-teal-600' },
-      { label: 'Casos identificados', value: String(thisYear.length), note: 'este año', tone: 'bg-amber-500' },
-      {
-        label: 'Casos en seguimiento',
-        value: String(cases.filter((c) => c.estado === 'En desarrollo').length),
-        note: 'activos',
-        tone: 'bg-blue-600',
-      },
+      { label: 'Casos', value: String(cases.length), note: 'registrados', tone: 'bg-amber-500' },
+      { label: 'Reportes recibidos', value: String(reports.length), note: 'en total', tone: 'bg-teal-600' },
       {
         label: 'Casos cerrados',
         value: String(cases.filter((c) => c.estado === 'Cerrado').length),
         note: 'Con restitución de derechos',
         tone: 'bg-emerald-600',
+      },
+      {
+        label: 'Reportes canalizados',
+        value: String(reports.filter((r) => r.id_caso !== null).length),
+        note: 'asignados a un caso',
+        tone: 'bg-blue-600',
       },
     ];
 
@@ -46,7 +48,13 @@ export function useHomeViewModel(now: Date = new Date()) {
       return { name, value };
     });
 
-    return { stats, graphData };
+    const caseStatus = CASE_STATES.map((value) => ({ value, total: cases.filter((c) => c.estado === value).length }));
+    const reportStatus = REPORT_STATUSES.map((value) => ({
+      value,
+      total: reports.filter((r) => r.estatus_seguimiento === value).length,
+    }));
+
+    return { stats, graphData, caseStatus, reportStatus };
     // `version` changes when the mock data is mutated
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [version]);

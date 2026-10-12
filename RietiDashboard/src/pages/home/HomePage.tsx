@@ -2,6 +2,7 @@ import SideBar from '../../components/ui/SideBar';
 import InfoKpis from './components/KpiHome/InfoKpi';
 import LineGraph from './components/Graph/Graph';
 import HeatMap from '@/components/ui/HeatMap';
+import { StatusChart } from '@/components/ui/StatusChart';
 import { useNavigate } from 'react-router-dom';
 import { useHomeViewModel } from '@/lib/VM/Usehome';
 
@@ -14,7 +15,7 @@ const riskLevels = [
 /** Home page: KPI cards, cases chart and a preview of the heat map */
 const HomePage = () => {
     const navigate = useNavigate();
-    const { stats, graphData } = useHomeViewModel();
+    const { stats, graphData, caseStatus, reportStatus } = useHomeViewModel();
 
     return (
         <div className="min-h-screen bg-page transition-colors duration-300">
@@ -31,24 +32,6 @@ const HomePage = () => {
 
                 <main className="mt-4 rounded-xl bg-panel p-4 transition-colors duration-300 sm:mt-6 sm:p-8">
                     <div className="flex flex-col gap-6 sm:gap-8">
-                        <section aria-label="Resumen">
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                                {stats.map((stat) => (
-                                    <InfoKpis
-                                        key={stat.label}
-                                        label={stat.label}
-                                        value={stat.value}
-                                        note={stat.note}
-                                        tone={stat.tone}
-                                    />
-                                ))}
-                            </div>
-                        </section>
-
-                        <section aria-label="Graph" className="w-full min-w-0 overflow-x-auto">
-                            <LineGraph data={graphData} />
-                        </section>
-
                         <section
                             aria-label="Map"
                             className="w-full rounded-xl bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6"
@@ -82,6 +65,33 @@ const HomePage = () => {
 
                             <div className="h-[320px] w-full overflow-hidden rounded-lg sm:h-[420px] sm:p-5 lg:h-[500px]">
                                 <HeatMap />
+                            </div>
+                        </section>
+
+                        <section aria-label="Resumen">
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-4">
+                                {stats.map((stat) => (
+                                    <InfoKpis
+                                        key={stat.label}
+                                        label={stat.label}
+                                        value={stat.value}
+                                        note={stat.note}
+                                        tone={stat.tone}
+                                    />
+                                ))}
+                            </div>
+                        </section>
+
+                        <section aria-label="Graph" className="w-full min-w-0 overflow-x-auto">
+                            <LineGraph data={graphData} />
+                        </section>
+
+                        <section aria-label="Estatus de casos y reportes" className="grid grid-cols-1 gap-4 lg:grid-cols-2 sm:gap-6">
+                            <div className="rounded-xl bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
+                                <StatusChart title="Casos por estado" options={caseStatus} allValue="Todos" className="" />
+                            </div>
+                            <div className="rounded-xl bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
+                                <StatusChart title="Reportes por estatus" options={reportStatus} allValue="Todos" className="" />
                             </div>
                         </section>
                     </div>

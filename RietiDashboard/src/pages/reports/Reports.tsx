@@ -2,6 +2,7 @@ import SideBar from '../../components/ui/SideBar';
 import SearchInput from '@/components/ui/SearchInput';
 import { useNavigate } from 'react-router-dom';
 import { ReportCard } from './components/Report_Card';
+import { StatusChart } from '@/components/ui/StatusChart';
 import { useReportsViewModel } from '@/lib/VM/Usereportescm';
 
 /** Reports list with a status filter and a search box */
@@ -37,6 +38,14 @@ const ReportPage = () => {
                         </button>
                     ))}
                 </div>
+
+                <StatusChart
+                    title="Reportes por estatus"
+                    options={vm.filterOptions}
+                    allValue="Todos"
+                    selected={vm.selectedFilter}
+                    onSelect={vm.setSelectedFilter}
+                />
                 </header>
 
                 <main className="mt-4 rounded-xl bg-panel p-4 transition-colors duration-300 sm:mt-6 sm:p-8">
