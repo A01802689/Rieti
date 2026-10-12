@@ -15,13 +15,13 @@ export const PERMISSIONS = [
   { key: "reports.view_detail", group: "Reportes", label: "Ver detalle de reporte" }, // explicit
   { key: "reports.edit", group: "Reportes", label: "Editar reportes" }, // implicit
   { key: "reports.close", group: "Reportes", label: "Cerrar reportes" }, // implicit
-  // pending approval: reports.triage "Aceptar, fusionar y rechazar reportes"
+
   // Casos
   { key: "cases.view", group: "Casos", label: "Ver casos" }, // explicit
   { key: "cases.edit", group: "Casos", label: "Editar casos y notas" }, // implicit
   { key: "cases.close", group: "Casos", label: "Cerrar casos" }, // implicit
   { key: "cases.assign", group: "Casos", label: "Asignar responsables" }, // implicit
-  // pending approval: cases.urgency "Cambiar urgencia de casos", cases.transfer "Transferir casos a otro municipio"
+
   // Herramientas
   { key: "map.view", group: "Herramientas", label: "Ver mapa de calor" }, // explicit
   { key: "stats.view", group: "Herramientas", label: "Ver estadísticas" }, // explicit
