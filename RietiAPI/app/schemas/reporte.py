@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from enum import Enum
 from app.schemas.ubicacion import UbicacionCreate
+from typing import Literal
 
 class CantidadNna(str, Enum):
     UNO = "1"
@@ -31,13 +32,13 @@ class TipoTrabajo(str, Enum):
     NO_SE = "No sé"
 
 class ReporteCreate(BaseModel):
-    id_usuario: int | None = None
     ubicacion: UbicacionCreate
     cantidad_nna: CantidadNna
     edad_aproximada: EdadAproximada 
     tipo_trabajo: TipoTrabajo
     descripcion: str | None = None
-    imagen: str | None = None
+    imagen_content_type: Literal["image/jpeg", "image/png"] | None = None
+    con_seguimiento: bool
 
 class ReporteResponse(BaseModel):
     id_reporte: int
@@ -45,6 +46,9 @@ class ReporteResponse(BaseModel):
     id_usuario: int | None
     id_caso: int | None
     id_ubicacion: int
+    url_subida_imagen: str | None = None
+    url_subida_expira_en: int | None = None
+    
 
     model_config = {"from_attributes": True}
 

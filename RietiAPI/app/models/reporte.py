@@ -98,7 +98,7 @@ class Reporte(Base):
         nullable = False,
         server_default = func.now()
     )
-    imagen = Column(
+    imagen_key = Column(
         String(255),
         nullable=True,
     )

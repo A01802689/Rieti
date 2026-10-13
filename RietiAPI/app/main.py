@@ -2,7 +2,14 @@ from fastapi import FastAPI
 from app.api.routes import usuario as usuario_routes
 from app.api.routes import municipio as municipio_routes
 from app.api.routes import reporte as reporte_routes
-from app.models import municipio, usuario
+from app.models import (
+    municipio,
+    usuario,
+    ubicacion,
+    caso,
+    reporte,
+    folio_contador,
+)
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
