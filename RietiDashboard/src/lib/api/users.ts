@@ -1,6 +1,6 @@
 import type { User } from "../types/User"
 import { ALL_PERMISSION_KEYS } from "@/lib/types/Permission"
-import { municipios } from "./municipios"
+import { municipios1 } from "./municipios"
 
 // this one works as api fetcher
 // here will be the fetch done
@@ -14,7 +14,7 @@ export const getUsers = async (): Promise<User[]> => users
  * @param id - id_municipio to look for
  * @returns The municipio, or null when it does not exist
  */
-const mun = (id: number) => municipios.find((m) => m.id_municipio === id) ?? null
+const mun = (id: number) => municipios1.find((m) => m.id_municipio === id) ?? null
 
 /** Hardcoded users used while the endpoint does not exist */
 export const users: User[] = [

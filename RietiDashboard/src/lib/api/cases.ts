@@ -1,12 +1,16 @@
+// import { type expression } from "maplibre-gl";
 import type { Caso, Municipio } from "../types/Case"
 import { ubicaciones } from "./reports"
+import { api } from "./client";
 
 // this one works as api fetcher
 // here will be the fetch done
 
 
 /** Simulates the cases endpoint; it will become a fetch */
-export const getCases = async (): Promise<Caso[]> => cases
+// export const getCases = async (): Promise<Caso[]> => cases
+export const getCases = async() => api<Caso[]>(`/dashboard/casos`, {method: "GET"})
+export const getCase = async(id: number) => api<Caso>(`/dashboard/casos/${id}`,{method: "GET"} )
 
 const municipio: Municipio = { nombre: "Atizapán de Zaragoza" }
 
