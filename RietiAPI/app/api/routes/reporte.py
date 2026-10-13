@@ -20,11 +20,11 @@ def crear_reporte(
     usuario_actual: Usuario = Depends(get_current_user),
 ):
     
-    """if usuario_actual.rol is not None:
+    if usuario_actual.rol is not None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Sólo los usuarios sin rol pueden crear reportes",
-        )"""
+        )
 
     return reporte_service.create_reporte(
         db=db,
