@@ -34,7 +34,6 @@ const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, ""
 const toggleKey = (list: PermissionKey[], key: PermissionKey) =>
   list.includes(key) ? list.filter((k) => k !== key) : [...list, key]
 
-// Filter states:  hook / filter
 
 /**
  * State of the search text

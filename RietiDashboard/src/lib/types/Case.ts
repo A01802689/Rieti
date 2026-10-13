@@ -45,7 +45,7 @@
   "urgencia": "'Baja' | 'Media' | 'Alta' | null"
 }, ...]
 
-* Cambiar el estado de un caso, endpoint PATCH (/dashboard/casos/{id}/estado)
+* Cambiar el estado de un caso, endpoint PUT (/dashboard/casos/{id}/estado)
 cuerpo:
 {
   "estado": "'Abierto' | 'En desarrollo' | 'Cerrado'"
