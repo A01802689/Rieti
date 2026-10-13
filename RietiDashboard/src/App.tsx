@@ -9,6 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 // import { RequireRole } from "./components/layout/RequireRole"; // needed when the guarded /users route below is enabled
 import UsersPage from "./pages/users/Users";
 import LogsPage from "./pages/logs/Logs";
+import NotFoundPage from "./pages/404/404";
 
 /** Routes of the app, inside the session provider */
 function App() {
@@ -24,6 +25,7 @@ function App() {
         {/* <Route path="/users" element={<RequireRole role="Administrador"><UsersPage/></RequireRole>} /> */}
         <Route path="/users" element={<UsersPage/>} />
         <Route path="/logs" element={<LogsPage/>} />
+        <Route path="*" element={<NotFoundPage/>} />
 
       </Routes>
     </AuthProvider>
