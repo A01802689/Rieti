@@ -23,3 +23,4 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     id_usuario = int(payload.get("sub"))
     usuario = usuario_repository.get_by_id(db, id_usuario)
     return usuario
+

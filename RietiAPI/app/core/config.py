@@ -9,6 +9,13 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     DASHBOARD_ORIGIN: str
     PRODUCTION: bool = False
+
+    AWS_REGION: str
+    S3_REPORTES_BUCKET: str
+    S3_PRESIGNED_URL_EXPIRES_IN: int = 300
+
+
+
     model_config = {"env_file": ".env"}
 
 # settings con minuscula es una instancia de la clase Settings
