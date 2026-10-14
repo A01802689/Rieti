@@ -1,8 +1,11 @@
 from pydantic import BaseModel
 
+class UsuarioCasoCreate(BaseModel):
+    id_usuario: int
+    id_caso: int
+
 class UsuarioCasoResponse(BaseModel):
     id_usuario_caso: int
     id_usuario: int
-    id_caso:int
+    id_caso: int
     model_config = {"from_attributes": True}
-
