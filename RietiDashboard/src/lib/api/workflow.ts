@@ -1,6 +1,6 @@
 import type { Caso, CaseState, CaseUrgency } from '../types/Case';
-import type { EstatusSeguimiento, Riesgo } from '../types/Report';
-import { cases } from './cases';
+import type { ReportState, Riesgo } from '../types/Report';
+import { cases1 } from './cases';
 import { reportes } from './reports';
 import { notify } from './store';
 import { seguimientoFolio, timelineOf } from '../utilities/caseTimeline';
@@ -16,9 +16,9 @@ const patchReport = (id: number, patch: Partial<(typeof reportes)[number]>) => {
 };
 
 const patchCase = (id: number, patch: Partial<Caso>) => {
-  const i = cases.findIndex((c) => c.id_caso === id);
+  const i = cases1.findIndex((c) => c.id_caso === id);
   if (i === -1) throw new Error(`Caso ${id} no existe`);
-  cases[i] = { ...cases[i], ...patch };
+  cases1[i] = { ...cases1[i], ...patch };
 };
 
 // Accept: the report becomes a new case
@@ -32,9 +32,9 @@ export function acceptReport(reportId: number): number {
   const report = reportes.find((r) => r.id_reporte === reportId);
   if (!report) throw new Error(`Reporte ${reportId} no existe`);
 
-  const id_caso = Math.max(0, ...cases.map((c) => c.id_caso)) + 1;
+  const id_caso = Math.max(0, ...cases1.map((c) => c.id_caso)) + 1;
   const fecha_caso = new Date().toISOString();
-  cases.push({
+  cases1.push({
     id_caso,
     municipio: { nombre: report.ubicacion.municipio },
     ubicacion: report.ubicacion,
@@ -87,7 +87,7 @@ export function rejectReport(reportId: number) {
  * @param reportId - Report to update
  * @param status - New status
  */
-export function setReportStatus(reportId: number, status: EstatusSeguimiento) {
+export function setReportStatus(reportId: number, status: ReportState) {
   patchReport(reportId, { estatus_seguimiento: status });
   notify();
 }
@@ -105,7 +105,7 @@ export function detachReport(reportId: number) {
 
 // appends an entry to the case timeline
 const logEntry = (caseId: number, tipo: string, autor: string, nota: string | null): Partial<Caso> => {
-  const c = cases.find((x) => x.id_caso === caseId);
+  const c = cases1.find((x) => x.id_caso === caseId);
   if (!c) throw new Error(`Caso ${caseId} no existe`);
   const timeline = timelineOf(c);
   return {

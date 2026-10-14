@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Reporte } from '@/lib/types/Report';
 import type { Caso } from '@/lib/types/Case';
-import { cases } from '@/lib/api/cases';
+import { cases1 } from '@/lib/api/cases';
 import { acceptReport, mergeReport, rejectReport } from '@/lib/api/workflow';
 import { isAdmin, useRole } from '@/lib/utilities/useRole';
 
@@ -14,7 +14,7 @@ type Mode = 'idle' | 'merge' | 'reject';
  * @param report - Report to merge
  */
 function mergeCandidates(report: Reporte): Caso[] {
-    return cases
+    return cases1
         .filter((c) => c.estado !== 'Cerrado')
         .sort((a, b) => {
             const sameA = a.ubicacion.colonia === report.ubicacion.colonia ? 0 : 1;

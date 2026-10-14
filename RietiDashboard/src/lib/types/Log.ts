@@ -1,5 +1,5 @@
 /*
-* JSON de Logs, endpoint (/dashboard/logs)
+! * JSON de Logs, endpoint (/dashboard/logs)
 [{
   "id_logs": "number",
   "id_usuario": "number",

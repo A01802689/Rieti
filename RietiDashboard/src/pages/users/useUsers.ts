@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react"
 import type { User, Role, UserCreateForm } from "@/lib/types/User"
 import type { Municipio } from "@/lib/types/Municipio"
 import { DEFAULT_INITIAL_PERMISSIONS, type PermissionKey } from "@/lib/types/Permission"
-import { getUsers } from "@/lib/api/users"
+import { getUsers1 } from "@/lib/api/users"
 import { getMunicipios } from "@/lib/api/municipios"
 
 /** Gives a blank create form with the default permissions */
@@ -111,7 +111,7 @@ export const useUsers = () => {
 
   // fetch once and keep a copy
   useEffect(() => {
-    Promise.all([getUsers(), getMunicipios()])
+    Promise.all([getUsers1(), getMunicipios()])
       .then(([fetchedUsers, fetchedMunicipios]) => {
         setAllUsers(fetchedUsers)
         setMunicipios(fetchedMunicipios)

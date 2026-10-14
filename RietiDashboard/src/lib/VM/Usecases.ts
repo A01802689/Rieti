@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Caso } from '../types/Case';
 import type { Reporte } from '../types/Report';
-import { cases } from '../api/cases';
+import { cases1 } from '../api/cases';
 import { getReports } from '../api/reports';
 import { useStoreVersion } from '../api/store';
 
@@ -38,8 +38,8 @@ export function useCasesViewModel() {
 
   const filterOptions = useMemo(
     () => [
-      { value: ALL_OPTION, total: cases.length },
-      ...STATE_ORDER.map((state) => ({ value: state, total: cases.filter((c) => c.estado === state).length })),
+      { value: ALL_OPTION, total: cases1.length },
+      ...STATE_ORDER.map((state) => ({ value: state, total: cases1.filter((c) => c.estado === state).length })),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [version],
@@ -47,7 +47,7 @@ export function useCasesViewModel() {
 
   const filteredCases = useMemo(() => {
     const query = normalize(searchQuery.trim());
-    return cases
+    return cases1
       .filter((c) => selectedFilter === ALL_OPTION || c.estado === selectedFilter)
       .filter(
         (c) =>
@@ -81,7 +81,7 @@ export function useCaseDetail(id: number): { caso: Caso | undefined; reports: Re
   const version = useStoreVersion();
   return useMemo(
     () => ({
-      caso: cases.find((c) => c.id_caso === id),
+      caso: cases1.find((c) => c.id_caso === id),
       reports: getReports()
         .filter((r) => r.id_caso === id)
         .sort((a, b) => new Date(a.fecha_reporte).getTime() - new Date(b.fecha_reporte).getTime()),

@@ -1,11 +1,18 @@
 import type { Log } from "../types/Log"
+import { api } from "./client"
 
 // this one works as api fetcher
 // here will be the fetch done
 
-export const getLogs = async (): Promise<Log[]> => logs
+/**
+ * log api fetcher
+ * @returns Log array of changes and updated at system layer
+ */
+export const getLogs =  () => api<Log[]>(`/dashboard/logs`, {method: "GET"})
+export const getLogs1 = async (): Promise<Log[]> => logs1
 
-export const logs: Log[] = [
+
+ const logs1: Log[] = [
   {
     id_logs: 1, id_usuario: 1, usuario: "Admin Rieti", action: "Cambio de estado del caso",
     entity_type: "caso", id_registro_afectado: 2, fecha: "2026-09-02T10:14:00-06:00",

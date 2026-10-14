@@ -59,10 +59,9 @@ data class ReporteUiState(
 
     /** Las cuatro preguntas del formulario respondidas. */
     val formularioValido: Boolean
-        get() = cantidad != null && edad != null && actividad != null && riesgo != null
+        get() = cantidad != null && edad != null && actividad != null
     val ubicacionValida: Boolean
-        get() = (latitud != null && longitud != null) ||
-            (municipio.isNotBlank() && colonia.isNotBlank() && calle.isNotBlank())
+        get() = latitud != null && longitud != null
     val puedeEnviar: Boolean
         get() = formularioValido && ubicacionValida &&
             (esAnonimo || contactoValido) && envio !is EnvioUiState.Loading
@@ -77,7 +76,8 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
     val cantidad = cantidad ?: return null
     val edad = edad ?: return null
     val actividad = actividad ?: return null
-    val riesgo = riesgo ?: return null
+    val latitud = latitud ?: return null
+    val longitud = longitud ?: return null
 
     val direccion = listOf(calle, colonia, municipio)
         .filter { it.isNotBlank() }
@@ -85,16 +85,20 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
         .ifBlank { null }
 
     return ReporteCreateRequest(
-        ubicacion = UbicacionCreateRequest(latitud, longitud, direccion),
-        cantidadNna = cantidad.valorApi,
-        edadAproximada = edad.valorApi,
-        tipoTrabajo = actividad.valorApi,
-        riesgo = riesgo.valorApi,
+        ubicacion = UbicacionCreateRequest(
+            municipio = municipio.trim(),
+            colonia = colonia.trim(),
+            calle = calle.trim(),
+            longitud = longitud,
+            latitud = latitud,
+            referencia = null
+        ),
+        cantidadNna = cantidad.etiqueta,
+        edadAproximada = edad.etiqueta,
+        tipoTrabajo = actividad.etiqueta,
         descripcion = descripcion.ifBlank { null },
-        anonimo = esAnonimo,
-        nombre = if (esAnonimo) null else nombre.trim(),
-        apellidos = if (esAnonimo) null else apellidos.trim(),
-        telefono = if (esAnonimo) null else telefono
+        imagenContentType = null,
+        conSeguimiento = !esAnonimo
     )
 }
 
@@ -167,8 +171,7 @@ class ReporteViewModel : ViewModel() {
                 val response = ApiClient.apiService.crearReporte(request)
                 val body = response.body()
                 if (response.isSuccessful && body != null) {
-                    val folio = body.folio ?: "R-${body.idReporte}"
-                    _uiState.update { it.copy(envio = EnvioUiState.Success(folio)) }
+                    _uiState.update { it.copy(envio = EnvioUiState.Success(body.folioReporte)) }
                 } else {
                     Log.e(
                         TAG,

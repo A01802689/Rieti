@@ -1,5 +1,5 @@
 /*
-* JSON de Usuario, endpoint (/dashboard/usuarios/{id})
+* JSON de Usuario, endpoint GET (/dashboard/usuarios/{id})
 {
   "id_usuario": "number",
   "nombre": "string",
@@ -20,7 +20,7 @@
     "notas_registradas": "number"
   }
 }
-* JSON de Usuario, endpoint (/dashboard/usuarios)
+* JSON de Usuario, endpoint GET (/dashboard/usuarios)
 [{
   "id_usuario": "number",
   "nombre": "string",
@@ -37,7 +37,7 @@
   "permisos": "PermissionKey[] (ver lib/types/Permission.ts)"
 }, ...]
 * JSON de alta de Usuario, endpoint POST (/dashboard/usuarios)
-{
+body : {
   "nombre": "string",
   "apellido": "string",
   "correo": "string",
@@ -45,8 +45,7 @@
   "id_municipio": "number",
   "permisos": "PermissionKey[]"
 }
-
-* Respuesta del alta de Usuario, endpoint POST (/dashboard/usuarios)
+respuesta :
 el Usuario creado (mismo JSON que un elemento de la lista)
 
 * JSON de Usuario de la sesión, endpoint GET (/usuarios/me) (propuesto: hoy la sesión se pierde al recargar)
@@ -119,12 +118,12 @@ export interface UserCreate {
   permisos: PermissionKey[]
 }
 
-/** State of the create form while it is being filled */
-export interface UserCreateForm {
-  nombre: string
-  apellido: string
-  correo: string
-  rol: Role
-  id_municipio: number | null
-  permisos: PermissionKey[]
-}
+// /** State of the create form while it is being filled */
+// export interface UserCreateForm {
+//   nombre: string
+//   apellido: string
+//   correo: string
+//   rol: Role
+//   id_municipio: number | null
+//   permisos: PermissionKey[]
+// }

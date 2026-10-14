@@ -1,5 +1,5 @@
 // import { type expression } from "maplibre-gl";
-import type { Caso, Municipio } from "../types/Case"
+import type { CaseState, CaseUrgency, Caso, Municipio, Seguimiento } from "../types/Case"
 import { ubicaciones } from "./reports"
 import { api } from "./client";
 
@@ -8,14 +8,82 @@ import { api } from "./client";
 
 
 /** Simulates the cases endpoint; it will become a fetch */
-// export const getCases = async (): Promise<Caso[]> => cases
-export const getCases = async() => api<Caso[]>(`/dashboard/casos`, {method: "GET"})
-export const getCase = async(id: number) => api<Caso>(`/dashboard/casos/${id}`,{method: "GET"} )
+/**
+ * Fetches api cases array
+ * @returns Caso[]
+ */
+// export const getCases = () => api<Caso[]>(`/dashboard/casos`, {method: "GET"})  
+
+/**
+ * 
+ * @param id of case
+ * @returns case detail
+ */
+export const getCase = (id: number) => api<Caso>(`/dashboard/casos/${id}`,{method: "GET"} )
+
+/**
+ * 
+ * @param id of case
+ * @param state to be placed in the case
+ * @returns case updated detail
+ */
+export const changeCaseState = (id: number, state: CaseState) => api<Caso>(`/dashboard/casos/${id}/estado`, 
+  { method: "PATCH",
+    body: JSON.stringify({
+      estado: state
+    })
+  })
+
+  /**
+   * 
+   * @param id of case
+   * @param municipality to be assigned 
+   * @returns case updated detail
+   */
+export const transferCase = (id: number, municipality: string) => api<Caso>(`/dashboard/casos/${id}/transferir`, 
+  { method: "PUT",
+    body: JSON.stringify({
+      municipio: municipality
+    })
+  }
+)
+
+/**
+ * 
+ * @param id of case
+ * @param note note to be assigned
+ * @returns "seguimiento" log detail
+ */
+export const addNote2Case = (id: number, note: string) => api<Seguimiento>(`/dashboard/casos/${id}/notas`,
+  { method: "POST",
+    body: JSON.stringify({
+      nota: note
+    })
+  }
+)
+
+/**
+ * 
+ * @param id of case
+ * @param urgency to be assigned
+ * @returns case id and urgency updated
+ */
+export const changeUrgency = (id: number, urgency: CaseUrgency) => api<{id_caso: number, urgencia: CaseUrgency}>(`/dashboard/casos/${id}/urgencia`,{
+  method: "PATCH",
+  body: JSON.stringify({
+    urgencia: urgency
+  })
+})
+
+
+
+    //? Emulator 
+export const getCases = async (): Promise<Caso[]>  => cases1
 
 const municipio: Municipio = { nombre: "Atizapán de Zaragoza" }
 
 /** Hardcoded cases used while the endpoint does not exist */
-export const cases: Caso[] = [
+const cases1: Caso[] = [
   {
     id_caso: 1, municipio: municipio, ubicacion: ubicaciones[0],
     estado: "Cerrado", fecha_caso: "2026-08-03T18:42:10-06:00", urgencia: "Media", cantidad_nna: 2,

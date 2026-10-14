@@ -1,13 +1,18 @@
 import type { Municipio } from "../types/Municipio"
 import { api } from "./client"
+import { useState } from "react"
 
 // this one works as api fetcher
 // here will be the fetch done
 
 /** Simulates the municipios endpoint; it will become a fetch */
 // export const getMunicipios = async (): Promise<Municipio[]> => municipios
-let municipios: Municipio[] | null = null
-export const getMunicipios = async () => municipios ? municipios : await api<Municipio[]>(`/municipios`, {method: "POST"})
+const [] = useState()
+/**
+ * Municipality api fetcher
+ * @returns "Municipio" array in the database
+ */
+export const getMunicipios = () => api<Municipio[]>(`/municipios`, {method: "GET"})
 
 /** Hardcoded municipios used while the endpoint does not exist */
 export const municipios1: Municipio[] = [

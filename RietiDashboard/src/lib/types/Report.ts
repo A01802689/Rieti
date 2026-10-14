@@ -93,7 +93,7 @@ sin cuerpo; respuesta:
 import type { FeatureCollection, Point } from "geojson";
 
 /** Follow-up status of a report */
-export type EstatusSeguimiento =
+export type ReportState =
   | "Recibido"
   | "En revisión"
   | "Canalizado"
@@ -135,7 +135,7 @@ export interface Reporte {
   id_caso: number | null;
   ubicacion: Ubicacion;
   folio_reporte: string;
-  estatus_seguimiento: EstatusSeguimiento | null;
+  estatus_seguimiento: ReportState | null;
   cantidad_nna: CantidadNNA;
   edad_aproximada: EdadAproximada | null;
   tipo_trabajo: TipoTrabajo;
@@ -162,7 +162,7 @@ export type FeatureReportProps = {
   risk: Riesgo | null;
   nna: CantidadNNA;
   approx_age: EdadAproximada | null;
-  status: EstatusSeguimiento | null;
+  status: ReportState | null;
   report_date: string;
   hour: number;                    // 0-23 hrs
   weekday: number;                 // 0 = sunday ... 6 = saturday

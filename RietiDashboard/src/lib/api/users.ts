@@ -1,12 +1,43 @@
-import type { User } from "../types/User"
-import { ALL_PERMISSION_KEYS } from "@/lib/types/Permission"
+import type { SessionUser, User, UserCreate } from "../types/User"
+import { ALL_PERMISSION_KEYS, type PermissionKey } from "@/lib/types/Permission"
 import { municipios1 } from "./municipios"
+import { api } from "./client"
 
 // this one works as api fetcher
 // here will be the fetch done
 
 /** Simulates the users endpoint; it will become a fetch */
-export const getUsers = async (): Promise<User[]> => users
+export const getUsers1 = async (): Promise<User[]> => users
+
+/**
+ * Fetches api users array
+ * @returns User[] of "alimentador" | "administrador" role
+ */
+export const getUsers = () => api<User[]> (`/dashboard/usuarios`, {method: "GET"})
+
+/**
+ * 
+ * @param id of user
+ * @returns user detail
+ */
+export const getUser = (id: number) => api<User> (`/dashboard/usuarios/${id}`, {method: "GET"})
+
+export const createUser = (user: UserCreate) => api<User> (`/dashboard/usuarios`, {method: "POST", body: JSON.stringify(user)})
+
+export const getMe = () => api<SessionUser>(`/usuarios/me`, {method: "GET"})
+
+export const changePermissions = (id: number, permissions: PermissionKey[]) => api<User> (`/dashboard/usuarios/${id}/permisos`, 
+  { method: "PUT",
+    body: JSON.stringify({
+      permisos: permissions
+    })
+  }
+)
+
+export const deleteUser = (id: number) => api (`/dashboard/usuarios/${id}`, { method: "DELETE"})
+
+export const logout = () => api(`/usuarios/logout`, {method: "POST"})
+
 
 /**
  * Finds a municipio by id
@@ -15,6 +46,7 @@ export const getUsers = async (): Promise<User[]> => users
  * @returns The municipio, or null when it does not exist
  */
 const mun = (id: number) => municipios1.find((m) => m.id_municipio === id) ?? null
+
 
 /** Hardcoded users used while the endpoint does not exist */
 export const users: User[] = [

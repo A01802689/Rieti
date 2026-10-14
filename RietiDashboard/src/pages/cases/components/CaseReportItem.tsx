@@ -1,11 +1,11 @@
-import type { EstatusSeguimiento, Reporte } from '@/lib/types/Report';
+import type { ReportState, Reporte } from '@/lib/types/Report';
 import { ReportDetails } from '@/components/ui/ReportDetails';
 import { detachReport, setReportStatus } from '@/lib/api/workflow';
 import { statusStyle } from '@/lib/utilities/reportStyles';
 import { isAdmin, useRole } from '@/lib/utilities/useRole';
 
 /** Statuses a report of a case can move through */
-const FOLLOW_UP: EstatusSeguimiento[] = ['Canalizado', 'En atención', 'Concluido'];
+const FOLLOW_UP: ReportState[] = ['Canalizado', 'En atención', 'Concluido'];
 
 /**
  * Report that belongs to the case, with its full data and the follow-up controls
@@ -38,7 +38,7 @@ export function CaseReportItem({ report }: { report: Reporte }) {
                     <select
                         id={`status-${report.id_reporte}`}
                         value={report.estatus_seguimiento ?? ''}
-                        onChange={(e) => setReportStatus(report.id_reporte, e.target.value as EstatusSeguimiento)}
+                        onChange={(e) => setReportStatus(report.id_reporte, e.target.value as ReportState)}
                         className="select-field w-auto"
                     >
                         {report.estatus_seguimiento && !FOLLOW_UP.includes(report.estatus_seguimiento) && (
