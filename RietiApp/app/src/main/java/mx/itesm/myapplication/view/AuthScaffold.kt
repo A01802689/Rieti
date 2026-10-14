@@ -30,7 +30,7 @@ fun AuthScaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             Column {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 AppHeader()
                 Spacer(modifier = Modifier.height(16.dp))
                 AuthTabsBar(navController)

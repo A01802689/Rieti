@@ -1,21 +1,26 @@
 package mx.itesm.myapplication.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mx.itesm.myapplication.R
 
 /**
  * Componente Composable que muestra el encabezado oficial de la aplicación RIETI,
- * incluyendo el nombre del proyecto y el subtítulo representativo.
+ * incluyendo la imagen/logo arriba del título "RIETI" y el subtítulo representativo.
  */
 @Composable
 fun AppHeader() {
@@ -23,6 +28,15 @@ fun AppHeader() {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.logo_rieti_atizapan),
+            contentDescription = "Logo RIETI",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .height(80.dp)
+                .padding(bottom = 8.dp)
+        )
+
         Text(
             text = "RIETI",
             fontSize = 24.sp,
