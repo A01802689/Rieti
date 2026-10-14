@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+
 /**
  * Vista principal con la lista de reportes, mostrados como tarjetas de resumen.
  *
@@ -74,7 +75,6 @@ fun ContentMainView(modifier: Modifier = Modifier){
         )
     }
 }
-
 @Composable
 fun ReportSummaryCard(
     folio: String,
