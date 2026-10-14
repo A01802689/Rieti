@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -31,8 +33,7 @@ import mx.itesm.myapplication.viewModel.AuthViewModel
 /**
  * Formulario de inicio de sesión de usuario.
  *
- * Muestra los campos de texto para correo electrónico y contraseña, gestiona la validación local
- * de campos requeridos y reacciona a las emisiones de estado emitidas por [AuthViewModel].
+ * Muestra los campos de texto para correo electrónico y contraseña con soporte de desplazamiento vertical.
  *
  * @param navController Controlador de navegación [NavHostController].
  * @param authViewModel Instancia de [AuthViewModel] inyectada o proveída.
@@ -58,9 +59,15 @@ fun LoginForm(
     }
 
     AuthScaffold(navController) { innerPadding ->
-        Column(modifier = Modifier.fillMaxWidth().padding(innerPadding).padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+        ) {
             Text(text = "CORREO ELECTRÓNICO")
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             TextField(
                 value = email,
                 onValueChange = {
@@ -73,10 +80,10 @@ fun LoginForm(
                 modifier = Modifier.fillMaxWidth().testTag("emailInput")
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Text(text = "CONTRASEÑA")
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             TextField(
                 value = password,
                 onValueChange = {
@@ -91,7 +98,7 @@ fun LoginForm(
 
             val displayedError = localError ?: (uiState as? AuthUiState.Error)?.message
             if (displayedError != null) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = displayedError,
                     color = MaterialTheme.colorScheme.error,
@@ -100,7 +107,7 @@ fun LoginForm(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 onClick = {
@@ -130,8 +137,8 @@ fun LoginForm(
 /**
  * Formulario para el registro de nuevos usuarios en la plataforma.
  *
- * Captura el nombre completo (dividiéndolo automáticamente en nombre y apellido), el correo electrónico
- * y la contraseña. Se conecta con [AuthViewModel] para ejecutar el alta en el servidor.
+ * Incluye scroll vertical (`verticalScroll`) y espaciado compacto para garantizar que
+ * todos los campos y el botón "Crear cuenta" sean visibles en cualquier pantalla.
  *
  * @param navController Controlador de navegación [NavHostController].
  * @param authViewModel Instancia de [AuthViewModel] inyectada o proveída.
@@ -141,7 +148,8 @@ fun RegisterForm(
     navController: NavHostController,
     authViewModel: AuthViewModel = viewModel()
 ) {
-    var fullName by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var localError by remember { mutableStateOf<String?>(null) }
@@ -158,23 +166,43 @@ fun RegisterForm(
     }
 
     AuthScaffold(navController) { innerPadding ->
-        Column(modifier = Modifier.fillMaxWidth().padding(innerPadding).padding(16.dp)) {
-            Text(text = "NOMBRE COMPLETO")
-            Spacer(modifier = Modifier.height(8.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(text = "NOMBRE(S)")
+            Spacer(modifier = Modifier.height(6.dp))
             TextField(
-                value = fullName,
+                value = nombre,
                 onValueChange = {
-                    fullName = it
+                    nombre = it
                     if (localError != null) localError = null
                     if (uiState is AuthUiState.Error) authViewModel.resetState()
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(text = "APELLIDOS")
+            Spacer(modifier = Modifier.height(6.dp))
+            TextField(
+                value = apellido,
+                onValueChange = {
+                    apellido = it
+                    if (localError != null) localError = null
+                    if (uiState is AuthUiState.Error) authViewModel.resetState()
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(text = "CORREO ELECTRÓNICO")
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             TextField(
                 value = email,
                 onValueChange = {
@@ -186,10 +214,10 @@ fun RegisterForm(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(text = "CONTRASEÑA")
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             TextField(
                 value = password,
                 onValueChange = {
@@ -203,7 +231,7 @@ fun RegisterForm(
 
             val displayedError = localError ?: (uiState as? AuthUiState.Error)?.message
             if (displayedError != null) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = displayedError,
                     color = MaterialTheme.colorScheme.error,
@@ -211,19 +239,20 @@ fun RegisterForm(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    val parts = fullName.trim().split(" ", limit = 2)
-                    val nombre = parts.getOrNull(0) ?: ""
-                    val apellido = parts.getOrNull(1) ?: ""
-
-                    if (nombre.isBlank() || email.isBlank() || password.isBlank()) {
+                    if (nombre.isBlank() || apellido.isBlank() || email.isBlank() || password.isBlank()) {
                         localError = "Por favor, completa todos los campos"
                     } else {
                         localError = null
-                        authViewModel.registrar(nombre, apellido, correo = email.trim(), contrasena = password.trim())
+                        authViewModel.registrar(
+                            nombre = nombre.trim(),
+                            apellido = apellido.trim(),
+                            correo = email.trim(),
+                            contrasena = password.trim()
+                        )
                     }
                 },
                 enabled = uiState !is AuthUiState.Loading,
@@ -238,6 +267,8 @@ fun RegisterForm(
                     Text("Crear cuenta")
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

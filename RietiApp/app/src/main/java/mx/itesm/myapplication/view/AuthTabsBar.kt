@@ -28,7 +28,7 @@ fun AuthTabsBar(navController: NavHostController, modifier: Modifier = Modifier)
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 60.dp)
+            .padding(top = 8.dp)
     ) {
         val authScreens = Pantalla.listaPantallas.filter {
             it.ruta == Pantalla.RUTA_LOGIN || it.ruta == Pantalla.RUTA_REGISTER
