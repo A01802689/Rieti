@@ -7,7 +7,7 @@
 }, ...]
 */
 
-/** Municipality, as the API returns it */
+/** Municipality model*/
 export interface Municipio {
   id_municipio: number
   nombre: string

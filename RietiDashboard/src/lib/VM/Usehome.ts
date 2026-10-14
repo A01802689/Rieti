@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { cases } from '../api/cases';
+import { cases1 } from '../api/cases';
 import { getReports } from '../api/reports';
 import { useStoreVersion } from '../api/store';
 
@@ -21,11 +21,11 @@ export function useHomeViewModel(now: Date = new Date()) {
     const reports = getReports();
 
     const stats = [
-      { label: 'Casos', value: String(cases.length), note: 'registrados', tone: 'bg-amber-500' },
+      { label: 'Casos', value: String(cases1.length), note: 'registrados', tone: 'bg-amber-500' },
       { label: 'Reportes recibidos', value: String(reports.length), note: 'en total', tone: 'bg-teal-600' },
       {
         label: 'Casos cerrados',
-        value: String(cases.filter((c) => c.estado === 'Cerrado').length),
+        value: String(cases1.filter((c) => c.estado === 'Cerrado').length),
         note: 'Con restitución de derechos',
         tone: 'bg-emerald-600',
       },
@@ -40,7 +40,7 @@ export function useHomeViewModel(now: Date = new Date()) {
     // cases per month, last GRAPH_MONTHS months ending at the current one
     const graphData = Array.from({ length: GRAPH_MONTHS }, (_, i) => {
       const date = new Date(now.getFullYear(), now.getMonth() - (GRAPH_MONTHS - 1 - i), 1);
-      const value = cases.filter((c) => {
+      const value = cases1.filter((c) => {
         const d = new Date(c.fecha_caso);
         return d.getFullYear() === date.getFullYear() && d.getMonth() === date.getMonth();
       }).length;
@@ -48,7 +48,7 @@ export function useHomeViewModel(now: Date = new Date()) {
       return { name, value };
     });
 
-    const caseStatus = CASE_STATES.map((value) => ({ value, total: cases.filter((c) => c.estado === value).length }));
+    const caseStatus = CASE_STATES.map((value) => ({ value, total: cases1.filter((c) => c.estado === value).length }));
     const reportStatus = REPORT_STATUSES.map((value) => ({
       value,
       total: reports.filter((r) => r.estatus_seguimiento === value).length,

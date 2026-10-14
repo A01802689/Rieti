@@ -1,4 +1,5 @@
-import type { Ubicacion, Reporte } from "../types/Report"
+import type { Ubicacion, Reporte, ReportState } from "../types/Report"
+import { api } from "./client"
 
 // this one works as api fetcher
 // here will be the fetch done
@@ -15,21 +16,77 @@ export class ApiError extends Error {
 // const API_URL = import.meta.env.VITE_API_URL // enable with the real fetch
 // export const fecthReports
 /**
- * Simulates the reports endpoint; it will become a fetch
- *
- * @returns The reports
+ * Fetches api cases array, if id_case is passed the array fetched are reports related with the id_case passed
+ * @returns Reporte[]
  */
-export function getReports():Reporte[] {
-let  reports: Reporte[] = []
-  // fetch
-  try {
-    // fetch block
-    reports = reportes
-  } catch (e) {
-    throw new Error(`Error fetching reports from API for HeatMap ${e}`)
-  }
-  return reports
-}
+export const getReports = (id_case?: number) => api<Reporte[]>(`/dashboard/reportes` + id_case !== undefined ? `?id_caso=${id_case}` : ``,{method: "GET"})
+
+/**
+ * 
+ * @param id of report
+ * @returns report detail
+ */
+export const getReport = (id: number) => api<Reporte>(`/dashboard/reportes/${id}`, {method: "GET"})
+
+/**
+ * 
+ * @param id of report
+ * @returns report and case id with the status updated
+ */
+export const acceptReport = (id: number) => api<{
+  id_reporte: number,
+  id_caso: number,
+  estatus_seguimiento: ReportState
+}> (`/dashboard/reportes/${id}/aceptar`, {method: "POST"})
+
+/**
+ * 
+ * @param id_report to be accepted
+ * @param id_case to be fused with
+ * @returns report and case id with the status updated
+ */
+export const fuseReport = (id_report: number, id_case: number) => api<{
+  id_reporte: number,
+  id_caso: number,
+  estatus_seguimiento: ReportState
+}> (`/dashboard/reportes/${id_report}/fusionar`, {
+  method: "POST",
+  body: JSON.stringify({
+    id_caso: id_case
+  })
+})
+
+/**
+ * 
+ * @param id of report to be declined
+ * @returns report and case id with the status updated (declined)
+ */
+export const declineReport = (id: number) => api<{
+  id_reporte: number,
+  id_caso: null,
+  estatus_seguimiento: ReportState
+}> (`/dashboard/reportes/${id}/rechazar`, {method: "POST"})
+
+
+export const changeReportState = (id: number, state: ReportState) => api<{
+  id_reporte: number
+  estatus_seguimiento: ReportState
+}> (`/dashboard/reportes/${id}/estatus`, 
+  { method: "PATCH",
+    body: JSON.stringify({
+      estatus_seguimiento: state
+    })
+  })
+
+export const unlinkReport = (id: number) => api<{
+  id_reporte: number,
+  id_caso: null,
+  estatus_seguimiento: ReportState
+}> (`/dashboard/reportes/${id}/desvincular`)
+
+
+
+
 
 /** Hardcoded locations referenced by the mock reports */
 export const ubicaciones: Ubicacion[] = [
