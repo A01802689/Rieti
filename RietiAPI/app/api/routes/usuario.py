@@ -8,24 +8,26 @@ from app.core.security import create_access_token, settings
 from app.core.limiter import limiter
 
 
-router = APIRouter()
+router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
 
-@router.post("/usuarios/logout")
+
+
+@router.post("/logout")
 def logout(response: Response):
     response.delete_cookie("access_token")
     return {"message": "Sesión cerrada"}
 
 
 
-@router.post("/usuarios", response_model=UsuarioResponse)
+@router.post("/", response_model=UsuarioResponse)
 @limiter.limit("10/minute")
 def crear_usuario(request: Request, datos: UsuarioCreate, db: Session = Depends(get_db)):
     return usuario_service.create_usuario(db, datos)
 
 
 #este lo genere solo par ausarios los admins lo hare en otro .py
-@router.post("/usuarios/login", response_model=UsuarioResponse)
+@router.post("/login", response_model=UsuarioResponse)
 @limiter.limit("5/minute")
 def login(request: Request, datos: UsuarioLogin,response: Response ,db: Session = Depends(get_db)):
     usuario = usuario_service.login(db, datos.correo, datos.contrasena)
@@ -44,8 +46,8 @@ def login(request: Request, datos: UsuarioLogin,response: Response ,db: Session 
     return usuario
 
 
-@router.post("/usuarios/admin", response_model=UsuarioResponse)
-def crear_usuario_admin(
+@router.post("/rol", response_model=UsuarioResponse)
+def crear_usuario_con_rol(
     datos: UsuarioCreateAdmin,
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(get_current_user)

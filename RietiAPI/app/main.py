@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from app.api.routes import usuario as usuario_routes
 from app.api.routes import municipio as municipio_routes
 from app.api.routes import reporte as reporte_routes
+from app.api.routes import seguimiento as seguimiento_routes
+from app.api.routes import caso as caso_routes
+
+
 from app.api.routes import usuario_caso
 from app.models import (
     municipio,
@@ -10,6 +14,8 @@ from app.models import (
     caso,
     reporte,
     folio_contador,
+    seguimiento,
+
 )
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -33,7 +39,8 @@ app.add_middleware(
 app.include_router(usuario_routes.router)
 app.include_router(municipio_routes.router)
 app.include_router(reporte_routes.router)
-app.include_router(usuario_caso.router)
+app.include_router(seguimiento_routes.router)
+app.include_router(caso_routes.router)
 
 @app.get("/")
 def read_root():

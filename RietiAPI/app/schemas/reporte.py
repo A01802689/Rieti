@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
 from app.schemas.ubicacion import UbicacionCreate
 from typing import Literal
@@ -39,6 +39,10 @@ class ReporteCreate(BaseModel):
     descripcion: str | None = None
     imagen_content_type: Literal["image/jpeg", "image/png"] | None = None
     con_seguimiento: bool
+
+
+class AsociarReporteACaso(BaseModel):
+    id_caso: int = Field(gt=0)
 
 class ReporteResponse(BaseModel):
     id_reporte: int

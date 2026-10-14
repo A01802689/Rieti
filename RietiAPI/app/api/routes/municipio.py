@@ -4,10 +4,12 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_current_user
 from app.schemas.municipio import  MunicipioResponse
 from app.services import municipio_service
+from fastapi import APIRouter, Depends
 
-router = APIRouter()
+# PODRIAa agrefar una expepcion en caso de que no quieran que se repitabn los municipio.
 
 
+router = APIRouter(prefix="/municipio", tags=["Municipios"])
 
 @router.get("/dashboard/municipios", response_model=list[MunicipioResponse])
 def listar_municipios(

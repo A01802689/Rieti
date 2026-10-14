@@ -83,6 +83,7 @@ respuesta:
   "id_caso": "number",
   "urgencia": "'Baja' | 'Media' | 'Alta'"
 }
+  
 */
 
 import type { FeatureCollection, Point } from "geojson";

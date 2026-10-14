@@ -6,7 +6,7 @@ from app.models.usuario import Usuario
 from app.schemas.reporte import ReporteCreate, ReporteResponse
 from app.services import reporte_service
 
-router = APIRouter(prefix="/reportes")
+router = APIRouter(prefix="/reportes",tags=["Reportes"] )
 
 
 @router.post(

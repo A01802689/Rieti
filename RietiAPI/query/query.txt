@@ -1,5 +1,11 @@
 -- ADVERTENCIA: este script elimina las tablas existentes y sus datos.
+-- Usar solo para reiniciar una base de desarrollo. Incluye los 125 municipios.
+BEGIN;
+
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 DROP TABLE IF EXISTS logs;
+DROP TABLE IF EXISTS seguimiento;
 DROP TABLE IF EXISTS usuario_caso;
 DROP TABLE IF EXISTS folio_contador;
 DROP TABLE IF EXISTS reporte;
@@ -41,13 +47,143 @@ CREATE TABLE municipio (
     clave VARCHAR(25) NOT NULL UNIQUE
 );
 
+-- Catálogo de municipios del Estado de México (mismo contenido que seed_municipios_edomex.sql).
+INSERT INTO municipio (nombre, clave) VALUES
+    ('Acambay de Ruíz Castañeda', 'ACA'),
+    ('Acolman', 'ACL'),
+    ('Aculco', 'ACU'),
+    ('Almoloya de Alquisiras', 'ALA'),
+    ('Almoloya de Juárez', 'ALJ'),
+    ('Almoloya del Río', 'ALR'),
+    ('Amanalco', 'AMA'),
+    ('Amatepec', 'AMT'),
+    ('Amecameca', 'AMC'),
+    ('Apaxco', 'APX'),
+    ('Atenco', 'ATE'),
+    ('Atizapán', 'ATS'),
+    ('Atizapán de Zaragoza', 'ATZ'),
+    ('Atlacomulco', 'ATL'),
+    ('Atlautla', 'ATU'),
+    ('Axapusco', 'AXP'),
+    ('Ayapango', 'AYA'),
+    ('Calimaya', 'CAL'),
+    ('Capulhuac', 'CAP'),
+    ('Coacalco de Berriozábal', 'COB'),
+    ('Coatepec Harinas', 'COH'),
+    ('Cocotitlán', 'COC'),
+    ('Coyotepec', 'COY'),
+    ('Cuautitlán', 'CUA'),
+    ('Chalco', 'CHA'),
+    ('Chapa de Mota', 'CHM'),
+    ('Chapultepec', 'CHP'),
+    ('Chiautla', 'CHI'),
+    ('Chicoloapan', 'CPO'),
+    ('Chiconcuac', 'CCU'),
+    ('Chimalhuacán', 'CHU'),
+    ('Donato Guerra', 'DOG'),
+    ('Ecatepec de Morelos', 'ECA'),
+    ('Ecatzingo', 'ECZ'),
+    ('Huehuetoca', 'HUH'),
+    ('Hueypoxtla', 'HUP'),
+    ('Huixquilucan', 'HUI'),
+    ('Isidro Fabela', 'IFA'),
+    ('Ixtapaluca', 'IXP'),
+    ('Ixtapan de la Sal', 'IXS'),
+    ('Ixtapan del Oro', 'IXO'),
+    ('Ixtlahuaca', 'IXH'),
+    ('Xalatlaco', 'XAL'),
+    ('Jaltenco', 'JAL'),
+    ('Jilotepec', 'JIL'),
+    ('Jilotzingo', 'JIZ'),
+    ('Jiquipilco', 'JIQ'),
+    ('Jocotitlán', 'JOC'),
+    ('Joquicingo', 'JOQ'),
+    ('Juchitepec', 'JUC'),
+    ('Lerma', 'LER'),
+    ('Malinalco', 'MAL'),
+    ('Melchor Ocampo', 'MOC'),
+    ('Metepec', 'MET'),
+    ('Mexicaltzingo', 'MEX'),
+    ('Morelos', 'MOR'),
+    ('Naucalpan de Juárez', 'NAU'),
+    ('Nezahualcóyotl', 'NEZ'),
+    ('Nextlalpan', 'NEX'),
+    ('Nicolás Romero', 'NIR'),
+    ('Nopaltepec', 'NOP'),
+    ('Ocoyoacac', 'OCO'),
+    ('Ocuilan', 'OCU'),
+    ('El Oro', 'ORO'),
+    ('Otumba', 'OTU'),
+    ('Otzoloapan', 'OZA'),
+    ('Otzolotepec', 'OZT'),
+    ('Ozumba', 'OZM'),
+    ('Papalotla', 'PAP'),
+    ('La Paz', 'LPA'),
+    ('Polotitlán', 'POL'),
+    ('Rayón', 'RAY'),
+    ('San Antonio la Isla', 'SAI'),
+    ('San Felipe del Progreso', 'SFP'),
+    ('San Martín de las Pirámides', 'SMP'),
+    ('San Mateo Atenco', 'SMA'),
+    ('San Simón de Guerrero', 'SSG'),
+    ('Santo Tomás', 'STO'),
+    ('Soyaniquilpan de Juárez', 'SOY'),
+    ('Sultepec', 'SUL'),
+    ('Tecámac', 'TEC'),
+    ('Tejupilco', 'TEJ'),
+    ('Temamatla', 'TEM'),
+    ('Temascalapa', 'TMA'),
+    ('Temascalcingo', 'TMC'),
+    ('Temascaltepec', 'TMT'),
+    ('Temoaya', 'TMO'),
+    ('Tenancingo', 'TEN'),
+    ('Tenango del Aire', 'TNA'),
+    ('Tenango del Valle', 'TNV'),
+    ('Teoloyucan', 'TLY'),
+    ('Teotihuacán', 'TEH'),
+    ('Tepetlaoxtoc', 'TEP'),
+    ('Tepetlixpa', 'TLI'),
+    ('Tepotzotlán', 'TPO'),
+    ('Tequixquiac', 'TQX'),
+    ('Texcaltitlán', 'TXA'),
+    ('Texcalyacac', 'TXY'),
+    ('Texcoco', 'TXC'),
+    ('Tezoyuca', 'TZY'),
+    ('Tianguistenco', 'TIA'),
+    ('Timilpan', 'TIM'),
+    ('Tlalmanalco', 'TLM'),
+    ('Tlalnepantla de Baz', 'TLA'),
+    ('Tlatlaya', 'TLT'),
+    ('Toluca', 'TOL'),
+    ('Tonatico', 'TON'),
+    ('Tultepec', 'TUL'),
+    ('Tultitlán', 'TUT'),
+    ('Valle de Bravo', 'VBR'),
+    ('Villa de Allende', 'VAA'),
+    ('Villa del Carbón', 'VCA'),
+    ('Villa Guerrero', 'VGU'),
+    ('Villa Victoria', 'VVI'),
+    ('Xonacatlán', 'XON'),
+    ('Zacazonapan', 'ZAC'),
+    ('Zacualpan', 'ZAP'),
+    ('Zinacantepec', 'ZIN'),
+    ('Zumpahuacán', 'ZUH'),
+    ('Zumpango', 'ZUM'),
+    ('Cuautitlán Izcalli', 'CIZ'),
+    ('Valle de Chalco Solidaridad', 'VCS'),
+    ('Luvianos', 'LUV'),
+    ('San José del Rincón', 'SJR'),
+    ('Tonanitla', 'TNI')
+ON CONFLICT (clave) DO UPDATE
+SET nombre = EXCLUDED.nombre;
+
 
 CREATE TABLE usuario (
     id_usuario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_municipio INTEGER REFERENCES municipio(id_municipio),
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
-    correo VARCHAR(30) NOT NULL,
+    correo VARCHAR(30) NOT NULL UNIQUE,
     contrasena_hash VARCHAR(100) NOT NULL,
     rol rol_usuario
 );
@@ -86,7 +222,7 @@ CREATE TABLE reporte (
     tipo_trabajo tipo_trabajo_reporte NOT NULL,
     descripcion TEXT,
     fecha_reporte TIMESTAMP NOT NULL DEFAULT now(),
-    imagen VARCHAR(255)
+    imagen_key VARCHAR(255)
 );
 
 
@@ -95,6 +231,31 @@ CREATE TABLE usuario_caso (
     id_usuario INTEGER NOT NULL REFERENCES usuario(id_usuario),
     id_caso INTEGER NOT NULL REFERENCES caso(id_caso)
 );
+
+CREATE TABLE seguimiento (
+    id_seguimiento INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_caso INTEGER NOT NULL REFERENCES caso(id_caso),
+    id_usuario_autor INTEGER NOT NULL REFERENCES usuario(id_usuario),
+    consecutivo INTEGER NOT NULL CHECK (consecutivo > 0),
+    folio VARCHAR(80) NOT NULL UNIQUE,
+    fecha TIMESTAMPTZ NOT NULL DEFAULT now(),
+    tipo VARCHAR(32) NOT NULL CHECK (
+        tipo IN (
+            'Recepción de reporte',
+            'Nota',
+            'Cambio de estado',
+            'Transferencia'
+        )
+    ),
+    nota TEXT NOT NULL,
+    CONSTRAINT uq_seguimiento_caso_consecutivo
+        UNIQUE (id_caso, consecutivo),
+    CONSTRAINT ck_seguimiento_nota_no_vacia
+        CHECK (length(btrim(nota)) > 0)
+);
+
+CREATE INDEX ix_seguimiento_caso_fecha
+    ON seguimiento (id_caso, fecha, id_seguimiento);
 
 CREATE TABLE folio_contador (
     id_folio_contador INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -117,3 +278,5 @@ CREATE TABLE logs (
     after_data JSONB,
     fecha TIMESTAMP NOT NULL DEFAULT now()
 );
+
+COMMIT;
