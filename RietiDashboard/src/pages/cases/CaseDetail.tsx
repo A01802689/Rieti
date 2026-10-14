@@ -7,6 +7,7 @@ import { CaseTimeline } from './components/CaseTimeline';
 import { AddNoteCard, MetadataCard } from './components/CaseSidePanel';
 import { CaseReportItem } from './components/CaseReportItem';
 import { useCaseDetail } from '@/lib/VM/Usecases';
+import { Footer } from '@/components/layout/Footer';
 
 /** Page of one case (id from the URL): header, reporter and case data, timeline, its reports and the side panel */
 const CaseDetailPage = () => {
@@ -20,7 +21,7 @@ const CaseDetailPage = () => {
                 <SideBar />
             </div>
 
-            <div className="min-h-screen p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
+            <div className="flex min-h-screen flex-col p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
                 {caso ? (
                     <div className="flex flex-col gap-4 sm:gap-6">
                         <CaseHeader caso={caso} firstReport={reports[0]} />
@@ -53,6 +54,7 @@ const CaseDetailPage = () => {
                         <h1>Caso no encontrado</h1>
                     </header>
                 )}
+                <Footer />
             </div>
         </div>
     );

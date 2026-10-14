@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CaseCard } from './components/CaseCard';
 import { StatusChart } from '@/components/ui/StatusChart';
 import { useCasesViewModel } from '@/lib/VM/Usecases';
+import { Footer } from '@/components/layout/Footer';
 
 /** List of cases with a state filter and a search box; each card opens the case page */
 const CasesPage = () => {
@@ -15,7 +16,7 @@ const CasesPage = () => {
                 <SideBar />
             </div>
 
-            <div className="min-h-screen p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
+            <div className="flex min-h-screen flex-col p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
                 <header className="rounded-xl bg-card px-5 py-5 shadow-sm transition-colors duration-300 sm:px-8 sm:py-6">
                     <h1>Casos</h1>
                     <p className="font-sight">Seguimiento y atención de casos</p>
@@ -76,6 +77,7 @@ const CasesPage = () => {
                         </section>
                     </div>
                 </main>
+                <Footer />
             </div>
         </div>
     );

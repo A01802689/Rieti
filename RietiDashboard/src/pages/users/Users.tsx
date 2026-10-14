@@ -7,6 +7,7 @@ import { UserCard } from "./components/UserCard"
 import { UserDetailPopup } from "./components/UserDetailPopup"
 import { UserCreatePopup } from "./components/UserCreatePopup"
 import { useUsers } from "./useUsers"
+import { Footer } from '@/components/layout/Footer';
 
 /** Users page for admins: cards with search and role filter, and the popups to see a user or create a new one */
 const UsersPage = () => {
@@ -18,7 +19,7 @@ const UsersPage = () => {
         <SideBar />
       </div>
 
-      <div className="min-h-screen p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
+      <div className="flex min-h-screen flex-col p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
         <header className="rounded-xl bg-card px-5 py-5 shadow-sm transition-colors duration-300 sm:px-8 sm:py-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h1>Usuarios</h1>
@@ -64,6 +65,7 @@ const UsersPage = () => {
             )}
           </div>
         </main>
+        <Footer />
       </div>
 
       <UserDetailPopup

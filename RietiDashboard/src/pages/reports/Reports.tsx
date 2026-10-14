@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ReportCard } from './components/Report_Card';
 import { StatusChart } from '@/components/ui/StatusChart';
 import { useReportsViewModel } from '@/lib/VM/Usereportescm';
+import { Footer } from '@/components/layout/Footer';
 
 /** Reports list with a status filter and a search box */
 const ReportPage = () => {
@@ -16,7 +17,7 @@ const ReportPage = () => {
                 <SideBar />
             </div>
 
-            <div className="min-h-screen p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
+            <div className="flex min-h-screen flex-col p-3 pt-20 sm:p-6 sm:pt-20 md:ml-60 md:pt-6">
                 <header className="rounded-xl bg-card px-5 py-5 shadow-sm transition-colors duration-300 sm:px-8 sm:py-6">
                     <h1>Reportes</h1>
                     <p className="font-sight">Gestión y seguimiento de casos</p>
@@ -74,6 +75,7 @@ const ReportPage = () => {
                         </section>
                     </div>
                 </main>
+                <Footer />
             </div>
         </div>
     );
