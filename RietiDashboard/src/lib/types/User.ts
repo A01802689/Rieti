@@ -114,7 +114,7 @@ export interface UserCreate {
   apellido: string
   correo: string
   rol: Role
-  id_municipio: number
+  id_municipio: number | null
   permisos: PermissionKey[]
 }
 

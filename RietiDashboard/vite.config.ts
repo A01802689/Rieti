@@ -10,6 +10,7 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  base: '/Rieti/', 
   optimizeDeps: {
     exclude: ['maplibre-gl'],
   },
@@ -18,5 +19,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  
   
 })

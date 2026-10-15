@@ -1,13 +1,13 @@
 // custom hook (works as a vm): fetch users and municipios, keep a copy and filter it
 import { useEffect, useMemo, useState } from "react"
-import type { User, Role, UserCreateForm } from "@/lib/types/User"
+import type { User, Role,  UserCreate } from "@/lib/types/User"
 import type { Municipio } from "@/lib/types/Municipio"
 import { DEFAULT_INITIAL_PERMISSIONS, type PermissionKey } from "@/lib/types/Permission"
 import { getUsers1 } from "@/lib/api/users"
 import { getMunicipios } from "@/lib/api/municipios"
 
 /** Gives a blank create form with the default permissions */
-const EMPTY_FORM = (): UserCreateForm => ({
+const EMPTY_FORM = (): UserCreate => ({
   nombre: "",
   apellido: "",
   correo: "",
@@ -88,7 +88,7 @@ export const useCreateOpen = (initial: boolean) => useState(initial)
  *
  * @param initial - Starting values
  */
-export const useCreateForm = (initial: UserCreateForm) => useState(initial)
+export const useCreateForm = (initial: UserCreate) => useState(initial)
 
 /**
  * View model of the users page: fetches users and municipios once, keeps a copy, filters it by name and role, and drives the detail and create popups
@@ -164,7 +164,7 @@ export const useUsers = () => {
 
   const closeCreate = () => setCreateOpen(false)
 
-  const updateCreateForm = <K extends keyof UserCreateForm>(field: K, value: UserCreateForm[K]) =>
+  const updateCreateForm = <K extends keyof UserCreate>(field: K, value: UserCreate[K]) =>
     setCreateForm((prev) => ({ ...prev, [field]: value }))
 
   const toggleInitialPermission = (key: PermissionKey) =>
