@@ -1,5 +1,5 @@
 /*
-* JSON de Municipio, endpoint (/dashboard/municipios)
+* JSON de Municipio, endpoint (/municipios)
 [{
   "id_municipio": "number",
   "nombre": "string",

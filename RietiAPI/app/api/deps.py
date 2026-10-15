@@ -13,6 +13,7 @@ def get_db():
     finally:
         db.close()
 
+        
 def get_current_user(request: Request, db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if token is None:
@@ -20,7 +21,12 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     payload = verify_token(token)
     if payload is None:
         raise HTTPException(status_code=401, detail="Token inválido o expirado")
-    id_usuario = int(payload.get("sub"))
+    sub = payload.get("sub")
+    if sub is None:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    id_usuario = int(sub)
     usuario = usuario_repository.get_by_id(db, id_usuario)
+    if usuario is None:
+        raise HTTPException(status_code=401, detail="Usuario no encontrado")
     return usuario
 

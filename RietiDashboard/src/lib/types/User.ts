@@ -1,5 +1,5 @@
 /*
-* JSON de Usuario, endpoint GET (/dashboard/usuarios/{id})
+* JSON de Usuario, endpoint GET (/usuarios/{id})
 {
   "id_usuario": "number",
   "nombre": "string",
@@ -20,7 +20,7 @@
     "notas_registradas": "number"
   }
 }
-* JSON de Usuario, endpoint GET (/dashboard/usuarios)
+* JSON de Usuario, endpoint GET (/usuarios)
 [{
   "id_usuario": "number",
   "nombre": "string",
@@ -36,7 +36,7 @@
   "ultimo_acceso": "string (ISO 8601 TIMESTAMP) | null",
   "permisos": "PermissionKey[] (ver lib/types/Permission.ts)"
 }, ...]
-* JSON de alta de Usuario, endpoint POST (/dashboard/usuarios)
+* JSON de alta de Usuario, endpoint POST (/usuarios)
 body : {
   "nombre": "string",
   "apellido": "string",
@@ -58,14 +58,14 @@ el Usuario creado (mismo JSON que un elemento de la lista)
   "id_municipio": "number | null"
 }
 
-* Cambiar los permisos de un Usuario, endpoint PUT (/dashboard/usuarios/{id}/permisos) (propuesto)
+* Cambiar los permisos de un Usuario, endpoint PUT (/usuarios/{id}/permisos) (propuesto)
 cuerpo:
 {
   "permisos": "PermissionKey[]"
 }
-respuesta: el Usuario completo (JSON de GET /dashboard/usuarios/{id})
+respuesta: el Usuario completo (JSON de GET /usuarios/{id})
 
-* Eliminar un Usuario, endpoint DELETE (/dashboard/usuarios/{id}) (propuesto)
+* Eliminar un Usuario, endpoint DELETE (/usuarios/{id}) (propuesto)
 sin cuerpo; respuesta 204 sin contenido
 
 * Cerrar la sesión, endpoint POST (/usuarios/logout) (ya existe en la API)
@@ -114,7 +114,7 @@ export interface UserCreate {
   apellido: string
   correo: string
   rol: Role
-  id_municipio: number
+  id_municipio: number | null
   permisos: PermissionKey[]
 }
 

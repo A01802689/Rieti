@@ -1,5 +1,5 @@
 /* 
-* JSON de Caso, endpoint GET (/dashboard/casos/{id})
+* JSON de Caso, endpoint GET (/casos/{id})
 {
   "id_caso": "number",
   "municipio": {
@@ -26,7 +26,7 @@
   }, ...]
 }
 
-* JSON de Caso, endpoint GET (/dashboard/casos) (lista, sin notas ni seguimientos)
+* JSON de Caso, endpoint GET (/casos) (lista, sin notas ni seguimientos)
 [{
   "id_caso": "number",
   "municipio": {
@@ -45,21 +45,21 @@
   "urgencia": "'Baja' | 'Media' | 'Alta' | null"
 }, ...]
 
-* Cambiar el estado de un caso, endpoint PATCH (/dashboard/casos/{id}/estado)
+* Cambiar el estado de un caso, endpoint PATCH (/casos/{id}/estado)
 cuerpo:
 {
   "estado": "'Abierto' | 'En desarrollo' | 'Cerrado'"
 }
-respuesta: el Caso completo (JSON de GET /dashboard/casos/{id}) con el seguimiento "Cambio de estado" agregado
+respuesta: el Caso completo (JSON de GET /casos/{id}) con el seguimiento "Cambio de estado" agregado
 
-* Transferir un caso a otro municipio, endpoint POST (/dashboard/casos/{id}/transferir)
+* Transferir un caso a otro municipio, endpoint POST (/casos/{id}/transferir)
 cuerpo (hoy el front envía el nombre; lo ideal es id_municipio):
 {
   "municipio": "string (nombre del municipio)"
 }
 respuesta: el Caso completo con el seguimiento "Transferencia" agregado
 
-* Agregar una nota al seguimiento, endpoint POST (/dashboard/casos/{id}/notas)
+* Agregar una nota al seguimiento, endpoint POST (/casos/{id}/notas)
 cuerpo:
 {
   "nota": "string"
@@ -73,7 +73,7 @@ respuesta: el seguimiento creado:
   "nota": "string"
 }
 
-* Cambiar la urgencia de un caso, endpoint PATCH (/dashboard/casos/{id}/urgencia)
+* Cambiar la urgencia de un caso, endpoint PATCH (/casos/{id}/urgencia)
 cuerpo:
 {
   "urgencia": "'Baja' | 'Media' | 'Alta'"
