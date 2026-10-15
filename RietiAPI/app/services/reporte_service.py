@@ -3,6 +3,7 @@ from uuid import uuid4
 from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
+from botocore.exceptions import BotoCoreError, ClientError
 from geoalchemy2.elements import WKTElement
 from sqlalchemy.orm import Session
 
@@ -10,9 +11,121 @@ from app.core.config import settings
 from app.models.municipio import Municipio
 from app.models.reporte import Reporte
 from app.models.ubicacion import Ubicacion
-from app.repositories import folio_contador_repository
+from app.models.caso import Caso
+from app.repositories import folio_contador_repository, reporte_repositorio
 from app.schemas.reporte import ReporteCreate
 from app.services.s3_service import generar_url_subida
+from app.schemas.reporte import (
+    AsociarReporteACaso,
+    ImagenReporteResponse,
+    ReporteDetalle,
+    ReporteListado,
+    UbicacionReporteDetalle,
+    UbicacionReporteListado,
+)
+from app.services.s3_service import generar_urls_lectura
+
+
+def listar_reportes(
+    *,
+    db: Session,
+    solo_sin_caso: bool,
+    limit: int,
+    offset: int,
+) -> list[ReporteListado]:
+    filas = reporte_repositorio.listar(
+        db,
+        solo_sin_caso=solo_sin_caso,
+        limit=limit,
+        offset=offset,
+    )
+    return [
+        ReporteListado(
+            id_reporte=fila.id_reporte,
+            id_caso=fila.id_caso,
+            folio_reporte=fila.folio_reporte,
+            fecha_reporte=fila.fecha_reporte,
+            descripcion=fila.descripcion,
+            estatus_seguimiento=fila.estatus_seguimiento,
+            cantidad_nna=fila.cantidad_nna,
+            edad_aproximada=fila.edad_aproximada,
+            tipo_trabajo=fila.tipo_trabajo,
+            ubicacion=UbicacionReporteListado(
+                municipio=fila.municipio,
+                colonia=fila.colonia,
+                calle=fila.calle,
+                lat=fila.lat,
+                lng=fila.lng,
+            ),
+        )
+        for fila in filas
+    ]
+
+
+def obtener_detalle_reporte(*, db: Session, id_reporte: int) -> ReporteDetalle:
+    fila = reporte_repositorio.obtener_detalle(db, id_reporte)
+    if fila is None:
+        raise HTTPException(status_code=404, detail="El reporte no existe")
+
+    return ReporteDetalle(
+        id_reporte=fila.id_reporte,
+        id_caso=fila.id_caso,
+        folio_reporte=fila.folio_reporte,
+        fecha_reporte=fila.fecha_reporte,
+        descripcion=fila.descripcion,
+        estatus_seguimiento=fila.estatus_seguimiento,
+        cantidad_nna=fila.cantidad_nna,
+        edad_aproximada=fila.edad_aproximada,
+        tipo_trabajo=fila.tipo_trabajo,
+        ubicacion=UbicacionReporteDetalle(
+            municipio=fila.municipio,
+            colonia=fila.colonia,
+            calle=fila.calle,
+            referencia=fila.referencia,
+            lat=fila.lat,
+            lng=fila.lng,
+        ),
+        tiene_imagen=fila.imagen_key is not None,
+    )
+
+
+def obtener_urls_imagen_reporte(
+    *, db: Session, id_reporte: int
+) -> ImagenReporteResponse:
+    fila = reporte_repositorio.obtener_imagen_key(db, id_reporte)
+    if fila is None:
+        raise HTTPException(status_code=404, detail="El reporte no existe")
+    if fila.imagen_key is None:
+        raise HTTPException(status_code=404, detail="El reporte no tiene imagen")
+
+    try:
+        url_visualizacion, url_descarga = generar_urls_lectura(
+            imagen_key=fila.imagen_key,
+            id_reporte=id_reporte,
+        )
+    except ClientError as error:
+        if error.response.get("Error", {}).get("Code") in (
+            "404", "NoSuchKey", "NotFound"
+        ):
+            raise HTTPException(
+                status_code=404,
+                detail="La imagen todavía no está disponible",
+            ) from error
+        raise HTTPException(
+            status_code=502,
+            detail="No se pudo consultar la imagen en S3",
+        ) from error
+    except (BotoCoreError, ValueError) as error:
+        raise HTTPException(
+            status_code=502,
+            detail="No se pudo consultar la imagen en S3",
+        ) from error
+
+    return ImagenReporteResponse(
+        url_visualizacion=url_visualizacion,
+        url_descarga=url_descarga,
+        expira_en=settings.S3_PRESIGNED_URL_EXPIRES_IN,
+    )
 
 
 def create_reporte(
@@ -106,6 +219,35 @@ def create_reporte(
                 else None
             ),
         }
+    except Exception:
+        db.rollback()
+        raise
+
+
+def asociar_reporte_a_caso(
+    *,
+    db: Session,
+    id_reporte: int,
+    datos: AsociarReporteACaso,
+):
+    try:
+        reporte = (
+            db.query(Reporte)
+            .filter(Reporte.id_reporte == id_reporte)
+            .with_for_update()
+            .first()
+        )
+        if reporte is None:
+            raise HTTPException(status_code=404, detail="El reporte no existe")
+
+        caso = db.query(Caso).filter(Caso.id_caso == datos.id_caso).first()
+        if caso is None:
+            raise HTTPException(status_code=404, detail="El caso no existe")
+
+        reporte.id_caso = caso.id_caso
+        respuesta = {"id_reporte": reporte.id_reporte, "id_caso": caso.id_caso}
+        db.commit()
+        return respuesta
     except Exception:
         db.rollback()
         raise

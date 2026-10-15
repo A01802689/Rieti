@@ -1,7 +1,11 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 from enum import Enum
 from app.schemas.ubicacion import UbicacionCreate
 from typing import Literal
+
+from app.models.reporte import EstatusSeguimiento
 
 class CantidadNna(str, Enum):
     UNO = "1"
@@ -44,6 +48,48 @@ class ReporteCreate(BaseModel):
 class AsociarReporteACaso(BaseModel):
     id_caso: int = Field(gt=0)
 
+class ReporteCasoResponse(BaseModel):
+    id_reporte: int
+    id_caso: int
+
+
+class UbicacionReporteListado(BaseModel):
+    municipio: str
+    colonia: str
+    calle: str
+    lat: float
+    lng: float
+
+
+class UbicacionReporteDetalle(UbicacionReporteListado):
+    referencia: str | None
+
+
+class ReporteListado(BaseModel):
+    id_reporte: int
+    id_caso: int | None
+    folio_reporte: str
+    fecha_reporte: datetime
+    descripcion: str | None
+    estatus_seguimiento: EstatusSeguimiento | None
+    cantidad_nna: CantidadNna
+    edad_aproximada: EdadAproximada
+    tipo_trabajo: TipoTrabajo
+    ubicacion: UbicacionReporteListado
+
+
+class ReporteDetalle(ReporteListado):
+    ubicacion: UbicacionReporteDetalle
+    tiene_imagen: bool
+    imagen: str | None = None
+    url_descarga_imagen: str | None = None
+
+
+class ImagenReporteResponse(BaseModel):
+    url_visualizacion: str
+    url_descarga: str
+    expira_en: int
+
 class ReporteResponse(BaseModel):
     id_reporte: int
     folio_reporte: str
@@ -53,7 +99,6 @@ class ReporteResponse(BaseModel):
     url_subida_imagen: str | None = None
     url_subida_expira_en: int | None = None
     
-
     model_config = {"from_attributes": True}
 
 

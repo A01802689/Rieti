@@ -8,7 +8,6 @@ from fastapi import APIRouter, Depends
 
 # PODRIAa agrefar una expepcion en caso de que no quieran que se repitabn los municipio.
 
-
 router = APIRouter(prefix="/municipio", tags=["Municipios"])
 
 @router.get("/dashboard/municipios", response_model=list[MunicipioResponse])
