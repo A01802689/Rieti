@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario #importo el molde
-
+from sqlalchemy import func
 
 
 def get_by_id(db: Session, id_usuario: int):
@@ -10,7 +10,7 @@ def get_by_id(db: Session, id_usuario: int):
 # regresa el primer resulado que coincida 
 
 def get_by_email(db: Session, email: str):
-    return db.query(Usuario).filter(Usuario.correo == email).first()
+    return db.query(Usuario).filter(func.lower(Usuario.correo) == email.lower()).first()
 
 #ya usuario ya como objeto de la clase Usuario
 def create(db: Session, usuario: Usuario):
