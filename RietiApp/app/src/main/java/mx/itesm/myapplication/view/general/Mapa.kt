@@ -1,4 +1,4 @@
-package mx.itesm.myapplication.view.seguimiento
+package mx.itesm.myapplication.view.general
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -32,6 +32,7 @@ import com.mapbox.maps.extension.compose.style.MapStyle
 
 @Composable
 fun MapaInteractivo(
+    onUbicacionSeleccionada: (Double, Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (LocalInspectionMode.current) {
@@ -64,6 +65,10 @@ fun MapaInteractivo(
                 .height(250.dp)
                 .clip(RoundedCornerShape(12.dp)),
             mapViewportState = mapViewportState,
+            onMapClickListener = { punto ->
+                onUbicacionSeleccionada(punto.longitude(), punto.latitude())
+                true
+            },
             style = {
                 MapStyle(style = Style.MAPBOX_STREETS)
             }

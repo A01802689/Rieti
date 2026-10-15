@@ -1,69 +1,42 @@
 package mx.itesm.myapplication.view.seguimiento
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import mx.itesm.myapplication.view.Pantalla
+import mx.itesm.myapplication.view.general.DialogoReporteEnviado
 import mx.itesm.myapplication.view.general.Enviar
+import mx.itesm.myapplication.view.general.PasoReporte
+import mx.itesm.myapplication.viewModel.EnvioUiState
+import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
  * Pantalla final del flujo de reporte con seguimiento, donde se redacta y se envía el reporte.
- *
- * Esta pantalla es el equivalente de [AnonimoEnviar] para el flujo con seguimiento: solo
- * cambia el título.
  *
  * @param navController Controlador de navegación para manejar la navegación entre pantallas.
  */
 
 @Composable
-fun SeguimientoEnviar(navController: NavController){
-    Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp)
-    ) {
-        // Fila de encabezado con el botón para regresar.
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = {
-                navController.popBackStack()
-            })
-            {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver"
-                )
-            }
-            Text(text = "Volver")
+fun SeguimientoEnviar(navController: NavController, vm: ReporteViewModel){
+    val state by vm.uiState.collectAsState()
+    (state.envio as? EnvioUiState.Success)?.let { exito ->
+        DialogoReporteEnviado(exito.folio) {
+            navController.popBackStack(Pantalla.RUTA_MAIN, inclusive = false)
         }
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = "Reporte con Seguimiento",
-            fontWeight = FontWeight.Bold
-        )
-
-        Enviar(navController = navController,
-            modifier = Modifier)
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SeguimientoPrev() {
-    SeguimientoEnviar(navController = rememberNavController())
+    PasoReporte(
+        "Reporte con Seguimiento",
+        onVolver = { navController.popBackStack() }
+    ) {
+        Enviar(
+            descripcion = state.descripcion,
+            onDescripcionChange = vm::setDescripcion,
+            envio = state.envio,
+            puedeEnviar = state.puedeEnviar,
+            onEnviar = vm::enviarReporte,
+            modifier = Modifier.weight(1f)
+        )
+    }
 }

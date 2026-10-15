@@ -1,36 +1,36 @@
 package mx.itesm.myapplication.view.seguimiento
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import mx.itesm.myapplication.view.Pantalla
+import mx.itesm.myapplication.view.general.BotonContinuar
+import mx.itesm.myapplication.view.general.PasoReporte
+import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
  * Pantalla de datos de contacto para un reporte con seguimiento.
@@ -48,100 +48,50 @@ import androidx.navigation.compose.rememberNavController
  */
 
 @Composable
-fun ReporteSeguimiento(navController: NavController)
+fun ReporteSeguimiento(navController: NavController, vm: ReporteViewModel)
 {
-    /** Nombre(s) del usuario. Vacío si no se ha capturado. */
-    var nombre by remember { mutableStateOf("") }
-
-    /** Apellidos del usuario. Vacío si no se han capturado. */
-    var apellidos by remember { mutableStateOf("") }
-
-    /** Número de teléfono del usuario. Vacío si no se ha capturado. */
-    var numero by remember { mutableStateOf("") }
-    Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp)
+    val state by vm.uiState.collectAsState()
+    LaunchedEffect(Unit) { vm.setEsAnonimo(false) }
+    PasoReporte(
+        titulo = "Reporte con Seguimiento",
+        onVolver = { navController.popBackStack() }
     ) {
-        // Fila de encabezado con el botón para regresar.
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = {navController.popBackStack()
-            })
-            {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver"
-                )
-            }
-            Text(text = "Volver")
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(
-            text = "Reporte con Seguimiento",
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Recibiras tu folio por correo o WhatsApp"
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Tarjeta informativa sobre el uso de los datos solicitados.
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.Gray)
-        ) {
+        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
             Row(
                 modifier = Modifier.padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = null
-                )
-                Text(
-                    text = "Estos datos son para identificar tu reporte y contactarte sobre tu avance"
-                )
+                Icon(Icons.Default.Info, contentDescription = null)
+                Text(text = "Estos datos son para identificar tu reporte y contactarte sobre tu avance")
             }
         }
         Spacer(modifier = Modifier.height(15.dp))
-
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it},
-            label = {Text("Nombre(s)*")},
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-        OutlinedTextField(
-            value = apellidos,
-            onValueChange = { apellidos = it},
-            label = {Text("Apellidos*")},
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(15.dp))
-        OutlinedTextField(
-            value = numero,
-            onValueChange = { numero = it},
-            label = {Text("Número de teléfono*")},
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-        Button(
-            onClick = {
-                navController.navigate(route = "SegFormulario")
-            },
-            modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(15.dp    )
-        ) {Text("Continuar") }
+        Column(
+            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(15.dp)
+        ){
+            OutlinedTextField(
+                value = state.nombre, onValueChange = vm::setNombre,
+                label = {Text("Nombre(s)*")},
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = state.apellidos, onValueChange = vm::setApellidos,
+                label = {Text("Apellidos*")},
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = state.telefono, onValueChange = vm::setTelefono,
+                label = {Text("Número de teléfono*")},
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        BotonContinuar(enabled = state.contactoValido) {
+            navController.navigate(Pantalla.RUTA_SEGFORM)
+        }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ReportePrev() {
-    ReporteSeguimiento(
-        navController = rememberNavController()
-    )
 }

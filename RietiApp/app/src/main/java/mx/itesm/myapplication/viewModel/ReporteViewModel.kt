@@ -61,10 +61,11 @@ data class ReporteUiState(
     val formularioValido: Boolean
         get() = cantidad != null && edad != null && actividad != null
     val ubicacionValida: Boolean
-        get() = latitud != null && longitud != null
+        get() = latitud != null && longitud != null && municipio.isNotBlank()
     val puedeEnviar: Boolean
         get() = formularioValido && ubicacionValida &&
-            (esAnonimo || contactoValido) && envio !is EnvioUiState.Loading
+            (esAnonimo || contactoValido)
+                && envio !is EnvioUiState.Loading && envio !is EnvioUiState.Success
 }
 
 /**
