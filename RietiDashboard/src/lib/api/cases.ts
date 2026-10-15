@@ -12,14 +12,14 @@ import { api } from "./client";
  * Fetches api cases array
  * @returns Caso[]
  */
-// export const getCases = () => api<Caso[]>(`/dashboard/casos`, {method: "GET"})  
+// export const getCases = () => api<Caso[]>(`/casos`, {method: "GET"})  
 
 /**
  * 
  * @param id of case
  * @returns case detail
  */
-export const getCase = (id: number) => api<Caso>(`/dashboard/casos/${id}`,{method: "GET"} )
+export const getCase = (id: number) => api<Caso>(`/casos/${id}`,{method: "GET"} )
 
 /**
  * 
@@ -27,7 +27,7 @@ export const getCase = (id: number) => api<Caso>(`/dashboard/casos/${id}`,{metho
  * @param state to be placed in the case
  * @returns case updated detail
  */
-export const changeCaseState = (id: number, state: CaseState) => api<Caso>(`/dashboard/casos/${id}/estado`, 
+export const changeCaseState = (id: number, state: CaseState) => api<Caso>(`/casos/${id}/estado`, 
   { method: "PATCH",
     body: JSON.stringify({
       estado: state
@@ -40,7 +40,7 @@ export const changeCaseState = (id: number, state: CaseState) => api<Caso>(`/das
    * @param municipality to be assigned 
    * @returns case updated detail
    */
-export const transferCase = (id: number, municipality: string) => api<Caso>(`/dashboard/casos/${id}/transferir`, 
+export const transferCase = (id: number, municipality: string) => api<Caso>(`/casos/${id}/transferir`, 
   { method: "PUT",
     body: JSON.stringify({
       municipio: municipality
@@ -54,7 +54,7 @@ export const transferCase = (id: number, municipality: string) => api<Caso>(`/da
  * @param note note to be assigned
  * @returns "seguimiento" log detail
  */
-export const addNote2Case = (id: number, note: string) => api<Seguimiento>(`/dashboard/casos/${id}/notas`,
+export const addNote2Case = (id: number, note: string) => api<Seguimiento>(`/casos/${id}/notas`,
   { method: "POST",
     body: JSON.stringify({
       nota: note
@@ -68,7 +68,7 @@ export const addNote2Case = (id: number, note: string) => api<Seguimiento>(`/das
  * @param urgency to be assigned
  * @returns case id and urgency updated
  */
-export const changeUrgency = (id: number, urgency: CaseUrgency) => api<{id_caso: number, urgencia: CaseUrgency}>(`/dashboard/casos/${id}/urgencia`,{
+export const changeUrgency = (id: number, urgency: CaseUrgency) => api<{id_caso: number, urgencia: CaseUrgency}>(`/casos/${id}/urgencia`,{
   method: "PATCH",
   body: JSON.stringify({
     urgencia: urgency

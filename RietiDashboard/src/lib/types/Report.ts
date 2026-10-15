@@ -1,5 +1,5 @@
 /* 
-* JSON de Reporte, endpoint GET (/dashboard/reportes/{id})
+* JSON de Reporte, endpoint GET (/reportes/{id})
 {
   "id_reporte": "number",
   "id_usuario": "number | null",
@@ -22,7 +22,7 @@
   "riesgo": "'Bajo' | 'Medio' | 'Alto' | null"
 }
 
-* JSON de Reporte, endpoint GET (/dashboard/reportes) (lista; admite ?id_caso={id} para los reportes de un caso)
+* JSON de Reporte, endpoint GET (/reportes) (lista; admite ?id_caso={id} para los reportes de un caso)
 [{
   "id_reporte": "number",
   "id_caso": "number | null",
@@ -42,7 +42,7 @@
   "riesgo": "'Bajo' | 'Medio' | 'Alto' | null"
 }, ...]
 
-* Aceptar un reporte (crea un caso), endpoint POST (/dashboard/reportes/{id}/aceptar)
+* Aceptar un reporte (crea un caso), endpoint POST (/reportes/{id}/aceptar)
 sin cuerpo; respuesta:
 {
   "id_caso": "number",
@@ -50,7 +50,7 @@ sin cuerpo; respuesta:
   "estatus_seguimiento": "'Canalizado'"
 }
 
-* Fusionar un reporte con un caso existente, endpoint POST (/dashboard/reportes/{id}/fusionar)
+* Fusionar un reporte con un caso existente, endpoint POST (/reportes/{id}/fusionar)
 cuerpo:
 {
   "id_caso": "number"
@@ -62,7 +62,7 @@ respuesta:
   "estatus_seguimiento": "'Canalizado'"
 }
 
-* Rechazar un reporte, endpoint POST (/dashboard/reportes/{id}/rechazar)
+* Rechazar un reporte, endpoint POST (/reportes/{id}/rechazar)
 sin cuerpo; respuesta:
 {
   "id_reporte": "number",
@@ -70,7 +70,7 @@ sin cuerpo; respuesta:
   "estatus_seguimiento": "'Rechazado'"
 }
 
-* Cambiar el seguimiento de un reporte que ya tiene caso, endpoint PATCH (/dashboard/reportes/{id}/estatus)
+* Cambiar el seguimiento de un reporte que ya tiene caso, endpoint PATCH (/reportes/{id}/estatus)
 cuerpo:
 {
   "estatus_seguimiento": "'Recibido' | 'En revisión' | 'Canalizado' | 'En atención' | 'Concluido' | 'Rechazado'"
@@ -81,7 +81,7 @@ respuesta:
   "estatus_seguimiento": "'Recibido' | 'En revisión' | 'Canalizado' | 'En atención' | 'Concluido' | 'Rechazado'"
 }
 
-* Sacar un reporte de su caso, endpoint POST (/dashboard/reportes/{id}/desvincular)
+* Sacar un reporte de su caso, endpoint POST (/reportes/{id}/desvincular)
 sin cuerpo; respuesta:
 {
   "id_reporte": "number",

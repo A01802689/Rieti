@@ -13,20 +13,20 @@ export const getUsers1 = async (): Promise<User[]> => users
  * Fetches api users array
  * @returns User[] of "alimentador" | "administrador" role
  */
-export const getUsers = () => api<User[]> (`/dashboard/usuarios`, {method: "GET"})
+export const getUsers = () => api<User[]> (`/usuarios`, {method: "GET"})
 
 /**
  * 
  * @param id of user
  * @returns user detail
  */
-export const getUser = (id: number) => api<User> (`/dashboard/usuarios/${id}`, {method: "GET"})
+export const getUser = (id: number) => api<User> (`/usuarios/${id}`, {method: "GET"})
 
-export const createUser = (user: UserCreate) => api<User> (`/dashboard/usuarios`, {method: "POST", body: JSON.stringify(user)})
+export const createUser = (user: UserCreate) => api<User> (`/usuarios`, {method: "POST", body: JSON.stringify(user)})
 
 export const getMe = () => api<SessionUser>(`/usuarios/me`, {method: "GET"})
 
-export const changePermissions = (id: number, permissions: PermissionKey[]) => api<User> (`/dashboard/usuarios/${id}/permisos`, 
+export const changePermissions = (id: number, permissions: PermissionKey[]) => api<User> (`/usuarios/${id}/permisos`, 
   { method: "PUT",
     body: JSON.stringify({
       permisos: permissions
@@ -34,7 +34,7 @@ export const changePermissions = (id: number, permissions: PermissionKey[]) => a
   }
 )
 
-export const deleteUser = (id: number) => api (`/dashboard/usuarios/${id}`, { method: "DELETE"})
+export const deleteUser = (id: number) => api (`/usuarios/${id}`, { method: "DELETE"})
 
 export const logout = () => api(`/usuarios/logout`, {method: "POST"})
 

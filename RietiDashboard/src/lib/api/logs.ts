@@ -8,7 +8,7 @@ import { api } from "./client"
  * log api fetcher
  * @returns Log array of changes and updated at system layer
  */
-export const getLogs =  () => api<Log[]>(`/dashboard/logs`, {method: "GET"})
+export const getLogs =  () => api<Log[]>(`/logs`, {method: "GET"})
 export const getLogs1 = async (): Promise<Log[]> => logs1
 
 

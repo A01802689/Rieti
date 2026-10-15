@@ -19,14 +19,14 @@ export class ApiError extends Error {
  * Fetches api cases array, if id_case is passed the array fetched are reports related with the id_case passed
  * @returns Reporte[]
  */
-export const getReports = (id_case?: number) => api<Reporte[]>(`/dashboard/reportes` + id_case !== undefined ? `?id_caso=${id_case}` : ``,{method: "GET"})
+export const getReports = (id_case?: number) => api<Reporte[]>(`/reportes` + id_case !== undefined ? `?id_caso=${id_case}` : ``,{method: "GET"})
 
 /**
  * 
  * @param id of report
  * @returns report detail
  */
-export const getReport = (id: number) => api<Reporte>(`/dashboard/reportes/${id}`, {method: "GET"})
+export const getReport = (id: number) => api<Reporte>(`/reportes/${id}`, {method: "GET"})
 
 /**
  * 
@@ -37,7 +37,7 @@ export const acceptReport = (id: number) => api<{
   id_reporte: number,
   id_caso: number,
   estatus_seguimiento: ReportState
-}> (`/dashboard/reportes/${id}/aceptar`, {method: "POST"})
+}> (`/reportes/${id}/aceptar`, {method: "POST"})
 
 /**
  * 
@@ -49,7 +49,7 @@ export const fuseReport = (id_report: number, id_case: number) => api<{
   id_reporte: number,
   id_caso: number,
   estatus_seguimiento: ReportState
-}> (`/dashboard/reportes/${id_report}/fusionar`, {
+}> (`/reportes/${id_report}/fusionar`, {
   method: "POST",
   body: JSON.stringify({
     id_caso: id_case
@@ -65,13 +65,13 @@ export const declineReport = (id: number) => api<{
   id_reporte: number,
   id_caso: null,
   estatus_seguimiento: ReportState
-}> (`/dashboard/reportes/${id}/rechazar`, {method: "POST"})
+}> (`/reportes/${id}/rechazar`, {method: "POST"})
 
 
 export const changeReportState = (id: number, state: ReportState) => api<{
   id_reporte: number
   estatus_seguimiento: ReportState
-}> (`/dashboard/reportes/${id}/estatus`, 
+}> (`/reportes/${id}/estatus`, 
   { method: "PATCH",
     body: JSON.stringify({
       estatus_seguimiento: state
@@ -82,7 +82,7 @@ export const unlinkReport = (id: number) => api<{
   id_reporte: number,
   id_caso: null,
   estatus_seguimiento: ReportState
-}> (`/dashboard/reportes/${id}/desvincular`)
+}> (`/reportes/${id}/desvincular`)
 
 
 
