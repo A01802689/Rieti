@@ -25,6 +25,7 @@ import mx.itesm.myapplication.viewModel.ReporteViewModel
 @Composable
 fun SeguimientoUbicacion(navController: NavController, vm: ReporteViewModel) {
     val state by vm.uiState.collectAsState()
+    val municipio by vm.municipios.collectAsState()
     PasoReporte(
         "Reporte con Seguimiento",
         { navController.popBackStack() }
@@ -35,6 +36,8 @@ fun SeguimientoUbicacion(navController: NavController, vm: ReporteViewModel) {
             calle = state.calle,
             longitud = state.longitud,
             latitud = state.latitud,
+            municipios = municipio,
+            onReintentarMunicipios = vm::cargarMunicipios,
             onMunicipioSeleccionado = vm::setMunicipio,
             onColoniaSeleccionada = vm::setColonia,
             onCalleSeleccionada = vm::setCalle,

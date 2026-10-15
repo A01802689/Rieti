@@ -67,8 +67,10 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.mapbox.sdk)
-    implementation(libs.mapbox.compose)
+
+    implementation("org.maplibre.compose:maplibre-compose-android:0.12.1") // verifica la versión en Maven Central
+    implementation("com.google.android.gms:play-services-location:21.3.0") // usa la versión vigente
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1") // para .await() de las tareas de ubicación
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

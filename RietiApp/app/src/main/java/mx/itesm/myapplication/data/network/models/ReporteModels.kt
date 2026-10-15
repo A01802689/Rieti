@@ -108,3 +108,15 @@ data class ReporteResponse(
     @SerializedName("url_subida_imagen") val urlSubidaImagen: String? = null,
     @SerializedName("url_subida_expira_en") val urlSubidaExpiraEn: String? = null
 )
+
+/**
+ * Municipio devuelto por el backend.
+ *
+ * @property idMunicipio Identificador en la base de datos.
+ * @property nombre Nombre exacto, tal como lo valida el backend al crear un reporte.
+ */
+data class MunicipioResponse(
+    @SerializedName("id_municipio") val idMunicipio: Int,
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("clave") val clave: String? = null
+)

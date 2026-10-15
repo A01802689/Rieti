@@ -24,6 +24,7 @@ import mx.itesm.myapplication.viewModel.ReporteViewModel
 @Composable
 fun AnonimoUbicacion(navController: NavController, vm: ReporteViewModel) {
     val state by vm.uiState.collectAsState()
+    val municipios by vm.municipios.collectAsState()
     LaunchedEffect(Unit) { vm.setEsAnonimo(true) }
 
     PasoReporte("Reporte Anónimo", onVolver = { navController.popBackStack() }) {
@@ -33,6 +34,8 @@ fun AnonimoUbicacion(navController: NavController, vm: ReporteViewModel) {
             calle = state.calle,
             longitud = state.longitud,
             latitud = state.latitud,
+            municipios = municipios,
+            onReintentarMunicipios = vm::cargarMunicipios,
             onMunicipioSeleccionado = vm::setMunicipio,
             onColoniaSeleccionada = vm::setColonia,
             onCalleSeleccionada = vm::setCalle,

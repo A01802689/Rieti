@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mx.itesm.myapplication.view.general.MapaInteractivo
+import mx.itesm.myapplication.viewModel.MunicipiosUiState
 
 
 /**
@@ -30,6 +31,8 @@ import mx.itesm.myapplication.view.general.MapaInteractivo
 @Composable
 fun Ubicacion(
     municipio: String,
+    municipios: MunicipiosUiState,
+    onReintentarMunicipios: () -> Unit,
     colonia: String,
     calle: String,
     longitud: Double?,
@@ -48,7 +51,7 @@ fun Ubicacion(
         Text(text = "¿Dónde viste la situación?")
         Spacer(modifier = Modifier.height(10.dp))
 
-        MapaInteractivo(onUbicacionSeleccionada = onUbicacionSeleccionada)
+        MapaInteractivo(latitud = latitud, longitud = longitud, onUbicacionSeleccionada = onUbicacionSeleccionada)
         Spacer(modifier = Modifier.height(5.dp))
         Text(
             text = if (longitud != null && latitud != null)
@@ -61,12 +64,11 @@ fun Ubicacion(
         Text("Completa la dirección", Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(15.dp))
 
-        OutlinedTextField(
-            value = municipio,
-            onValueChange = onMunicipioSeleccionado,
-            label = {Text("Municipio")},
-            keyboardOptions = opciones,
-            modifier = Modifier.fillMaxWidth()
+        SelectorMunicipio(
+            seleccionado = municipio,
+            estado = municipios,
+            onSeleccion = onMunicipioSeleccionado,
+            onReintentar = onReintentarMunicipios,
         )
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
