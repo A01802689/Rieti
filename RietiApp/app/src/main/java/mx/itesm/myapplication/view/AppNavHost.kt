@@ -2,10 +2,15 @@ package mx.itesm.myapplication.view
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import mx.itesm.myapplication.view.MainVIew.MainView
 import mx.itesm.myapplication.view.anonimo.AnonimoEnviar
 import mx.itesm.myapplication.view.anonimo.AnonimoFormulario
@@ -14,6 +19,19 @@ import mx.itesm.myapplication.view.seguimiento.ReporteSeguimiento
 import mx.itesm.myapplication.view.seguimiento.SeguimientoEnviar
 import mx.itesm.myapplication.view.seguimiento.SeguimientoFormulario
 import mx.itesm.myapplication.view.seguimiento.SeguimientoUbicacion
+import mx.itesm.myapplication.viewModel.ReporteViewModel
+
+private const val FLUJO_ANONIMO = "flujo_anonimo"
+private const val FLUJO_SEGUIMIENTO = "flujo_seguimiento"
+
+@Composable
+private fun NavBackStackEntry.reporteViewModel(
+    navController: NavController,
+    route: String
+) : ReporteViewModel {
+    val parentEntry = remember(this) {navController.getBackStackEntry(route)}
+    return viewModel(parentEntry)
+}
 
 /**
  * Grafo de navegación principal de la aplicación.
@@ -39,26 +57,33 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(Pantalla.RUTA_MAIN) {
             MainView(navController, modifier)
         }
-        composable(Pantalla.RUTA_SEGUIMIENTO) {
-            ReporteSeguimiento(navController)
+        //Flujo anonimo
+        navigation(startDestination = Pantalla.RUTA_ANONIMOUBICACION, route = FLUJO_ANONIMO) {
+            composable(Pantalla.RUTA_ANONIMOUBICACION) { entry ->
+                AnonimoUbicacion(navController, entry.reporteViewModel(navController, FLUJO_ANONIMO))
+            }
+            composable(Pantalla.RUTA_ANONIMOFORM) { entry ->
+                AnonimoFormulario(navController, entry.reporteViewModel(navController, FLUJO_ANONIMO))
+            }
+            composable(Pantalla.RUTA_ANONIMOENVIAR) { entry ->
+                AnonimoEnviar(navController, entry.reporteViewModel(navController, FLUJO_ANONIMO))
+            }
         }
-        composable(Pantalla.RUTA_SEGUBICACION){
-            SeguimientoUbicacion(navController)
-        }
-        composable(Pantalla.RUTA_SEGENVIAR) {
-            SeguimientoEnviar(navController)
-        }
-        composable(Pantalla.RUTA_SEGFORM){
-            SeguimientoFormulario(navController)
-        }
-        composable(Pantalla.RUTA_ANONIMOENVIAR){
-            AnonimoEnviar(navController)
-        }
-        composable(Pantalla.RUTA_ANONIMOBICACION){
-            AnonimoUbicacion(navController)
-        }
-        composable(Pantalla.RUTA_ANONIMOFORM){
-            AnonimoFormulario(navController)
+
+        //Flujo de seguimiento
+        navigation(startDestination = Pantalla.RUTA_SEGUIMIENTO, route = FLUJO_SEGUIMIENTO){
+            composable(Pantalla.RUTA_SEGUIMIENTO) { entry ->
+                ReporteSeguimiento(navController, entry.reporteViewModel(navController, FLUJO_SEGUIMIENTO))
+            }
+            composable(Pantalla.RUTA_SEGFORM) { entry ->
+                SeguimientoFormulario(navController, entry.reporteViewModel(navController, FLUJO_SEGUIMIENTO))
+            }
+            composable(Pantalla.RUTA_SEGUBICACION) { entry ->
+                SeguimientoUbicacion(navController, entry.reporteViewModel(navController, FLUJO_SEGUIMIENTO))
+            }
+            composable(Pantalla.RUTA_SEGENVIAR) { entry ->
+                SeguimientoEnviar(navController, entry.reporteViewModel(navController, FLUJO_SEGUIMIENTO))
+            }
         }
     }
 }

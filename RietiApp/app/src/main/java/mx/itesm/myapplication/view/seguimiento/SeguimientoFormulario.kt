@@ -1,27 +1,15 @@
 package mx.itesm.myapplication.view.seguimiento
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import mx.itesm.myapplication.view.Pantalla
+import mx.itesm.myapplication.view.general.BotonContinuar
 import mx.itesm.myapplication.view.general.Formulario
+import mx.itesm.myapplication.view.general.PasoReporte
+import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
  * Pantalla del paso del formulario dentro del flujo de reporte con seguimiento.
@@ -34,53 +22,25 @@ import mx.itesm.myapplication.view.general.Formulario
  */
 
 @Composable
-fun SeguimientoFormulario(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
+fun SeguimientoFormulario(navController: NavController, vm: ReporteViewModel) {
+    val state by vm.uiState.collectAsState()
+    PasoReporte(
+        "Reporte con Seguimiento",
+        { navController.popBackStack() }
     ) {
-        // Fila de encabezado con el botón para regresar.
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = {
-                navController.popBackStack()
-            }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver"
-                )
-            }
-            Text(text = "Volver")
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = "Reporte con Seguimiento",
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Recibiras tu folio por correo o WhatsApp"
-        )
-        Spacer(modifier = Modifier.height(25.dp))
-
         Formulario(
-            navController = navController,
+            cantidad = state.cantidad,
+            edad = state.edad,
+            actividad = state.actividad,
+            riesgo = state.riesgo,
+            onCantidadSeleccionada = vm::setCantidad,
+            onEdadSeleccionada = vm::setEdad,
+            onActividadSeleccionada = vm::setActividad,
+            onRiesgoSeleccionado = vm::setRiesgo,
             modifier = Modifier.weight(1f)
         )
-
-        Button(
-            onClick = {
-                navController.navigate(route = "SegUbicacion")
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("Continuar") }
+        BotonContinuar(enabled = state.formularioValido) {
+            navController.navigate(Pantalla.RUTA_SEGUBICACION)
+        }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrevForms() {
-    SeguimientoFormulario(navController = rememberNavController())
 }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mx.itesm.myapplication.data.network.ApiClient
 import mx.itesm.myapplication.data.network.models.Actividad
 import mx.itesm.myapplication.data.network.models.CantidadNna
+import mx.itesm.myapplication.data.network.models.MunicipioResponse
 import mx.itesm.myapplication.data.network.models.RangoEdad
 import mx.itesm.myapplication.data.network.models.ReporteCreateRequest
 import mx.itesm.myapplication.data.network.models.Riesgo
@@ -27,6 +28,13 @@ sealed interface EnvioUiState {
     object Loading : EnvioUiState
     data class Success(val folio: String) : EnvioUiState
     data class Error(val message: String) : EnvioUiState
+}
+
+/** Estado de la carga de municipios desde el backend. */
+sealed interface MunicipiosUiState {
+    object Loading : MunicipiosUiState
+    data class Success(val municipios: List<MunicipioResponse>) : MunicipiosUiState
+    data class Error(val message: String) : MunicipiosUiState
 }
 
 /**
@@ -61,10 +69,11 @@ data class ReporteUiState(
     val formularioValido: Boolean
         get() = cantidad != null && edad != null && actividad != null
     val ubicacionValida: Boolean
-        get() = latitud != null && longitud != null
+        get() = latitud != null && longitud != null && municipio.isNotBlank()
     val puedeEnviar: Boolean
         get() = formularioValido && ubicacionValida &&
-            (esAnonimo || contactoValido) && envio !is EnvioUiState.Loading
+            (esAnonimo || contactoValido)
+                && envio !is EnvioUiState.Loading && envio !is EnvioUiState.Success
 }
 
 /**
@@ -116,6 +125,11 @@ class ReporteViewModel : ViewModel() {
 
     /** Estado UI reactivo expuesto a las vistas Composable. */
     val uiState: StateFlow<ReporteUiState> = _uiState.asStateFlow()
+
+    private val _municipios = MutableStateFlow<MunicipiosUiState>(MunicipiosUiState.Loading)
+
+    /** Municipios disponibles para el selector. */
+    val municipios: StateFlow<MunicipiosUiState> = _municipios.asStateFlow()
 
     /**
      * Actualiza la modalidad del reporte (Anónimo o Con seguimiento).
@@ -198,6 +212,43 @@ class ReporteViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e(TAG, "Excepción en enviarReporte: ${e.localizedMessage}", e)
                 _uiState.update { it.copy(envio = EnvioUiState.Error("Ocurrió un error inesperado.")) }
+            }
+        }
+    }
+
+    init {
+        cargarMunicipios()
+    }
+
+    /** Pide al backend la lista de municipios. También sirve como "Reintentar". */
+    fun cargarMunicipios() {
+        _municipios.value = MunicipiosUiState.Loading
+        viewModelScope.launch {
+            try {
+                val response = ApiClient.apiService.obtenerMunicipios()
+                val lista = response.body()
+                _municipios.value = when {
+                    response.isSuccessful && !lista.isNullOrEmpty() ->
+                        MunicipiosUiState.Success(lista.sortedBy { it.nombre })
+                    response.isSuccessful ->
+                        MunicipiosUiState.Error("No hay municipios disponibles.")
+                    response.code() == 401 || response.code() == 403 -> {
+                        Log.e(TAG, "Municipios sin permiso (HTTP ${response.code()})")
+                        MunicipiosUiState.Error("No se pudo cargar la lista de municipios. Inicia sesión de nuevo.")
+                    }
+                    else -> {
+                        Log.e(TAG, "Error al cargar municipios (HTTP ${response.code()})")
+                        MunicipiosUiState.Error("No se pudieron cargar los municipios (${response.code()}).")
+                    }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                Log.e(TAG, "IOException al cargar municipios: ${e.localizedMessage}", e)
+                _municipios.value = MunicipiosUiState.Error("Error de conexión. Verifica tu red o servidor.")
+            } catch (e: Exception) {
+                Log.e(TAG, "Excepción al cargar municipios: ${e.localizedMessage}", e)
+                _municipios.value = MunicipiosUiState.Error("Ocurrió un error inesperado.")
             }
         }
     }

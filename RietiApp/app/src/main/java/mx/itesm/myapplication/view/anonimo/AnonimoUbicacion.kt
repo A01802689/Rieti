@@ -1,26 +1,16 @@
 package mx.itesm.myapplication.view.anonimo
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import mx.itesm.myapplication.view.Pantalla
+import mx.itesm.myapplication.view.general.BotonContinuar
+import mx.itesm.myapplication.view.general.PasoReporte
 import mx.itesm.myapplication.view.general.Ubicacion
+import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
  * Pantalla del paso de ubicación dentro del flujo de reporte anónimo.
@@ -32,46 +22,28 @@ import mx.itesm.myapplication.view.general.Ubicacion
  * @param navController Controlador de navegación usado para regresar a la pantalla anterior
  */
 @Composable
-fun AnonimoUbicacion(navController: NavController) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(20.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            // Fila de encabezado con el botón para regresar.
-            IconButton(onClick = {
-                navController.popBackStack()
-            })
-            {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver"
-                )
-            }
-            Text(text = "Volver")
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = "Reporte Anónimo",
-            fontWeight = FontWeight.Bold
+fun AnonimoUbicacion(navController: NavController, vm: ReporteViewModel) {
+    val state by vm.uiState.collectAsState()
+    val municipios by vm.municipios.collectAsState()
+    LaunchedEffect(Unit) { vm.setEsAnonimo(true) }
+
+    PasoReporte("Reporte Anónimo", onVolver = { navController.popBackStack() }) {
+        Ubicacion(
+            municipio = state.municipio,
+            colonia = state.colonia,
+            calle = state.calle,
+            longitud = state.longitud,
+            latitud = state.latitud,
+            municipios = municipios,
+            onReintentarMunicipios = vm::cargarMunicipios,
+            onMunicipioSeleccionado = vm::setMunicipio,
+            onColoniaSeleccionada = vm::setColonia,
+            onCalleSeleccionada = vm::setCalle,
+            onUbicacionSeleccionada = vm::setCoordenadas,
+            modifier = Modifier.weight(1f)
         )
-
-        Spacer(modifier = Modifier.height(25.dp))
-        Ubicacion(navController = navController,
-            modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = {
-                navController.navigate(route = "AnFormulario")
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("Continuar") }
+        BotonContinuar( enabled = state.ubicacionValida) {
+            navController.navigate(Pantalla.RUTA_ANONIMOFORM)
+        }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrevAnonimoUbicacion() {
-    AnonimoUbicacion(navController = rememberNavController())
 }

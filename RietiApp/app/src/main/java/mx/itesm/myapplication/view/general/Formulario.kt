@@ -2,21 +2,49 @@ package mx.itesm.myapplication.view.general
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import mx.itesm.myapplication.data.network.models.Actividad
+import mx.itesm.myapplication.data.network.models.CantidadNna
+import mx.itesm.myapplication.data.network.models.RangoEdad
+import mx.itesm.myapplication.data.network.models.Riesgo
+
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> PreguntaOpcionUnica(
+    titulo: String,
+    opciones: List<T>,
+    seleccionada: T?,
+    etiqueta: (T) -> String,
+    onSeleccionar: (T) -> Unit
+) {
+    Text(titulo)
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        opciones.forEach { opcion ->
+            FilterChip(
+                selected = seleccionada == opcion,
+                onClick = { onSeleccionar(opcion) },
+                label = { Text(etiqueta(opcion)) }
+            )
+        }
+    }
+    Spacer(modifier = Modifier.height(15.dp))
+}
+
+
 
 /**
  * Formulario de preguntas de opción única para describir una situación observada.
@@ -28,111 +56,31 @@ import androidx.navigation.NavController
  * 3. Actividad que estaban realizando.
  * 4. Si se observó alguna situación de riesgo.
  *
- * @param navController Controlador de navegación para manejar la navegación entre pantallas.
  * @param modifier Modificador opcional de diseño.
  */
 
-
 @Composable
 fun Formulario(
-    navController: NavController,
+    cantidad: CantidadNna?,
+    edad: RangoEdad?,
+    actividad: Actividad?,
+    riesgo: Riesgo?,
+    onCantidadSeleccionada: (CantidadNna) -> Unit,
+    onEdadSeleccionada: (RangoEdad) -> Unit,
+    onActividadSeleccionada: (Actividad) -> Unit,
+    onRiesgoSeleccionado: (Riesgo) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    /** Opción elegida para la cantidad de menores observados. Vacío si no hay selección. */
-    var cantidadSeleccionada by remember { mutableStateOf("") }
-
-    /** Rango de edad aproximada elegido. Vacío si no hay selección. */
-    var edadSeleccionada by remember { mutableStateOf("") }
-
-    /** Actividad elegida que realizaban los menores. Vacío si no hay selección. */
-    var actividadSeleccionada by remember { mutableStateOf("") }
-
-    /** Respuesta elegida sobre la observación de una situación de riesgo. Vacío si no hay selección. */
-    var riesgoSeleccionado by remember { mutableStateOf("") }
-
     Column(
-        modifier = modifier
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = "¿Cuantas niñas, niños o adolescentes observaste?"
-        )
-
-        /** Opciones disponibles para la pregunta de cantidad. */
-        val opcionesCantidad = listOf("1", "2", "3", "5 o más", "No sé")
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            opcionesCantidad.forEach { opcion ->
-                FilterChip(
-                    selected = cantidadSeleccionada == opcion,
-                    onClick = { cantidadSeleccionada = opcion },
-                    label = { Text(opcion) }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = "Edad aproximada"
-        )
-
-        /** Rangos de edad disponibles, en años. */
-        val edades = listOf("0-5", "6-11", "12-14", "15-17", "No sé")
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            edades.forEach { edad ->
-                FilterChip(
-                    selected = edadSeleccionada == edad,
-                    onClick = { edadSeleccionada = edad },
-                    label = { Text(edad) }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = "¿Que estaban haciendo?"
-        )
-
-        /** Actividades disponibles para la pregunta sobre lo que estaban haciendo. */
-        val actividades = listOf(
-            "Venta ambulante", "Limpieza de parabrisas", "Mendicidad",
-            "Carga y descarga", "Construccion", "Trabajo doméstico", "No sé"
-        )
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            actividades.forEach { actividad ->
-                FilterChip(
-                    selected = actividadSeleccionada == actividad,
-                    onClick = { actividadSeleccionada = actividad },
-                    label = { Text(actividad) }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = "¿Observaste alguna situación de riesgo?"
-        )
-
-        /** Respuestas disponibles para la pregunta de situación de riesgo. */
-        val riesgos = listOf("Sí", "No", "No sé")
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            riesgos.forEach { riesgo ->
-                FilterChip(
-                    selected = riesgoSeleccionado == riesgo,
-                    onClick = { riesgoSeleccionado = riesgo },
-                    label = { Text(riesgo) }
-                )
-            }
-        }
+        PreguntaOpcionUnica("¿Cuántas niñas, niños o adolescentes observados?",
+        CantidadNna.entries, cantidad, { it.etiqueta }, onCantidadSeleccionada)
+        PreguntaOpcionUnica("Edad aproximada",
+            RangoEdad.entries, edad, { it.etiqueta }, onEdadSeleccionada)
+        PreguntaOpcionUnica("¿Qué estaban realizando?",
+            Actividad.entries, actividad, { it.etiqueta }, onActividadSeleccionada)
+        PreguntaOpcionUnica("¿Se observó alguna situación de riesgo?",
+            Riesgo.entries, riesgo, { it.etiqueta }, onRiesgoSeleccionado)
     }
 }

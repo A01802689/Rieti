@@ -40,7 +40,7 @@ sealed class Pantalla(
         const val RUTA_SEGFORM = "SegFormulario"
 
         /** Ruta de ubicación del reporte anónimo. */
-        const val RUTA_ANONIMOBICACION = "AnUbicacion"
+        const val RUTA_ANONIMOUBICACION = "AnUbicacion"
 
         /** Ruta de envío del reporte anónimo. */
         const val RUTA_ANONIMOENVIAR = "AnEnviar"
@@ -77,7 +77,7 @@ sealed class Pantalla(
     data object SeguimientoFormulario : Pantalla(RUTA_SEGFORM, "Formulario de Seguimiento")
 
     /** Pantalla de captura de ubicación para el reporte anónimo. */
-    data object AnonimoUbicacion : Pantalla(RUTA_ANONIMOBICACION, "Ubicacion para el reporte anonimo")
+    data object AnonimoUbicacion : Pantalla(RUTA_ANONIMOUBICACION, "Ubicacion para el reporte anonimo")
 
     /** Pantalla de confirmación y envío de reporte anónimo. */
     data object AnonimoEnviar : Pantalla(RUTA_ANONIMOENVIAR, "Enviar el reporte de forma anonima")
