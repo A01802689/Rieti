@@ -9,13 +9,8 @@ from fastapi import APIRouter, Depends
 # PODRIAa agrefar una expepcion en caso de que no quieran que se repitabn los municipio.
 
 
-router = APIRouter(prefix="/municipio", tags=["Municipios"])
+router = APIRouter(prefix="/municipios", tags=["Municipios"])
 
-@router.get("/dashboard/municipios", response_model=list[MunicipioResponse])
-def listar_municipios(
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
-    if current_user.rol is None:
-        raise HTTPException(status_code=403, detail="Acceso solo para personal autorizado")
+@router.get("/", response_model=list[MunicipioResponse])
+def listar_municipios(db: Session = Depends(get_db)):
     return municipio_service.get_municipios(db)
