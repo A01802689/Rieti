@@ -67,6 +67,6 @@ interface ApiService {
     @POST("reportes/")
     suspend fun crearReporte(@Body datos: ReporteCreateRequest): Response<ReporteResponse>
 
-    @GET("municipio/dashboard/municipios")
+    @GET("municipios/")
     suspend fun obtenerMunicipios(): Response<List<MunicipioResponse>>
 }
