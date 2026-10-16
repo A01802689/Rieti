@@ -14,9 +14,19 @@ class Settings(BaseSettings):
     S3_REPORTES_BUCKET: str
     S3_PRESIGNED_URL_EXPIRES_IN: int = 300
 
+    # SMTP Service
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587  
+    SMTP_USER: str = ""  
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = ""
+    SMTP_FROM_NAME: str = "Rieti"
+    SMTP_TIMEOUT: int = 10  
 
-
+    # Recovery
+    RECOVERY_CODE_EXPIRE_MINUTES: int = 10
+    RECOVERY_LINK_EXPIRE_MINUTES: int = 15
+    RECOVERY_MAX_ATTEMPTS: int = 5  
     model_config = {"env_file": ".env"}
 
-# settings con minuscula es una instancia de la clase Settings
 settings = Settings()

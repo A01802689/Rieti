@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 
-/** Page shown when the URL does not match any route */
 const NotFoundPage = () => {
     const navigate = useNavigate();
 

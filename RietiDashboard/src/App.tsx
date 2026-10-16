@@ -10,6 +10,8 @@ import { AuthProvider } from "./context/AuthContext";
 import UsersPage from "./pages/users/Users";
 //import LogsPage from "./pages/logs/Logs";
 import NotFoundPage from "./pages/404/404";
+import RecoveryPage from "./pages/recovery/Recovery";
+import TokenPage from "./pages/recovery/Token";
 
 /** Routes of the app, inside the session provider */
 function App() {
@@ -18,6 +20,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login/>} />
+        <Route path="/recovery" element={<RecoveryPage/>} />
+        <Route path="/recovery/token" element={<TokenPage/>} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/reports" element={<ReportPage/>} />
         <Route path="/map" element={<HeatMapPage/>} />
