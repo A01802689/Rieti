@@ -209,7 +209,6 @@ CREATE TABLE caso (
     id_ubicacion INTEGER NOT NULL REFERENCES ubicacion(id_ubicacion),
     estado estado,
     fecha_caso TIMESTAMP NOT NULL DEFAULT now(),
-    notas TEXT,
     urgencia urgencia
 );
 

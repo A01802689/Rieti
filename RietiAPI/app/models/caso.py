@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey, func
+from sqlalchemy import Column, Integer, DateTime, ForeignKey, func
 from sqlalchemy import Enum as SQLEnum
 from enum import Enum
 
@@ -61,11 +61,6 @@ class Caso(Base):
         nullable = False,
         server_default = func.now()
     )
-    notas = Column(
-        Text,
-        nullable = True, 
-    )
-
     urgencia = Column(     
         SQLEnum(
             Urgencia,

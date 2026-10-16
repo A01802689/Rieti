@@ -14,7 +14,7 @@ class ContratoCantidadCaso(BaseModel):
     def normalizar_cantidad(cls, valor):
         return str(valor) if type(valor) is int else valor
 
-    @field_serializer("cantidad_nna", check_fields=False)
+    @field_serializer("cantidad_nna", check_fields=False, when_used="unless-none")
     def serializar_cantidad(self, valor) -> Literal[1, 2, 3, 4, "5 o más", "No sé"]:
         return int(valor.value) if valor.value in ("1", "2", "3", "4") else valor.value
 
@@ -29,7 +29,6 @@ class CasoCreate(ContratoCantidadCaso):
     id_municipio: int
     id_ubicacion: int
     estado: Estado | None = None
-    notas: str | None = None
     urgencia: Urgencia | None = None
     cantidad_nna: CantidadNNA = CantidadNNA.NO_SE
     edad_aproximada: EdadAproximada = EdadAproximada.NO_SE
@@ -85,30 +84,18 @@ class CasoDetalle(CasoListado):
     seguimientos: list[SeguimientoResponse]
 
 
-class ActualizarCantidadNna(ContratoCantidadCaso):
+class ActualizarCaso(ContratoCantidadCaso):
     model_config = ConfigDict(extra="forbid")
-    cantidad_nna: CantidadNNA
+    estado: Estado | None = None
+    urgencia: Urgencia | None = None
+    cantidad_nna: CantidadNNA | None = None
+    edad_aproximada: EdadAproximada | None = None
+    tipo_trabajo: TipoTrabajo | None = None
 
-
-class CantidadNnaCasoResponse(ActualizarCantidadNna):
-    id_caso: int
-
-
-class ActualizarEdadAproximada(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    edad_aproximada: EdadAproximada
-
-
-class EdadAproximadaCasoResponse(ActualizarEdadAproximada):
-    id_caso: int
-
-
-class ActualizarTipoTrabajo(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    tipo_trabajo: TipoTrabajo
-
-
-class TipoTrabajoCasoResponse(ActualizarTipoTrabajo):
-    id_caso: int
+    @field_validator("cantidad_nna", mode="before",
+                     json_schema_input_type=Literal[1, 2, 3, 4, "1", "2", "3", "4", "5 o más", "No sé"] | None)
+    @classmethod
+    def normalizar_cantidad(cls, valor):
+        return super().normalizar_cantidad(valor)
 
 

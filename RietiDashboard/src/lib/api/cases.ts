@@ -1,5 +1,5 @@
 // import { type expression } from "maplibre-gl";
-import type { CaseState, CaseUrgency, Caso, CasoListado, Municipio, Seguimiento } from "../types/Case"
+import type { CaseState, CaseUrgency, Caso, CasoListado, CasoPatch, Municipio, Seguimiento } from "../types/Case"
 import type { CantidadNNA, EdadAproximada, TipoTrabajo } from "../types/Report"
 import { ubicaciones } from "./reports"
 import { api } from "./client";
@@ -7,20 +7,18 @@ import { api } from "./client";
 /** Lista completa para que el VM filtre; getCases conserva el origen simulado actual. */
 export const listCases = () => api<CasoListado[]>("/casos")
 
+/** Los campos omitidos o null conservan su valor; devuelve el caso completo. */
+export const updateCase = (id: number, datos: CasoPatch) =>
+  api<Caso>(`/casos/${id}`, { method: "PATCH", body: JSON.stringify(datos) })
+
 export const changeCaseQuantity = (id: number, cantidad_nna: CantidadNNA) =>
-  api<{ id_caso: number; cantidad_nna: CantidadNNA }>(`/casos/${id}/cantidad-nna`, {
-    method: "PATCH", body: JSON.stringify({ cantidad_nna }),
-  })
+  updateCase(id, { cantidad_nna })
 
 export const changeCaseAge = (id: number, edad_aproximada: EdadAproximada) =>
-  api<{ id_caso: number; edad_aproximada: EdadAproximada }>(`/casos/${id}/edad-aproximada`, {
-    method: "PATCH", body: JSON.stringify({ edad_aproximada }),
-  })
+  updateCase(id, { edad_aproximada })
 
 export const changeCaseWorkType = (id: number, tipo_trabajo: TipoTrabajo) =>
-  api<{ id_caso: number; tipo_trabajo: TipoTrabajo }>(`/casos/${id}/tipo-trabajo`, {
-    method: "PATCH", body: JSON.stringify({ tipo_trabajo }),
-  })
+  updateCase(id, { tipo_trabajo })
 
 // this one works as api fetcher
 // here will be the fetch done
@@ -46,12 +44,7 @@ export const getCase = (id: number) => api<Caso>(`/casos/${id}`,{method: "GET"} 
  * @param state to be placed in the case
  * @returns case updated detail
  */
-export const changeCaseState = (id: number, state: CaseState) => api<Caso>(`/casos/${id}/estado`, 
-  { method: "PATCH",
-    body: JSON.stringify({
-      estado: state
-    })
-  })
+export const changeCaseState = (id: number, state: CaseState) => updateCase(id, { estado: state })
 
   /**
    * 
@@ -87,12 +80,7 @@ export const addNote2Case = (id: number, note: string) => api<Seguimiento>(`/cas
  * @param urgency to be assigned
  * @returns case id and urgency updated
  */
-export const changeUrgency = (id: number, urgency: CaseUrgency) => api<{id_caso: number, urgencia: CaseUrgency}>(`/casos/${id}/urgencia`,{
-  method: "PATCH",
-  body: JSON.stringify({
-    urgencia: urgency
-  })
-})
+export const changeUrgency = (id: number, urgency: CaseUrgency) => updateCase(id, { urgencia: urgency })
 
 
 

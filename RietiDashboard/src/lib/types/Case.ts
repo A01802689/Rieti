@@ -56,12 +56,21 @@
   "urgencia": "'Baja' | 'Media' | 'Alta' | null"
 }, ...]
 
-* Cambiar el estado de un caso, endpoint PATCH (/casos/{id}/estado)
-cuerpo:
-{
-  "estado": "'Abierto' | 'En desarrollo' | 'Cerrado'"
-}
-! respuesta: el Caso completo (JSON de GET /casos/{id}), sin crear seguimiento
+! Actualizar un caso, endpoint PATCH (/casos/{id_caso}), sólo Administrador.
+! Todos los campos son opcionales; los omitidos o null se ignoran.
+! cuerpo de ejemplo:
+! {
+!   "estado": "En desarrollo",
+!   "urgencia": "Alta",
+!   "cantidad_nna": 2,
+!   "edad_aproximada": "12-14",
+!   "tipo_trabajo": null
+! }
+! respuesta: Caso completo (JSON de GET /casos/{id}), sin crear seguimiento.
+! {} o todos null devuelven el caso sin cambios; null no borra la urgencia.
+! Se permiten únicamente esos cinco campos y sus opciones enum.
+! cantidad_nna, edad_aproximada y tipo_trabajo aceptan 'No sé'.
+! Sustituye los PATCH individuales de estado, urgencia y los tres datos del caso.
 
 * Transferir un caso a otro municipio, endpoint POST (/casos/{id}/transferir)
 cuerpo (hoy el front envía el nombre; lo ideal es id_municipio):
@@ -84,28 +93,6 @@ respuesta: el seguimiento creado:
   "nota": "string"
 }
 
-* Cambiar la urgencia de un caso, endpoint PATCH (/casos/{id}/urgencia)
-cuerpo:
-{
-  "urgencia": "'Baja' | 'Media' | 'Alta'"
-}
-respuesta:
-{
-  "id_caso": "number",
-  "urgencia": "'Baja' | 'Media' | 'Alta'"
-}
-  
-! Actualizar datos del caso (sólo Administrador; no crea seguimiento):
-! PATCH /casos/{id}/cantidad-nna
-! cuerpo: { "cantidad_nna": 2 }
-! respuesta: { "id_caso": 12, "cantidad_nna": 2 }
-! PATCH /casos/{id}/edad-aproximada
-! cuerpo: { "edad_aproximada": "12-14" }
-! respuesta: { "id_caso": 12, "edad_aproximada": "12-14" }
-! PATCH /casos/{id}/tipo-trabajo
-! cuerpo: { "tipo_trabajo": "Venta ambulante" }
-! respuesta: { "id_caso": 12, "tipo_trabajo": "Venta ambulante" }
-! Los tres aceptan 'No sé' para indicar que el dato es desconocido.
 */
 
 import type { FeatureCollection, Point } from "geojson";
@@ -144,6 +131,10 @@ export interface Caso {
 }
 
 export type CasoListado = Omit<Caso, "notas" | "seguimientos">
+
+export type CasoPatch = {
+  [Campo in "estado" | "urgencia" | "cantidad_nna" | "edad_aproximada" | "tipo_trabajo"]?: Caso[Campo] | null
+}
 
 /** Properties of each case point of the map */
 export type FeatureCaseProps = {

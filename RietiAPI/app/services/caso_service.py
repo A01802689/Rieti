@@ -8,7 +8,7 @@ from app.models.reporte import Reporte
 from app.models.ubicacion import Ubicacion
 from app.schemas.caso import AbrirCasoDesdeReporte, CasoAbiertoResponse
 from app.schemas.caso import (
-    ActualizarCantidadNna, ActualizarEdadAproximada, ActualizarTipoTrabajo,
+    ActualizarCaso,
     CasoListado, CasoDetalle, MunicipioCasoResponse, UbicacionCasoResponse,
 )
 from app.schemas.seguimiento import SeguimientoResponse
@@ -130,18 +130,18 @@ def obtener_caso(*, db: Session, id_caso: int) -> CasoDetalle:
     )
 
 
-def actualizar_dato_caso(
-    *, db: Session, id_caso: int,
-    datos: ActualizarCantidadNna | ActualizarEdadAproximada | ActualizarTipoTrabajo,
-):
+def actualizar_caso(*, db: Session, id_caso: int, datos: ActualizarCaso) -> CasoDetalle:
     try:
         caso = caso_repository.obtener_para_actualizar(db, id_caso)
         if caso is None:
             raise HTTPException(status_code=404, detail="El caso no existe")
-        valores = datos.model_dump()
+        valores = datos.model_dump(exclude_unset=True, exclude_none=True)
         for campo, valor in valores.items():
             setattr(caso, campo, str(valor) if type(valor) is int else valor)
-        respuesta = {"id_caso": caso.id_caso, **valores}
+        if valores:
+            db.flush()
+        # Construir y validar la respuesta antes de confirmar la transacción.
+        respuesta = obtener_caso(db=db, id_caso=id_caso)
         db.commit()
         return respuesta
     except Exception:

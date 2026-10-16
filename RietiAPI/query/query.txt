@@ -208,7 +208,6 @@ CREATE TABLE caso (
     edad_aproximada edad_aproximada_reporte NOT NULL DEFAULT 'No sé',
     tipo_trabajo tipo_trabajo_reporte NOT NULL DEFAULT 'No sé',
     fecha_caso TIMESTAMP NOT NULL DEFAULT now(),
-    notas TEXT,
     urgencia urgencia
 );
 
