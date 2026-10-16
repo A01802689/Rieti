@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.models.usuario import Usuario #importo el molde
 from sqlalchemy import func
 
@@ -19,9 +19,23 @@ def create(db: Session, usuario: Usuario):
     db.refresh(usuario)
     return usuario
 
+def update(db: Session, usuario: Usuario):
+    db.commit()
+    db.refresh(usuario)
+    return usuario
+
 
 #dependiendo del borrar usarios los admin 
 def delete(db: Session, id_usuario: int):
     filas_borradas = db.query(Usuario).filter(Usuario.id_usuario == id_usuario).delete()
     db.commit()
     return filas_borradas
+
+
+def get_all(db: Session):
+    return (
+        db.query(Usuario)
+        .options(joinedload(Usuario.municipio))
+        .order_by(Usuario.apellido, Usuario.nombre)
+        .all()
+    )

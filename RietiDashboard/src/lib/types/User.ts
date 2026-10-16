@@ -1,25 +1,6 @@
 /*
 * JSON de Usuario, endpoint GET (/usuarios/{id})
-{
-  "id_usuario": "number",
-  "nombre": "string",
-  "apellido": "string",
-  "correo": "string",
-  "rol": "'Administrador' | 'Alimentador' | null",
-  "id_municipio": "number | null",
-  "municipio": {
-    "id_municipio": "number",
-    "nombre": "string",
-    "clave": "string"
-  } | null,
-  "ultimo_acceso": "string (ISO 8601 TIMESTAMP) | null",
-  "permisos": "PermissionKey[] (ver lib/types/Permission.ts)",
-  "actividad": {
-    "reportes_atendidos": "number",
-    "casos_revisados": "number",
-    "notas_registradas": "number"
-  }
-}
+c
 * JSON de Usuario, endpoint GET (/usuarios)
 [{
   "id_usuario": "number",

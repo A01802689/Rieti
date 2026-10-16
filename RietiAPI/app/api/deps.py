@@ -24,9 +24,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     sub = payload.get("sub")
     if sub is None:
         raise HTTPException(status_code=401, detail="Token inválido")
-    id_usuario = int(sub)
-    usuario = usuario_repository.get_by_id(db, id_usuario)
+    usuario = usuario_repository.get_by_id(db, int(sub))
     if usuario is None:
         raise HTTPException(status_code=401, detail="Usuario no encontrado")
     return usuario
-
