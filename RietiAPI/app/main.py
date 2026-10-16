@@ -41,6 +41,7 @@ app.include_router(municipio_routes.router)
 app.include_router(reporte_routes.router)
 app.include_router(seguimiento_routes.router)
 app.include_router(caso_routes.router)
+app.include_router(caso_routes.casos_router)
 
 @app.get("/")
 def read_root():

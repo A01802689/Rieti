@@ -1,14 +1,39 @@
-from pydantic import BaseModel, Field
-from enum import Enum
+from datetime import datetime
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 from app.models.caso import Estado, Urgencia
+from app.models.reporte import CantidadNNA, EdadAproximada, TipoTrabajo
+from app.schemas.seguimiento import SeguimientoResponse
 
 
-class CasoCreate(BaseModel):
+class ContratoCantidadCaso(BaseModel):
+    @field_validator("cantidad_nna", mode="before", check_fields=False,
+                     json_schema_input_type=Literal[1, 2, 3, 4, "1", "2", "3", "4", "5 o más", "No sé"])
+    @classmethod
+    def normalizar_cantidad(cls, valor):
+        return str(valor) if type(valor) is int else valor
+
+    @field_serializer("cantidad_nna", check_fields=False)
+    def serializar_cantidad(self, valor) -> Literal[1, 2, 3, 4, "5 o más", "No sé"]:
+        return int(valor.value) if valor.value in ("1", "2", "3", "4") else valor.value
+
+
+class DatosCaso(ContratoCantidadCaso):
+    cantidad_nna: CantidadNNA
+    edad_aproximada: EdadAproximada
+    tipo_trabajo: TipoTrabajo
+
+
+class CasoCreate(ContratoCantidadCaso):
     id_municipio: int
     id_ubicacion: int
     estado: Estado | None = None
     notas: str | None = None
     urgencia: Urgencia | None = None
+    cantidad_nna: CantidadNNA = CantidadNNA.NO_SE
+    edad_aproximada: EdadAproximada = EdadAproximada.NO_SE
+    tipo_trabajo: TipoTrabajo = TipoTrabajo.NO_SE
 
 
 class UbicacionCasoCreate(BaseModel):
@@ -25,12 +50,65 @@ class AbrirCasoDesdeReporte(BaseModel):
     urgencia: Urgencia
 
 
-class CasoAbiertoResponse(BaseModel):
+class CasoAbiertoResponse(DatosCaso):
     id_caso: int
     id_reporte: int
     id_municipio: int
     id_ubicacion: int
     estado: Estado
     urgencia: Urgencia
+
+
+class MunicipioCasoResponse(BaseModel):
+    nombre: str
+
+
+class UbicacionCasoResponse(BaseModel):
+    municipio: str
+    colonia: str
+    calle: str
+    lat: float
+    lng: float
+
+
+class CasoListado(DatosCaso):
+    id_caso: int
+    municipio: MunicipioCasoResponse
+    ubicacion: UbicacionCasoResponse
+    estado: Estado | None
+    fecha_caso: datetime
+    urgencia: Urgencia | None
+
+
+class CasoDetalle(CasoListado):
+    notas: str | None
+    seguimientos: list[SeguimientoResponse]
+
+
+class ActualizarCantidadNna(ContratoCantidadCaso):
+    model_config = ConfigDict(extra="forbid")
+    cantidad_nna: CantidadNNA
+
+
+class CantidadNnaCasoResponse(ActualizarCantidadNna):
+    id_caso: int
+
+
+class ActualizarEdadAproximada(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    edad_aproximada: EdadAproximada
+
+
+class EdadAproximadaCasoResponse(ActualizarEdadAproximada):
+    id_caso: int
+
+
+class ActualizarTipoTrabajo(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    tipo_trabajo: TipoTrabajo
+
+
+class TipoTrabajoCasoResponse(ActualizarTipoTrabajo):
+    id_caso: int
 
 

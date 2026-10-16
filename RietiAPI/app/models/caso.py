@@ -3,6 +3,7 @@ from sqlalchemy import Enum as SQLEnum
 from enum import Enum
 
 from app.db.base import Base
+from app.models.reporte import CantidadNNA, EdadAproximada, TipoTrabajo
 
 class Urgencia(str, Enum):
     BAJA = "Baja"
@@ -39,6 +40,21 @@ class Caso(Base):
             ]
         ),
         nullable = True
+    )
+    cantidad_nna = Column(
+        SQLEnum(CantidadNNA, name="cantidad_nna_reporte",
+                values_callable=lambda items: [item.value for item in items]),
+        nullable=False, default=CantidadNNA.NO_SE, server_default="No sé",
+    )
+    edad_aproximada = Column(
+        SQLEnum(EdadAproximada, name="edad_aproximada_reporte",
+                values_callable=lambda items: [item.value for item in items]),
+        nullable=False, default=EdadAproximada.NO_SE, server_default="No sé",
+    )
+    tipo_trabajo = Column(
+        SQLEnum(TipoTrabajo, name="tipo_trabajo_reporte",
+                values_callable=lambda items: [item.value for item in items]),
+        nullable=False, default=TipoTrabajo.NO_SE, server_default="No sé",
     )
     fecha_caso = Column(
         DateTime,

@@ -204,6 +204,9 @@ CREATE TABLE caso (
     id_municipio INTEGER NOT NULL REFERENCES municipio(id_municipio),
     id_ubicacion INTEGER NOT NULL REFERENCES ubicacion(id_ubicacion),
     estado estado,
+    cantidad_nna cantidad_nna_reporte NOT NULL DEFAULT 'No sé',
+    edad_aproximada edad_aproximada_reporte NOT NULL DEFAULT 'No sé',
+    tipo_trabajo tipo_trabajo_reporte NOT NULL DEFAULT 'No sé',
     fecha_caso TIMESTAMP NOT NULL DEFAULT now(),
     notas TEXT,
     urgencia urgencia
