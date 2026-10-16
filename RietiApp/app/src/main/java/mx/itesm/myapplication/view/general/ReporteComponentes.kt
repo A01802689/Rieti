@@ -1,5 +1,8 @@
 package mx.itesm.myapplication.view.general
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -21,6 +24,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,11 +32,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import mx.itesm.myapplication.data.network.DireccionSugerida
+import mx.itesm.myapplication.data.network.ResultadoUbicacion
+import mx.itesm.myapplication.data.network.direccionDesdeCoordenadas
+import mx.itesm.myapplication.data.network.obtenerUbicacionActual
 import mx.itesm.myapplication.viewModel.MunicipiosUiState
 
 /**
@@ -149,5 +160,57 @@ fun SelectorMunicipio(
                 }
             }
         }
+    }
+}
+
+/** Botón "Usar mi ubicación actual": pide permiso, lee el GPS y entrega coordenadas y dirección sugerida. */
+@Composable
+fun BotonUbicacionActual(
+    onUbicacion: (Double, Double) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var cargando by remember { mutableStateOf(false) }
+    var mensaje by remember { mutableStateOf<String?>(null) }
+
+    fun buscar() {
+        scope.launch {
+            cargando = true
+            mensaje = null
+            when (val r = obtenerUbicacionActual(context)) {
+                is ResultadoUbicacion.Ok -> onUbicacion(
+                    r.latitud, r.longitud,
+                )
+                ResultadoUbicacion.SinPermiso ->
+                    mensaje = "Sin permiso de ubicación. Puedes marcar el lugar en el mapa."
+                ResultadoUbicacion.NoDisponible ->
+                    mensaje = "No se pudo obtener tu ubicación. Revisa que esté activada o márcala en el mapa."
+            }
+            cargando = false
+        }
+    }
+
+    val lanzador = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permisos ->
+        if (permisos.values.any { it }) buscar()
+        else mensaje = "Sin permiso de ubicación. Puedes marcar el lugar en el mapa."
+    }
+
+    Column(modifier = modifier) {
+        OutlinedButton(
+            onClick = {
+                lanzador.launch(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+                )
+            },
+            enabled = !cargando,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (cargando) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+            else Text("Usar mi ubicación actual")
+        }
+        mensaje?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
     }
 }

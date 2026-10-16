@@ -42,6 +42,7 @@ fun SeguimientoUbicacion(navController: NavController, vm: ReporteViewModel) {
             onColoniaSeleccionada = vm::setColonia,
             onCalleSeleccionada = vm::setCalle,
             onUbicacionSeleccionada = vm::setCoordenadas,
+            onDireccionSugerida = vm::aplicarDireccionSugerida,
             modifier = Modifier.weight(1f)
         )
         BotonContinuar(enabled = state.ubicacionValida) {

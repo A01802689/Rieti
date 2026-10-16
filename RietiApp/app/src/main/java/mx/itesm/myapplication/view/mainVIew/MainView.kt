@@ -1,4 +1,4 @@
-package mx.itesm.myapplication.view.MainVIew
+package mx.itesm.myapplication.view.mainVIew
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold

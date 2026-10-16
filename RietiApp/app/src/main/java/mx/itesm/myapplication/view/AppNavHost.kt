@@ -11,7 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import mx.itesm.myapplication.view.MainVIew.MainView
+import mx.itesm.myapplication.view.mainVIew.MainView
 import mx.itesm.myapplication.view.anonimo.AnonimoEnviar
 import mx.itesm.myapplication.view.anonimo.AnonimoFormulario
 import mx.itesm.myapplication.view.anonimo.AnonimoUbicacion

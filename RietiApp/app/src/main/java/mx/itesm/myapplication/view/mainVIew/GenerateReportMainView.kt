@@ -1,4 +1,4 @@
-package mx.itesm.myapplication.view.MainVIew
+package mx.itesm.myapplication.view.mainVIew
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

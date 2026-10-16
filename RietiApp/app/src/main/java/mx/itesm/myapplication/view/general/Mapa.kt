@@ -68,8 +68,9 @@ fun MapaInteractivo(
                 )
             }
         }
-        MaplibreMap(modifier = mapModifier, baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"), cameraState = camara, onMapClick = { posicion, _ ->
-                onUbicacionSeleccionada(posicion.latitude, posicion.longitude)
+        MaplibreMap(modifier = mapModifier, baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"), cameraState = camara,
+            onMapClick = { posicion, _ ->
+                onUbicacionSeleccionada(posicion.latitude, posicion.longitude )
                 ClickResult.Consume
             },
             onMapLoadFailed = { motivo -> Log.e("Mapa", "Fallo al cargar el mapa: $motivo")

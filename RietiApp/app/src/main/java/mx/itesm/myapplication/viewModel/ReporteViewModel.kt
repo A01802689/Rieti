@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mx.itesm.myapplication.data.network.ApiClient
+import mx.itesm.myapplication.data.network.DireccionSugerida
 import mx.itesm.myapplication.data.network.models.Actividad
 import mx.itesm.myapplication.data.network.models.CantidadNna
 import mx.itesm.myapplication.data.network.models.MunicipioResponse
@@ -19,6 +20,7 @@ import mx.itesm.myapplication.data.network.models.Riesgo
 import mx.itesm.myapplication.data.network.models.UbicacionCreateRequest
 import retrofit2.HttpException
 import java.io.IOException
+import java.text.Normalizer
 
 /**
  * Representa los estados del envío del reporte a la API.
@@ -69,7 +71,7 @@ data class ReporteUiState(
     val formularioValido: Boolean
         get() = cantidad != null && edad != null && actividad != null
     val ubicacionValida: Boolean
-        get() = latitud != null && longitud != null && municipio.isNotBlank()
+        get() = latitud != null && longitud != null && municipio.isNotBlank() && colonia.isNotBlank() && calle.isNotBlank()
     val puedeEnviar: Boolean
         get() = formularioValido && ubicacionValida &&
             (esAnonimo || contactoValido)
@@ -252,6 +254,31 @@ class ReporteViewModel : ViewModel() {
             }
         }
     }
+
+    /**
+     * Aplica la dirección sugerida para el punto elegido. Calle y colonia se reemplazan por la
+     * sugerencia (o quedan vacías si no hay), para no conservar datos del punto anterior.
+     * El municipio solo cambia si coincide con alguno de la lista cargada del backend.
+     */
+    fun aplicarDireccionSugerida(sugerida: DireccionSugerida?) {
+        val lista = (municipios.value as? MunicipiosUiState.Success)?.municipios.orEmpty()
+        val buscado = sugerida?.municipio?.normalizado()?.takeIf { it.isNotBlank() }
+        val municipioCoincidente = buscado?.let { b ->
+            lista.firstOrNull { val n = it.nombre.normalizado(); n == b || n.contains(b) || b.contains(n) }
+        }?.nombre
+
+        _uiState.update {
+            it.copy(
+                calle = sugerida?.calle.orEmpty(),
+                colonia = sugerida?.colonia.orEmpty(),
+                municipio = municipioCoincidente ?: it.municipio
+            )
+        }
+    }
+
+    /** Minúsculas y sin acentos, para comparar nombres. */
+    private fun String.normalizado(): String =
+        Normalizer.normalize(lowercase().trim(), Normalizer.Form.NFD).replace("\\p{M}+".toRegex(), "")
 
     /**
      * Restablece el estado de envío a [EnvioUiState.Idle].
