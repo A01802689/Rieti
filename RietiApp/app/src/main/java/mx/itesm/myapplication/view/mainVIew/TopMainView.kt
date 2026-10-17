@@ -19,8 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import mx.itesm.myapplication.R
+import mx.itesm.myapplication.view.Pantalla
+import mx.itesm.myapplication.viewModel.AuthViewModel
 
 /**
  * Barra superior de la pantalla principal.
@@ -33,6 +36,7 @@ import mx.itesm.myapplication.R
  */
 @Composable
 fun TopMainView(navController: NavController, modifier: Modifier = Modifier) {
+    val authVm: AuthViewModel = viewModel()
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -64,7 +68,13 @@ fun TopMainView(navController: NavController, modifier: Modifier = Modifier) {
             }
         }
 
-        Button(onClick = { navController.navigate(route = "login") }) {
+        Button(onClick = {
+            authVm.logout() // Limpia cookies y SesionUsuario
+            navController.navigate(Pantalla.RUTA_LOGIN) {
+                popUpTo(0) {inclusive = true }
+            }
+            })
+        {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
                 contentDescription = "Logout"

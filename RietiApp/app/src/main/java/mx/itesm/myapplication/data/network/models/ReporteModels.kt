@@ -120,3 +120,26 @@ data class MunicipioResponse(
     @SerializedName("nombre") val nombre: String,
     @SerializedName("clave") val clave: String? = null
 )
+
+/** Ubicación de un reporte en el listado. */
+data class UbicacionResumenResponse(
+    @SerializedName("municipio") val municipio: String? = null,
+    @SerializedName("colonia") val colonia: String? = null,
+    @SerializedName("calle") val calle: String? = null,
+    @SerializedName("lat") val lat: Double? = null,
+    @SerializedName("lng") val lng: Double? = null
+)
+
+/** Un reporte tal como lo devuelve `GET /reportes/`. */
+data class ReporteListadoResponse(
+    @SerializedName("id_reporte") val idReporte: Int,
+    @SerializedName("id_caso") val idCaso: Int? = null,
+    @SerializedName("folio_reporte") val folioReporte: String? = null,
+    @SerializedName("fecha_reporte") val fechaReporte: String? = null,
+    @SerializedName("descripcion") val descripcion: String? = null,
+    @SerializedName("estatus_seguimiento") val estatusSeguimiento: String? = null,
+    @SerializedName("cantidad_nna") val cantidadNna: String? = null,
+    @SerializedName("edad_aproximada") val edadAproximada: String? = null,
+    @SerializedName("tipo_trabajo") val tipoTrabajo: String? = null,
+    @SerializedName("ubicacion") val ubicacion: UbicacionResumenResponse? = null
+)

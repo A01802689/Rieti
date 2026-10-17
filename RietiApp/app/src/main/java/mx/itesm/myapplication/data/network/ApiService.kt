@@ -2,6 +2,7 @@ package mx.itesm.myapplication.data.network
 
 import mx.itesm.myapplication.data.network.models.MunicipioResponse
 import mx.itesm.myapplication.data.network.models.ReporteCreateRequest
+import mx.itesm.myapplication.data.network.models.ReporteListadoResponse
 import mx.itesm.myapplication.data.network.models.ReporteResponse
 import mx.itesm.myapplication.data.network.models.UsuarioCreateRequest
 import mx.itesm.myapplication.data.network.models.UsuarioLoginRequest
@@ -69,4 +70,7 @@ interface ApiService {
 
     @GET("municipios/")
     suspend fun obtenerMunicipios(): Response<List<MunicipioResponse>>
+
+    @GET("reportes/")
+    suspend fun obtenerMisReportes(): Response<List<ReporteListadoResponse>>
 }

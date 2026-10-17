@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,13 +19,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mx.itesm.myapplication.viewModel.ReporteUiState
+import mx.itesm.myapplication.viewModel.ReportesUiState
 
 
 /**
@@ -37,38 +45,59 @@ import androidx.compose.ui.unit.dp
  */
 
 @Composable
-fun ContentMainView(modifier: Modifier = Modifier){
-    Column (verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        // Tarjetas de ejemplo (datos de prueba repetidos).
-        ReportSummaryCard(
-            folio = "R-2408-001",
-            city = "Guadalajara",
-            location = "Mercado Corona, Sector Hidalgo",
-            tags = listOf("Venta ambulante", "3 NNA · 6–11 años"),
-            status = "En seguimiento",
-            hasRisk = true,
-            dateText = "14 ago 2026 · 11:32 hrs",
-        )
-        ReportSummaryCard(
-            folio = "R-2408-001",
-            city = "Guadalajara",
-            location = "Mercado Corona, Sector Hidalgo",
-            tags = listOf("Venta ambulante", "3 NNA · 6–11 años"),
-            status = "En seguimiento",
-            hasRisk = true,
-            dateText = "14 ago 2026 · 11:32 hrs",
-        )
-        ReportSummaryCard(
-            folio = "R-2408-001",
-            city = "Guadalajara",
-            location = "Mercado Corona, Sector Hidalgo",
-            tags = listOf("Venta ambulante", "3 NNA · 6–11 años"),
-            status = "En seguimiento",
-            hasRisk = true,
-            dateText = "14 ago 2026 · 11:32 hrs",
-        )
+fun ContentMainView(
+    estado: ReportesUiState,
+    onReintentar: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val reportes = estado.reportes
+
+    when {
+        reportes == null && estado.cargando -> Box(modifier.fillMaxSize(), Alignment.Center) {
+            CircularProgressIndicator()
+        }
+
+        reportes == null -> Column(
+            modifier = modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                estado.error ?: "No se pudieron cargar tus reportes.",
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+            TextButton(onClick = onReintentar) { Text("Reintentar") }
+        }
+
+        reportes.isEmpty() -> Box(modifier.fillMaxSize().padding(24.dp), Alignment.Center) {
+            Text(
+                "Aún no ha realizado ningún reporte con seguimiento.\nLos reportes que haga aparecerán aquí",
+                textAlign = TextAlign.Center
+            )
+        }
+
+        else -> LazyColumn(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Si falló una actualización pero ya había lista, se mantiene y se avisa arriba.
+            if (estado.error != null) {
+                item { Text(estado.error, color = MaterialTheme.colorScheme.error) }
+            }
+            items(reportes, key = { it.idReporte }) { r ->
+                ReportSummaryCard(
+                    folio = r.folio,
+                    city = r.ciudad,
+                    location = r.ubicacion,
+                    tags = r.etiquetas,
+                    status = r.estatus,
+                    hasRisk = false, // el backend sigue sin devolver el riesgo
+                    dateText = r.fecha
+                )
+            }
+        }
     }
 }
 @Composable
