@@ -37,6 +37,8 @@ fun AnonimoEnviar(navController: NavController, vm: ReporteViewModel){
             envio = state.envio,
             puedeEnviar = state.puedeEnviar,
             onEnviar = vm::enviarReporte,
+            foto = state.foto,
+            onFotoSeleccionada = vm::setFoto,
             modifier = Modifier.weight(1f)
         )
     }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mx.itesm.myapplication.data.network.ApiClient
 import mx.itesm.myapplication.data.network.DireccionSugerida
+import mx.itesm.myapplication.data.network.FotoReporte
 import mx.itesm.myapplication.data.network.models.Actividad
 import mx.itesm.myapplication.data.network.models.CantidadNna
 import mx.itesm.myapplication.data.network.models.MunicipioResponse
@@ -18,6 +19,7 @@ import mx.itesm.myapplication.data.network.models.RangoEdad
 import mx.itesm.myapplication.data.network.models.ReporteCreateRequest
 import mx.itesm.myapplication.data.network.models.Riesgo
 import mx.itesm.myapplication.data.network.models.UbicacionCreateRequest
+import mx.itesm.myapplication.data.network.subirImagen
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.Normalizer
@@ -28,7 +30,8 @@ import java.text.Normalizer
 sealed interface EnvioUiState {
     object Idle : EnvioUiState
     object Loading : EnvioUiState
-    data class Success(val folio: String) : EnvioUiState
+    object SubiendoImagen : EnvioUiState
+    data class Success(val folio: String, val fotoPendiente: Boolean = false) : EnvioUiState
     data class Error(val message: String) : EnvioUiState
 }
 
@@ -61,7 +64,8 @@ data class ReporteUiState(
     val longitud: Double? = null,
     //Envío
     val descripcion: String = "",
-    val envio: EnvioUiState = EnvioUiState.Idle
+    val envio: EnvioUiState = EnvioUiState.Idle,
+    val foto: FotoReporte? = null
 ) {
     /** Nombre, apellidos y teléfono de 10 dígitos capturados. */
     val contactoValido: Boolean
@@ -75,7 +79,7 @@ data class ReporteUiState(
     val puedeEnviar: Boolean
         get() = formularioValido && ubicacionValida &&
             (esAnonimo || contactoValido)
-                && envio !is EnvioUiState.Loading && envio !is EnvioUiState.Success
+                && envio !is EnvioUiState.Loading && envio !is EnvioUiState.SubiendoImagen && envio !is EnvioUiState.Success
 }
 
 /**
@@ -89,6 +93,7 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
     val actividad = actividad ?: return null
     val latitud = latitud ?: return null
     val longitud = longitud ?: return null
+
 
     val direccion = listOf(calle, colonia, municipio)
         .filter { it.isNotBlank() }
@@ -108,7 +113,7 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
         edadAproximada = edad.etiqueta,
         tipoTrabajo = actividad.etiqueta,
         descripcion = descripcion.ifBlank { null },
-        imagenContentType = null,
+        imagenContentType = if (foto != null) "image/jpeg" else null,
         conSeguimiento = !esAnonimo
     )
 }
@@ -172,6 +177,8 @@ class ReporteViewModel : ViewModel() {
      */
     fun setDescripcion(valor: String) = _uiState.update { it.copy(descripcion = valor) }
 
+    fun setFoto(foto: FotoReporte?) = _uiState.update { it.copy(foto = foto) }
+
     /**
      * Envía la información recopilada del reporte a la API REST backend.
      */
@@ -187,6 +194,17 @@ class ReporteViewModel : ViewModel() {
                 val response = ApiClient.apiService.crearReporte(request)
                 val body = response.body()
                 if (response.isSuccessful && body != null) {
+                    val folio = body.folioReporte
+                    val foto = state.foto
+                    val url = body.urlSubidaImagen
+                    if (foto != null && url != null) {
+                        _uiState.update { it.copy(envio = EnvioUiState.SubiendoImagen) }
+                        val subida = subirImagen(url, foto.bytes)
+                        if(!subida) Log.w(TAG, "Error al subir la imagen")
+                        _uiState.update { it.copy(envio = EnvioUiState.Success(folio, fotoPendiente = !subida)) }
+                    } else {
+                        _uiState.update { it.copy(envio = EnvioUiState.Success(folio, fotoPendiente = foto != null)) }
+                    }
                     _uiState.update { it.copy(envio = EnvioUiState.Success(body.folioReporte)) }
                 } else {
                     Log.e(
