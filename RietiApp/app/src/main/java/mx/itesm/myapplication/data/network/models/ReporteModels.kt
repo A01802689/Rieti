@@ -101,7 +101,7 @@ data class ReporteCreateRequest(
  */
 data class ReporteResponse(
     @SerializedName("id_reporte") val idReporte: Int,
-    @SerializedName("folio_reporte") val folioReporte: String,
+    @SerializedName("folio_reporte") val folioReporte: String? = null,
     @SerializedName("id_usuario") val idUsuario: Int? = null,
     @SerializedName("id_caso") val idCaso: Int? = null,
     @SerializedName("id_ubicacion") val idUbicacion: Int? = null,

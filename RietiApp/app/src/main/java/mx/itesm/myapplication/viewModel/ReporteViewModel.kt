@@ -31,7 +31,7 @@ sealed interface EnvioUiState {
     object Idle : EnvioUiState
     object Loading : EnvioUiState
     object SubiendoImagen : EnvioUiState
-    data class Success(val folio: String, val fotoPendiente: Boolean = false) : EnvioUiState
+    data class Success(val folio: String?, val fotoPendiente: Boolean = false) : EnvioUiState
     data class Error(val message: String) : EnvioUiState
 }
 
@@ -194,7 +194,7 @@ class ReporteViewModel : ViewModel() {
                 val response = ApiClient.apiService.crearReporte(request)
                 val body = response.body()
                 if (response.isSuccessful && body != null) {
-                    val folio = body.folioReporte
+                    val folio = if(state.esAnonimo) null else body.folioReporte
                     val foto = state.foto
                     val url = body.urlSubidaImagen
                     if (foto != null && url != null) {

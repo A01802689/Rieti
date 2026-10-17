@@ -25,8 +25,11 @@ import mx.itesm.myapplication.viewModel.ReporteViewModel
 fun AnonimoEnviar(navController: NavController, vm: ReporteViewModel){
 
     val state by vm.uiState.collectAsState()
-    (state.envio as? EnvioUiState.Success)?.let { exito ->
-        DialogoReporteEnviado(exito.folio) {
+    if (state.envio is EnvioUiState.Success) {
+        DialogoReporteEnviado(
+            folio = null,
+            mensaje = "Gracias por tu reporte"
+        ) {
             navController.popBackStack(Pantalla.RUTA_MAIN, inclusive = false)
         }
     }

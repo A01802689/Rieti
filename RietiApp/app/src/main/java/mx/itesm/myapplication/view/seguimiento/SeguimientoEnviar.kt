@@ -22,7 +22,10 @@ import mx.itesm.myapplication.viewModel.ReporteViewModel
 fun SeguimientoEnviar(navController: NavController, vm: ReporteViewModel){
     val state by vm.uiState.collectAsState()
     (state.envio as? EnvioUiState.Success)?.let { exito ->
-        DialogoReporteEnviado(exito.folio) {
+        DialogoReporteEnviado(
+            folio = exito.folio,
+            mensaje = if (exito.folio != null) "Tu reporte de seguimiento:\n${exito.folio}" else "Gracias por tu reporte"
+        ) {
             navController.popBackStack(Pantalla.RUTA_MAIN, inclusive = false)
         }
     }

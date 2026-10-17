@@ -3,6 +3,7 @@ package mx.itesm.myapplication.view.general
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -88,11 +89,19 @@ fun BotonContinuar(enabled: Boolean, onClick: () -> Unit) {
 
 /** Diálogo que muestra el folio devuelto por el backend. No se puede cerrar tocando fuera. */
 @Composable
-fun DialogoReporteEnviado(folio: String, onAceptar: () -> Unit) {
+fun DialogoReporteEnviado(
+    folio: String?,
+    mensaje: String = if (folio != null) "Tu folio es: $folio" else "Gracias por tu reporte",
+    onAceptar: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = {},
         title = { Text("Reporte enviado") },
-        text = { Text("Folio del reporte: $folio") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(mensaje)
+            }
+        },
         confirmButton = { TextButton(onClick = onAceptar) { Text("Aceptar") } }
     )
 }
