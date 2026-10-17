@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mx.itesm.myapplication.data.network.ApiClient
+import mx.itesm.myapplication.data.network.SesionUsuario
 import mx.itesm.myapplication.data.network.models.UsuarioCreateRequest
 import mx.itesm.myapplication.data.network.models.UsuarioLoginRequest
 import mx.itesm.myapplication.data.network.models.UsuarioResponse
@@ -67,7 +68,9 @@ class AuthViewModel : ViewModel() {
                 val request = UsuarioLoginRequest(correo = correo, contrasena = contrasena)
                 val response = ApiClient.apiService.login(request)
                 if (response.isSuccessful && response.body() != null) {
-                    _uiState.value = AuthUiState.Success(response.body()!!)
+                    val usuario = response.body()!!
+                    SesionUsuario.establecer(usuario)
+                    _uiState.value = AuthUiState.Success(usuario)
                 } else {
                     val rawError = response.errorBody()?.string()
                     Log.e(TAG, "Error en login (HTTP ${response.code()}): $rawError")
@@ -147,6 +150,7 @@ class AuthViewModel : ViewModel() {
                 Log.w(TAG, "Error en logout: ${e.localizedMessage}")
             } finally {
                 ApiClient.clearCookies()
+                SesionUsuario.limpiar()
                 _uiState.value = AuthUiState.Idle
             }
         }

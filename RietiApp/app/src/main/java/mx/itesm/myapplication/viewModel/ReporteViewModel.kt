@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mx.itesm.myapplication.data.network.ApiClient
 import mx.itesm.myapplication.data.network.DireccionSugerida
 import mx.itesm.myapplication.data.network.FotoReporte
+import mx.itesm.myapplication.data.network.SesionUsuario
 import mx.itesm.myapplication.data.network.models.Actividad
 import mx.itesm.myapplication.data.network.models.CantidadNna
 import mx.itesm.myapplication.data.network.models.MunicipioResponse
@@ -139,9 +140,22 @@ class ReporteViewModel : ViewModel() {
     val municipios: StateFlow<MunicipiosUiState> = _municipios.asStateFlow()
 
     /**
-     * Actualiza la modalidad del reporte (Anónimo o Con seguimiento).
+     * Define el tipo de reporte. Con seguimiento, precarga nombre y apellidos desde la sesión
+     * (solo si están vacíos, para no pisar lo que el usuario haya editado). En anónimo, descarta
+     * cualquier dato de contacto.
      */
-    fun setEsAnonimo(esAnonimo: Boolean) = _uiState.update { it.copy(esAnonimo = esAnonimo) }
+    fun setEsAnonimo(esAnonimo: Boolean) = _uiState.update { estado ->
+        if (esAnonimo) {
+            estado.copy(esAnonimo = true, nombre = "", apellidos = "", telefono = "")
+        } else {
+            val usuario = SesionUsuario.usuario
+            estado.copy(
+                esAnonimo = false,
+                nombre = estado.nombre.ifBlank { usuario?.nombre.orEmpty() },
+                apellidos = estado.apellidos.ifBlank { usuario?.apellido.orEmpty() }
+            )
+        }
+    }
 
     /**
      * Actualiza los datos de contacto del usuario (en reportes con seguimiento).

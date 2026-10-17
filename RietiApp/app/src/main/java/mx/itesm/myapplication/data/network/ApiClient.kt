@@ -1,5 +1,6 @@
 package mx.itesm.myapplication.data.network
 
+import mx.itesm.myapplication.data.network.models.UsuarioResponse
 import okhttp3.JavaNetCookieJar
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -82,4 +83,13 @@ object ApiClient {
     fun clearCookies() {
         cookieManager.cookieStore.removeAll()
     }
+}
+
+object SesionUsuario {
+    @Volatile
+    var usuario: UsuarioResponse? = null
+        private set
+
+    fun establecer(usuario: UsuarioResponse) {this.usuario = usuario}
+    fun limpiar() { usuario = null }
 }
