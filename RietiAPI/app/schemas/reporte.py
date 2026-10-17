@@ -45,6 +45,12 @@ class ReporteCreate(BaseModel):
     con_seguimiento: bool
 
 
+class ActualizarReporte(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    estatus_seguimiento: EstatusSeguimiento | None = None
+
+
 class AsociarReporteACaso(BaseModel):
     id_caso: int = Field(gt=0)
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -6,6 +6,7 @@ from app.api.deps import get_current_user, get_db
 from app.models.usuario import Usuario
 from app.schemas.reporte import (
     AsociarReporteACaso,
+    ActualizarReporte,
     ImagenReporteResponse,
     ReporteCasoResponse,
     ReporteCreate,
@@ -25,24 +26,22 @@ def _exigir_personal(usuario_actual: Usuario | None) -> None:
         raise HTTPException(status_code=403, detail="Acceso sólo para personal autorizado")
 
 
+def _exigir_administrador(usuario_actual: Usuario = Depends(get_current_user)) -> Usuario:
+    _exigir_personal(usuario_actual)
+    if usuario_actual.rol != "Administrador":
+        raise HTTPException(status_code=403, detail="Sólo un administrador puede modificar reportes")
+    return usuario_actual
+
+
 @router.get("/", response_model=list[ReporteListado])
 def listar_reportes(
-    solo_sin_caso: bool = False,
-    limit: int = Query(50, ge=1, le=100),
-    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(get_current_user),
 ):
-    if usuario_actual is None:
-        raise HTTPException(status_code=401, detail="Usuario no autenticado")
-    if usuario_actual.rol not in ("Alimentador", "Administrador"):
-        raise HTTPException(status_code=403, detail="Acceso sólo para personal autorizado")
 
     return reporte_service.listar_reportes(
         db=db,
-        solo_sin_caso=solo_sin_caso,
-        limit=limit,
-        offset=offset,
+        id_usuario=usuario_actual.id_usuario if usuario_actual.rol is None else None,
     )
 
 
@@ -67,6 +66,23 @@ def obtener_reporte(
             request.url_for("descargar_imagen_reporte", id_reporte=id_reporte)
         )
     return detalle
+
+
+@router.patch(
+    "/{id_reporte}",
+    response_model=ReporteDetalle,
+    dependencies=[Depends(_exigir_administrador)],
+)
+def actualizar_reporte(
+    id_reporte: int,
+    datos: ActualizarReporte,
+    db: Session = Depends(get_db),
+):
+    return reporte_service.actualizar_reporte(
+        db=db,
+        id_reporte=id_reporte,
+        datos=datos,
+    )
 
 
 @router.get("/{id_reporte}/imagen", response_model=ImagenReporteResponse)

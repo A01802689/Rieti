@@ -71,7 +71,7 @@ export const declineReport = (id: number) => api<{
 export const changeReportState = (id: number, state: ReportState) => api<{
   id_reporte: number
   estatus_seguimiento: ReportState
-}> (`/reportes/${id}/estatus`, 
+}> (`/reportes/${id}`,
   { method: "PATCH",
     body: JSON.stringify({
       estatus_seguimiento: state

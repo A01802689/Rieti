@@ -15,9 +15,7 @@ def create(db: Session, reporte: Reporte):
 def listar(
     db: Session,
     *,
-    solo_sin_caso: bool,
-    limit: int,
-    offset: int,
+    id_usuario: int | None = None,
 ):
     consulta = (
         db.query(
@@ -39,13 +37,11 @@ def listar(
         .join(Ubicacion, Reporte.id_ubicacion == Ubicacion.id_ubicacion)
         .join(Municipio, Ubicacion.id_municipio == Municipio.id_municipio)
     )
-    if solo_sin_caso:
-        consulta = consulta.filter(Reporte.id_caso.is_(None))
+    if id_usuario is not None:
+        consulta = consulta.filter(Reporte.id_usuario == id_usuario)
 
     return (
         consulta.order_by(Reporte.fecha_reporte.desc(), Reporte.id_reporte.desc())
-        .offset(offset)
-        .limit(limit)
         .all()
     )
 
@@ -73,6 +69,15 @@ def obtener_detalle(db: Session, id_reporte: int):
         .join(Ubicacion, Reporte.id_ubicacion == Ubicacion.id_ubicacion)
         .join(Municipio, Ubicacion.id_municipio == Municipio.id_municipio)
         .filter(Reporte.id_reporte == id_reporte)
+        .first()
+    )
+
+
+def obtener_para_actualizar(db: Session, id_reporte: int) -> Reporte | None:
+    return (
+        db.query(Reporte)
+        .filter(Reporte.id_reporte == id_reporte)
+        .with_for_update()
         .first()
     )
 

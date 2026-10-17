@@ -13,7 +13,7 @@ from app.models.reporte import Reporte
 from app.models.ubicacion import Ubicacion
 from app.models.caso import Caso
 from app.repositories import folio_contador_repository, reporte_repositorio
-from app.schemas.reporte import ReporteCreate
+from app.schemas.reporte import ActualizarReporte, ReporteCreate
 from app.services.s3_service import generar_url_subida
 from app.schemas.reporte import (
     AsociarReporteACaso,
@@ -29,15 +29,11 @@ from app.services.s3_service import generar_urls_lectura
 def listar_reportes(
     *,
     db: Session,
-    solo_sin_caso: bool,
-    limit: int,
-    offset: int,
+    id_usuario: int | None = None,
 ) -> list[ReporteListado]:
     filas = reporte_repositorio.listar(
         db,
-        solo_sin_caso=solo_sin_caso,
-        limit=limit,
-        offset=offset,
+        id_usuario=id_usuario,
     )
     return [
         ReporteListado(
@@ -87,6 +83,28 @@ def obtener_detalle_reporte(*, db: Session, id_reporte: int) -> ReporteDetalle:
         ),
         tiene_imagen=fila.imagen_key is not None,
     )
+
+
+def actualizar_reporte(
+    *, db: Session, id_reporte: int, datos: ActualizarReporte
+) -> ReporteDetalle:
+    try:
+        reporte = reporte_repositorio.obtener_para_actualizar(db, id_reporte)
+        if reporte is None:
+            raise HTTPException(status_code=404, detail="El reporte no existe")
+
+        valores = datos.model_dump(exclude_unset=True, exclude_none=True)
+        for campo, valor in valores.items():
+            setattr(reporte, campo, valor)
+
+        if valores:
+            db.flush()
+        respuesta = obtener_detalle_reporte(db=db, id_reporte=id_reporte)
+        db.commit()
+        return respuesta
+    except Exception:
+        db.rollback()
+        raise
 
 
 def obtener_urls_imagen_reporte(
