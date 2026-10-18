@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import mx.itesm.myapplication.view.Pantalla
-import mx.itesm.myapplication.view.general.BotonContinuar
+import mx.itesm.myapplication.view.general.BotonPrincipal
 import mx.itesm.myapplication.view.general.Formulario
 import mx.itesm.myapplication.view.general.PasoReporte
 import mx.itesm.myapplication.viewModel.ReporteViewModel
@@ -39,8 +39,10 @@ fun SeguimientoFormulario(navController: NavController, vm: ReporteViewModel) {
             onRiesgoSeleccionado = vm::setRiesgo,
             modifier = Modifier.weight(1f)
         )
-        BotonContinuar(enabled = state.formularioValido) {
-            navController.navigate(Pantalla.RUTA_SEGUBICACION)
-        }
+        BotonPrincipal(
+            texto = "Continuar",
+            enabled = state.formularioValido,
+            onClick = { navController.navigate(Pantalla.RUTA_SEGUBICACION) }
+        )
     }
 }

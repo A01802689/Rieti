@@ -147,14 +147,12 @@ fun Enviar(
         if (envio is EnvioUiState.SubiendoImagen) {
             Text("Subiendo fotografía…", style = MaterialTheme.typography.bodySmall)
         }
-        Button(
+        BotonPrincipal(
+            texto = "Enviar Reporte",
             onClick = onEnviar,
             enabled = puedeEnviar,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-        ) {
-            if (enviando) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-            else Text("Enviar reporte")
-        }
+            cargando = enviando
+        )
     }
 
     if (mostrarAviso) {

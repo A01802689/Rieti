@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import mx.itesm.myapplication.view.Pantalla
-import mx.itesm.myapplication.view.general.BotonContinuar
+import mx.itesm.myapplication.view.general.BotonPrincipal
 import mx.itesm.myapplication.view.general.PasoReporte
 import mx.itesm.myapplication.view.general.Ubicacion
 import mx.itesm.myapplication.viewModel.ReporteViewModel
@@ -43,8 +43,10 @@ fun AnonimoUbicacion(navController: NavController, vm: ReporteViewModel) {
             onDireccionSugerida = vm::aplicarDireccionSugerida,
             modifier = Modifier.weight(1f)
         )
-        BotonContinuar( enabled = state.ubicacionValida) {
-            navController.navigate(Pantalla.RUTA_ANONIMOFORM)
-        }
+        BotonPrincipal(
+            texto = "Continuar",
+            enabled = state.ubicacionValida,
+            onClick = { navController.navigate(Pantalla.RUTA_ANONIMOFORM) }
+        )
     }
 }
