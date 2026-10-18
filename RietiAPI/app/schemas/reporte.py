@@ -98,6 +98,7 @@ class UbicacionReporteListado(BaseModel):
     calle: str
     lat: float
     lng: float
+    riesgo: RiesgoReporte | None = None
 
 
 class UbicacionReporteDetalle(UbicacionReporteListado):
