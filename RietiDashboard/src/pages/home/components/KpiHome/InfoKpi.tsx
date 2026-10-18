@@ -1,12 +1,12 @@
 interface InfoKpiProp{
     /** Name of the indicator */
-    label: string;
+    label: string
     /** Main number */
-    value: string;
+    value: string
     /** Small clarification under the label */
-    note: string;
+    note: string
     /** Background class of the colored side bar */
-    tone: string;
+    tone: string
 }
 
 /** Card with one indicator of the home summary */
@@ -24,4 +24,4 @@ const InfoKpis =({label, value, note,  tone,}: InfoKpiProp) =>{
         </div>
     )
 }
-export default InfoKpis;
+export default InfoKpis

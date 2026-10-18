@@ -6,22 +6,21 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-} from 'recharts';
+} from 'recharts'
 
 /** One point of the line chart */
 interface GraphData {
-    name: string;
-    value: number;
+    name: string
+    value: number
 }
 
 interface LineGraphProps {
     /** Points to draw, in order */
-    data: GraphData[];
+    data: GraphData[]
 }
 
 /** Line chart of the cases registered over time */
 const LineGraph = ({ data }: LineGraphProps) => {
-
     return (
         <div className="w-full rounded-xl bg-card p-6 shadow-sm">
             <h2 className="mb-6">
@@ -50,7 +49,7 @@ const LineGraph = ({ data }: LineGraphProps) => {
                 </ResponsiveContainer>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default LineGraph;
+export default LineGraph
