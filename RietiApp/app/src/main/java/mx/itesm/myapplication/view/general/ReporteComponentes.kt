@@ -45,12 +45,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import mx.itesm.myapplication.data.network.DireccionSugerida
 import mx.itesm.myapplication.data.network.ResultadoUbicacion
-import mx.itesm.myapplication.data.network.direccionDesdeCoordenadas
 import mx.itesm.myapplication.data.network.obtenerUbicacionActual
 import mx.itesm.myapplication.viewModel.MunicipiosUiState
 

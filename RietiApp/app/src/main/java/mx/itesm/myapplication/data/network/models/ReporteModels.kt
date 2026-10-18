@@ -46,9 +46,9 @@ enum class Actividad(val etiqueta: String) {
  * Opciones para el nivel de riesgo observado en la situación.
  */
 enum class Riesgo(val etiqueta: String) {
-    SI("Sí"),
-    NO("No"),
-    NO_SE("No se")
+    ALTO("Alto"),
+    MEDIO("Medio"),
+    BAJO("Bajo")
 }
 
 /**
@@ -88,7 +88,8 @@ data class ReporteCreateRequest(
     @SerializedName("tipo_trabajo") val tipoTrabajo: String,
     @SerializedName("descripcion") val descripcion: String? = null,
     @SerializedName("imagen_content_type") val imagenContentType: String? = null,
-    @SerializedName("con_seguimiento") val conSeguimiento: Boolean
+    @SerializedName("con_seguimiento") val conSeguimiento: Boolean,
+    @SerializedName("riesgo") val riesgo: String? = null
 )
 
 /**
