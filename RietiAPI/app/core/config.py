@@ -26,7 +26,10 @@ class Settings(BaseSettings):
     # Recovery
     RECOVERY_CODE_EXPIRE_MINUTES: int = 10
     RECOVERY_LINK_EXPIRE_MINUTES: int = 15
-    RECOVERY_MAX_ATTEMPTS: int = 5  
+    RECOVERY_MAX_ATTEMPTS: int = 5
+    # Dirección completa del dashboard (con la ruta base, ej. https://a01802689.github.io/Rieti) para armar el enlace del correo. Si está vacía se usa DASHBOARD_ORIGIN.
+    DASHBOARD_URL: str = ""
     model_config = {"env_file": ".env"}
 
-settings = Settings()
+# Los campos obligatorios los lee de .env; Pylance no lo sabe y marcaría argumentos faltantes
+settings = Settings()  # pyright: ignore[reportCallIssue]

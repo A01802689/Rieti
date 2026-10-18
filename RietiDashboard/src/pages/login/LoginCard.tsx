@@ -1,7 +1,7 @@
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Eye, EyeClosed } from 'lucide-react'
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { ApiError } from '@/lib/api/client';
 
@@ -106,6 +106,10 @@ return (
       >
         {isSubmitting ? 'Cargando...' : 'Continuar'}
       </button>
+
+      <Link to="/recovery" className="block text-center text-sm font-accent hover:underline">
+        ¿Olvidaste tu contraseña?
+      </Link>
     </form>
   </div>
 );

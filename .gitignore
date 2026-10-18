@@ -19,3 +19,6 @@ terraform.tfvars
 *ns.md
 terraform/
 dist/
+
+# guía local de deploy a Lambda (no se sube)
+GUIA_DEPLOY_LAMBDA.md

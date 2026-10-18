@@ -1,0 +1,7 @@
+{
+  "venvPath": "RietiAPI",
+  "venv": ".venv",
+  "executionEnvironments": [
+    { "root": "RietiAPI", "extraPaths": ["RietiAPI"] }
+  ]
+}
