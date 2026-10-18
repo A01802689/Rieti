@@ -2,6 +2,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
+from app.core.config import settings
 from app.core.limiter import limiter
 from app.schemas.recovery import CodeReset, LinkReset, MessageResponse, RecoveryRequest
 from app.services import recovery_service
@@ -20,7 +21,12 @@ def request_recovery(
 ):
     send = recovery_service.request_recovery(db, email=data.email, method=data.method)
     if send is not None:
-        background_tasks.add_task(send)
+        if settings.RECOVERY_SEND_IN_BACKGROUND:
+            background_tasks.add_task(send)
+        else:
+            # En Lambda: si se mandara después de responder, la función se congelaría con el envío a medias.
+            # send() no lanza errores (el servicio los registra), así que la respuesta sigue siendo la misma.
+            send()
     return {"message": REQUEST_MESSAGE}
 
 

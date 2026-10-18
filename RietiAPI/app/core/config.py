@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     RECOVERY_MAX_ATTEMPTS: int = 5
     # Dirección completa del dashboard (con la ruta base, ej. https://a01802689.github.io/Rieti) para armar el enlace del correo. Si está vacía se usa DASHBOARD_ORIGIN.
     DASHBOARD_URL: str = ""
+    # True: el correo se manda DESPUÉS de responder (servidor normal; no se nota la demora de SMTP).
+    # False: se manda ANTES de responder. Necesario en Lambda, que congela la función al terminar la
+    # respuesta y puede dejar el envío a medias. Con False, el correo existente tarda más en responder.
+    RECOVERY_SEND_IN_BACKGROUND: bool = True
     model_config = {"env_file": ".env"}
 
 # Los campos obligatorios los lee de .env; Pylance no lo sabe y marcaría argumentos faltantes
