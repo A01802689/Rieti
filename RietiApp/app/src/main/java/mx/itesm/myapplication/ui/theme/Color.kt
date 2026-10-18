@@ -26,3 +26,5 @@ val Alerta = Color(0xFFB3261E)
 val AlertaSuave = Color(0xFFFBE4E2)
 
 val DegradadoEncabezado = Brush.horizontalGradient(listOf(TurquesaProfundo, Violeta))
+
+val DegradadoEncabezadoOscuro = Brush.horizontalGradient(listOf(Color(0xFF006B7A), Color(0xFF3F2D6E)))

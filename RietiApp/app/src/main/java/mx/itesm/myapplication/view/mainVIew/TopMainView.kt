@@ -2,6 +2,7 @@ package mx.itesm.myapplication.view.mainVIew
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import mx.itesm.myapplication.R
 import mx.itesm.myapplication.ui.theme.DegradadoEncabezado
+import mx.itesm.myapplication.ui.theme.DegradadoEncabezadoOscuro
 import mx.itesm.myapplication.view.Pantalla
 import mx.itesm.myapplication.viewModel.AuthViewModel
 
@@ -48,7 +50,7 @@ fun TopMainView(navController: NavController, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.fillMaxWidth()
             .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
-            .background(DegradadoEncabezado)
+            .background(if (isSystemInDarkTheme()) DegradadoEncabezadoOscuro else DegradadoEncabezado)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

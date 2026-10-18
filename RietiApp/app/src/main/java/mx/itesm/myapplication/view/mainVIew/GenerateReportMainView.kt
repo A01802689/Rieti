@@ -82,8 +82,8 @@ fun GenerateReportMainView(navController: NavController, modifier: Modifier = Mo
 
 @Composable
 fun ReportCard(anonymous: Boolean, navController: NavController, modifier: Modifier = Modifier) {
-    val acento = if (anonymous) Violeta else TurquesaProfundo
-    val fondoIcono = if (anonymous) VioletaSuave else TurquesaSuave
+    val acento = if (anonymous) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+    val fondoIcono = if (anonymous) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primaryContainer
     val icono = if (anonymous) Icons.Filled.PersonOff else Icons.Filled.Person
     val (titulo, descripcion) =
         if (anonymous) "Anónimo" to "Sin datos personales" else "Con seguimiento" to "Recibe tu folio"
