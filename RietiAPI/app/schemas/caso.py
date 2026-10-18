@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator, model_validator
 from app.models.caso import Estado, Urgencia
-from app.models.reporte import CantidadNNA, EdadAproximada, TipoTrabajo
+from app.models.reporte import CantidadNNA, EdadAproximada, EstatusSeguimiento, TipoTrabajo
 from app.schemas.seguimiento import SeguimientoResponse
 
 
@@ -44,9 +44,9 @@ class UbicacionCasoCreate(BaseModel):
 
 
 class AbrirCasoDesdeReporte(BaseModel):
-    id_municipio: int
-    ubicacion: UbicacionCasoCreate
-    urgencia: Urgencia
+    id_municipio: int | None = None
+    ubicacion: UbicacionCasoCreate | None = None
+    urgencia: Urgencia | None = None
 
 
 class CasoAbiertoResponse(DatosCaso):
@@ -55,7 +55,8 @@ class CasoAbiertoResponse(DatosCaso):
     id_municipio: int
     id_ubicacion: int
     estado: Estado
-    urgencia: Urgencia
+    urgencia: Urgencia | None
+    estatus_seguimiento: EstatusSeguimiento
 
 
 class MunicipioCasoResponse(BaseModel):
@@ -64,10 +65,10 @@ class MunicipioCasoResponse(BaseModel):
 
 class UbicacionCasoResponse(BaseModel):
     municipio: str
-    colonia: str
-    calle: str
-    lat: float
-    lng: float
+    colonia: str | None
+    calle: str | None
+    lat: float | None
+    lng: float | None
 
 
 class CasoListado(DatosCaso):
@@ -77,11 +78,27 @@ class CasoListado(DatosCaso):
     estado: Estado | None
     fecha_caso: datetime
     urgencia: Urgencia | None
+    cantidad_reportes: int
 
 
 class CasoDetalle(CasoListado):
     notas: str | None
     seguimientos: list[SeguimientoResponse]
+
+
+class ActualizarUbicacionCaso(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    colonia: str | None = Field(default=None, min_length=1, max_length=100)
+    calle: str | None = Field(default=None, min_length=1, max_length=100)
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    lng: float | None = Field(default=None, ge=-180, le=180)
+    referencia: str | None = None
+
+    @model_validator(mode="after")
+    def validar_coordenadas(self):
+        if (self.lat is None) != (self.lng is None):
+            raise ValueError("lat y lng deben enviarse juntos")
+        return self
 
 
 class ActualizarCaso(ContratoCantidadCaso):
@@ -91,11 +108,25 @@ class ActualizarCaso(ContratoCantidadCaso):
     cantidad_nna: CantidadNNA | None = None
     edad_aproximada: EdadAproximada | None = None
     tipo_trabajo: TipoTrabajo | None = None
+    ubicacion: ActualizarUbicacionCaso | None = None
 
     @field_validator("cantidad_nna", mode="before",
                      json_schema_input_type=Literal[1, 2, 3, 4, "1", "2", "3", "4", "5 o más", "No sé"] | None)
     @classmethod
     def normalizar_cantidad(cls, valor):
         return super().normalizar_cantidad(valor)
+
+
+class TransferirCaso(BaseModel):
+    id_municipio: int
+
+
+class EliminarCasos(BaseModel):
+    ids: list[int] = Field(min_length=1, max_length=200)
+
+
+class EliminarCasosResponse(BaseModel):
+    eliminados: list[int]
+    omitidos: list[int]
 
 

@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import exigir_permiso, get_db
 from app.models.usuario import Usuario
 from app.schemas.seguimiento import SeguimientoCreate, SeguimientoResponse
+from app.schemas.usuario import PermisoEnum
 from app.services import seguimiento_service
 
 router = APIRouter(prefix="/casos", tags=["Seguimiento"])
@@ -18,14 +19,8 @@ def crear_seguimiento(
     id_caso: int,
     datos: SeguimientoCreate,
     db: Session = Depends(get_db),
-    usuario_actual: Usuario = Depends(get_current_user),
+    usuario_actual: Usuario = Depends(exigir_permiso(PermisoEnum.cases_edit)),
 ):
-    if usuario_actual is None:
-        raise HTTPException(status_code=401, detail="Usuario no autenticado")
-
-    if usuario_actual.rol not in ("Alimentador", "Administrador"):
-        raise HTTPException(status_code=403, detail="No tienes permiso para añadir notas")
-
     return seguimiento_service.crear_seguimiento(
         db=db,
         id_caso=id_caso,

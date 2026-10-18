@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone  #me servira para importar fe
 from app.core.config import settings
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440 
 
 def create_access_token(data: dict):
     to_encode = data.copy()

@@ -1,6 +1,6 @@
-import SideBar from '../../components/ui/SideBar'
-import InfoKpis from './components/KpiHome/InfoKpi'
-import LineGraph from './components/Graph/Graph'
+import SideBar from '@/components/ui/SideBar'
+import InfoKpi from './components/InfoKpi'
+import LineGraph from './components/LineGraph'
 import HeatMap from '@/components/ui/HeatMap'
 import { StatusChart } from '@/components/ui/StatusChart'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { useHome } from './useHome'
 import { Footer } from '@/components/layout/Footer'
 import { Forbidden } from '@/components/ui/Forbidden'
 import { useAuth } from '@/context/auth'
+import { ALL_OPTION } from '@/lib/utilities/filters'
 
 /** Risk levels explained next to the map preview */
 const riskLevels = [
@@ -80,7 +81,7 @@ const HomePage = () => {
                             <section aria-label="Resumen">
                                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-4">
                                     {stats.map((stat) => (
-                                        <InfoKpis
+                                        <InfoKpi
                                             key={stat.label}
                                             label={stat.label}
                                             value={stat.value}
@@ -97,10 +98,10 @@ const HomePage = () => {
 
                             <section aria-label="Estatus de casos y reportes" className="grid grid-cols-1 gap-4 lg:grid-cols-2 sm:gap-6">
                                 <div className="rounded-xl bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
-                                    <StatusChart title="Casos por estado" options={caseStatus} allValue="Todos" className="" />
+                                    <StatusChart title="Casos por estado" options={caseStatus} allValue={ALL_OPTION} className="" />
                                 </div>
                                 <div className="rounded-xl bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
-                                    <StatusChart title="Reportes por estatus" options={reportStatus} allValue="Todos" className="" />
+                                    <StatusChart title="Reportes por estatus" options={reportStatus} allValue={ALL_OPTION} className="" />
                                 </div>
                             </section>
                         </div>

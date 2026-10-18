@@ -10,7 +10,7 @@ interface InfoKpiProp{
 }
 
 /** Card with one indicator of the home summary */
-const InfoKpis =({label, value, note,  tone,}: InfoKpiProp) =>{
+const InfoKpi =({label, value, note,  tone,}: InfoKpiProp) =>{
     return (
         <div className="flex overflow-hidden rounded-xl bg-card shadow-sm transition-colors duration-300">
             <div className={`w-1 shrink-0 ${tone}`}/>
@@ -24,4 +24,4 @@ const InfoKpis =({label, value, note,  tone,}: InfoKpiProp) =>{
         </div>
     )
 }
-export default InfoKpis
+export default InfoKpi

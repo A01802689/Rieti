@@ -1,9 +1,10 @@
 import HeatMap from "@/components/ui/HeatMap"
 import Loading from "@/components/ui/Loading"
+import { Forbidden } from "@/components/ui/Forbidden"
 // import { Popup } from "react-map-gl/maplibre"
 
 import { useHeatMap } from "./useHeatMap"
-import { DragableMenu } from "../../components/layout/DragableMenu"
+import { DragableMenu } from "./components/DragableMenu"
 import { Filters } from "./components/Filters"
 import { SelectionCard } from "./components/SelectionCard"
 import SideBar from "@/components/ui/SideBar"
@@ -18,7 +19,6 @@ const HeatMapPage = () => {
   const visibleSelected = selected && (selected.type === "report" ? state.showReports : state.showCases)
     ? selected
     : null
-
   return(
     // the map fills the screen and the rest floats over it
     <div className="relative h-screen w-screen">
@@ -28,6 +28,10 @@ const HeatMapPage = () => {
                     </div>
       { state.loading ? 
         <Loading />
+      : state.forbidden ?
+        <div className="flex h-full items-center justify-center p-4 md:pl-64">
+          <Forbidden className="max-w-sm py-10" />
+        </div>
       :
         <HeatMap
           reportsArr={state.reports}
@@ -44,16 +48,17 @@ const HeatMapPage = () => {
       }
       </div>
 
-      {!state.loading && (
-        // show the selected report or case
+      {!state.loading && !state.forbidden && (
         <div className="absolute left-4 top-4 z-10">
           <SelectionCard selected={visibleSelected} reports={state.allReports} cases={state.allCases} onClose={() => state.setSelected(null)} />
         </div>
       )}
 
-      <DragableMenu>
-        <Filters state={state} />
-      </DragableMenu>
+      {!state.forbidden && (
+        <DragableMenu>
+          <Filters state={state} />
+        </DragableMenu>
+      )}
     </div>
   )
 }

@@ -9,7 +9,7 @@ import CaseDetailPage from "./pages/cases/CaseDetail"
 import { AuthProvider } from "./context/AuthContext"
 import { RequirePermission } from "./components/layout/RequirePermission"
 import UsersPage from "./pages/users/Users"
-import LogsPage from "./pages/logsp/Logs"
+import LogsPage from "./pages/logs/Logs"
 import NoAccessPage from "./pages/noaccess/NoAccess"
 import NotFoundPage from "./pages/404/404"
 import RecoveryPage from "./pages/recovery/Recovery"
@@ -32,7 +32,7 @@ function App() {
         <Route path="/cases" element={<RequirePermission permission="cases.view"><CasesPage/></RequirePermission>} />
         <Route path="/cases/:id" element={<RequirePermission permission="cases.view"><CaseDetailPage/></RequirePermission>} />
         <Route path="/users" element={<RequirePermission role="Administrador"><UsersPage/></RequirePermission>} />
-        <Route path="/logs" element={<RequirePermission permission="logs.view"><LogsPage/></RequirePermission>} />
+        <Route path="/logs" element={<RequirePermission role="Administrador"><LogsPage/></RequirePermission>} />
         <Route path={NO_ACCESS_ROUTE} element={<RequirePermission><NoAccessPage/></RequirePermission>} />
         <Route path="*" element={<NotFoundPage/>} />
       </Routes>

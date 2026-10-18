@@ -7,6 +7,7 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from 'recharts'
+import useIsDark from '@/lib/utilities/useIsDark'
 
 /** One point of the line chart */
 interface GraphData {
@@ -21,6 +22,10 @@ interface LineGraphProps {
 
 /** Line chart of the cases registered over time */
 const LineGraph = ({ data }: LineGraphProps) => {
+    const dark = useIsDark()
+    const textColor = dark ? '#e5e7eb' : '#030712'
+    const axisColor = dark ? '#94a3b8' : '#64748b'
+
     return (
         <div className="w-full rounded-xl bg-card p-6 shadow-sm">
             <h2 className="mb-6">
@@ -30,13 +35,22 @@ const LineGraph = ({ data }: LineGraphProps) => {
             <div className="h-80 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" />
+                        <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#e2e8f0'} />
 
-                        <XAxis dataKey="name" />
+                        <XAxis dataKey="name" tick={{ fill: axisColor }} stroke={axisColor} />
 
-                        <YAxis />
+                        <YAxis tick={{ fill: axisColor }} stroke={axisColor} />
 
-                        <Tooltip />
+                        <Tooltip
+                            contentStyle={{
+                                background: dark ? '#0f172a' : '#ffffff',
+                                border: `1px solid ${dark ? '#334155' : '#e2e8f0'}`,
+                                borderRadius: 8,
+                                color: textColor,
+                            }}
+                            itemStyle={{ color: textColor }}
+                            labelStyle={{ color: textColor }}
+                        />
 
                         <Line
                             type="monotone"

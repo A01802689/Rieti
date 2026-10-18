@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, Text, DateTime, func
+from sqlalchemy import Column, DateTime, ForeignKey, Identity, Integer, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import Enum as SQLEnum
 from app.db.base import Base
 from enum import Enum
 
 
-class Entity_type(str, Enum):
+class EntityType(str, Enum):
     USUARIO = "usuario"
     MUNICIPIO = "municipio"
     REPORTE = "reporte"
@@ -13,16 +13,18 @@ class Entity_type(str, Enum):
     CASO = "caso"
 
 
-class logs(Base):
-    __tablename__ = "base"
+class Log(Base):
+    __tablename__ = "logs"
 
     id_logs = Column(
         Integer,
+        Identity(always=True),
         primary_key=True,
         index=True
     )
     id_usuario = Column(
         Integer,
+        ForeignKey("usuario.id_usuario"),
         nullable=False
     )
     action = Column(
@@ -31,9 +33,9 @@ class logs(Base):
     )
     entity_type = Column(
         SQLEnum(
-            Entity_type,
-            name = "entity_type",
-            values_callale = lambda enum_class: [
+            EntityType,
+            name = "entity_type_logs",
+            values_callable = lambda enum_class: [
                 item.value for item in enum_class
             ]
         ),
@@ -48,7 +50,11 @@ class logs(Base):
         nullable=False
     )
     after_data = Column(
-        JSONB,
-        nullable=False
+        JSONB(none_as_null=True),
+        nullable=True
     )
-
+    fecha = Column(
+        DateTime,
+        nullable=False,
+        server_default=func.now()
+    )

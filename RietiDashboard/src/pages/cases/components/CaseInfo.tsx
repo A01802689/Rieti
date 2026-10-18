@@ -1,10 +1,9 @@
-import { DocumentIcon, UserIcon } from './CaseIcons';
-import type { Caso } from '@/lib/types/Case';
-import type { Reporte } from '@/lib/types/Report';
-import { Empty, Field } from '@/components/ui/ReportDetails';
-import { LocationMap } from '@/components/ui/LocationMap';
-import { ReportImage } from '@/components/ui/ReportImage';
-import { formatDateTime } from '@/lib/utilities/reportStyles';
+import { DocumentIcon, UserIcon } from './CaseIcons'
+import type { Caso } from '@/lib/types/Case'
+import type { Reporte } from '@/lib/types/Report'
+import { Empty, Field } from '@/components/ui/ReportDetails'
+import { ReportImage } from '@/components/ui/ReportImage'
+import { formatDateTime } from '@/lib/utilities/reportStyles'
 
 /**
  * Titled card of the case page
@@ -12,9 +11,10 @@ import { formatDateTime } from '@/lib/utilities/reportStyles';
  * @param title - Heading of the card
  * @param icon - Icon next to the title
  * @param tone - Classes that color the icon badge
+ * @param action - Optional control placed at the right of the title, e.g. an edit button
  * @param children - Content of the card
  */
-export function Card({ title, icon, tone, children }: { title: string; icon: React.ReactNode; tone: string; children: React.ReactNode }) {
+export function Card({ title, icon, tone, action, children }: { title: string; icon: React.ReactNode; tone: string; action?: React.ReactNode; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-4 rounded-xl border border-card bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
             <div className="flex items-center gap-3">
@@ -22,20 +22,20 @@ export function Card({ title, icon, tone, children }: { title: string; icon: Rea
                     {icon}
                 </span>
                 <h2 className="p-0">{title}</h2>
+                {action && <div className="ml-auto shrink-0">{action}</div>}
             </div>
             {children}
         </section>
-    );
+    )
 }
 
-// "Información del denunciante": built from the case's first report (reports carry no contact data)
 /**
- * Card with the data of the people who reported the case
+ * Card with the data of the people who reported the case, built from the first report because reports carry no contact data
  *
  * @param reports - Reports of the case
  */
 export function ReporterCard({ reports }: { reports: Reporte[] }) {
-    const first = reports[0];
+    const first = reports[0]
     return (
         <Card title="Información del denunciante" icon={<UserIcon />} tone="bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300">
             {first ? (
@@ -50,35 +50,24 @@ export function ReporterCard({ reports }: { reports: Reporte[] }) {
                 <Empty text="Este caso no tiene reportes asociados." />
             )}
         </Card>
-    );
+    )
 }
 
 /**
- * Card with the main data of the case: location, minors and notes
+ * Card with the main data of the case: municipio, descriptions and photos; the classification (minors, age, work type) is in CaseEditCard and the location in CaseLocationCard
  *
  * @param caso - Case shown
  * @param reports - Reports of the case
  */
 export function CaseDataCard({ caso, reports }: { caso: Caso; reports: Reporte[] }) {
-    const descriptions = reports.filter((r) => r.descripcion);
-    const photos = reports.filter((r) => r.imagen);
+    const descriptions = reports.filter((r) => r.descripcion)
+    const photos = reports.filter((r) => r.imagen)
 
     return (
         <Card title="Datos del caso" icon={<DocumentIcon />} tone="bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
-            <dl className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-                <Field label="Niños">{caso.cantidad_nna}</Field>
-                <Field label="Edad aproximada">{caso.edad_aproximada}</Field>
-                <Field label="Tipo">{caso.tipo_trabajo}</Field>
+            <dl className="grid grid-cols-1 gap-2">
                 <Field label="Municipio">{caso.municipio.nombre}</Field>
             </dl>
-
-            <div className="flex flex-col gap-2">
-                <p className="section-label p-0">Ubicación exacta</p>
-                <p className="p-0 font-clear">
-                    {caso.ubicacion.calle}, {caso.ubicacion.colonia}, {caso.ubicacion.municipio}
-                </p>
-                <LocationMap lat={caso.ubicacion.lat} lng={caso.ubicacion.lng} />
-            </div>
 
             <div className="flex flex-col gap-2">
                 <p className="section-label p-0">Descripción</p>
@@ -108,5 +97,5 @@ export function CaseDataCard({ caso, reports }: { caso: Caso; reports: Reporte[]
                 )}
             </div>
         </Card>
-    );
+    )
 }

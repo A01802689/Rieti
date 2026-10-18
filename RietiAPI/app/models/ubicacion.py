@@ -18,15 +18,15 @@ class Ubicacion(Base):
     )
     colonia = Column(
         String(100),
-        nullable=False
+        nullable=True
     )
     calle = Column(
         String(100),
-        nullable=False
+        nullable=True
     )
     coordenadas = Column(
         Geometry(geometry_type="POINT", srid=4326),
-        nullable=False
+        nullable=True
     )
     referencia = Column(
         Text,

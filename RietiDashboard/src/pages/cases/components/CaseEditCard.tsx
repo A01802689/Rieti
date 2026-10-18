@@ -9,12 +9,12 @@ import {
     type EdadAproximada,
     type TipoTrabajo,
 } from '@/lib/types/Report'
-import { addNote2Case, updateCase } from '@/lib/api/cases'
 import { Empty, Field } from '@/components/ui/ReportDetails'
 import { SelectField } from '@/components/ui/SelectField'
 import { URGENCY_STYLES } from '@/lib/utilities/reportStyles'
-import { isAdmin, useRole } from '@/lib/utilities/useRole'
-import type { Mutate } from '../useCases'
+import { useAuth } from '@/context/auth'
+import { useAction } from '@/lib/utilities/useAction'
+import type { SaveChanges } from '../useCases'
 import { TagIcon } from './CaseIcons'
 import { Card } from './CaseInfo'
 
@@ -48,28 +48,20 @@ function changesOf(caso: Caso, draft: Draft) {
     return { patch, note }
 }
 
-/**
- * Reads the message of an error
- *
- * @param e - Value thrown by an api call
- */
-const messageOf = (e: unknown) => (e instanceof Error ? e.message : 'error desconocido')
-
 interface Props {
     /** Case shown */
     caso: Caso
-    /** Runs the api calls and reloads the case */
-    mutate: Mutate
+    /** Saves the changed fields and the note in one batch and reloads the case */
+    saveChanges: SaveChanges
 }
 
-/** Card with the data of the case that can be edited (minors, age, work type, urgency and last note); only admins get the edit button and its form */
-export function CaseEditCard({ caso, mutate }: Props) {
-    const role = useRole()
+/** Card with the data of the case that can be edited (minors, age, work type, urgency and last note); only users who can edit cases get the edit button and its form */
+export function CaseEditCard({ caso, saveChanges }: Props) {
+    const { can } = useAuth()
     const noteId = useId()
     const [editing, setEditing] = useState(false)
     const [draft, setDraft] = useState<Draft>({})
-    const [saving, setSaving] = useState(false)
-    const [error, setError] = useState('')
+    const { busy: saving, error, run, clearError } = useAction()
     const { patch, note } = changesOf(caso, draft)
     const changed = Object.keys(patch).length > 0 || note !== null
 
@@ -85,35 +77,12 @@ export function CaseEditCard({ caso, mutate }: Props) {
     const close = () => {
         setEditing(false)
         setDraft({})
-        setError('')
+        clearError()
     }
 
-    /** Sends one PATCH with the changed fields and then the note, and closes the form if both worked */
+    /** Saves the changed fields and the note, and closes the form if it worked */
     const save = async () => {
-        setSaving(true)
-        setError('')
-        let failure = ''
-        // the action never throws, so mutate reloads the case even if the note fails after the PATCH was saved
-        await mutate(async () => {
-            if (Object.keys(patch).length > 0) {
-                try {
-                    await updateCase(caso.id_caso, patch)
-                } catch (e) {
-                    failure = `No se pudieron guardar los datos: ${messageOf(e)}`
-                    return
-                }
-            }
-            if (note !== null) {
-                try {
-                    await addNote2Case(caso.id_caso, note)
-                } catch (e) {
-                    failure = `${Object.keys(patch).length > 0 ? 'Los datos se guardaron, pero no' : 'No'} se pudo agregar la nota: ${messageOf(e)}`
-                }
-            }
-        })
-        setSaving(false)
-        if (failure) setError(failure)
-        else close()
+        if (await run(() => saveChanges({ patch, nota: note }))) close()
     }
 
     return (
@@ -122,7 +91,7 @@ export function CaseEditCard({ caso, mutate }: Props) {
             icon={<TagIcon />}
             tone="bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300"
             action={
-                isAdmin(role) && !editing ? (
+                can('cases.edit') && !editing ? (
                     <button type="button" onClick={() => setEditing(true)} className="btn-secondary rounded-lg px-3 py-1.5 text-sm">
                         Editar
                     </button>
