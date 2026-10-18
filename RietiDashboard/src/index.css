@@ -154,6 +154,11 @@ for common components (they work as classes)
   @apply text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400;
 }
 
+/* card picked while a list is in selection mode */
+@utility card-selected{
+  @apply ring-2 ring-blue-500 dark:ring-blue-400;
+}
+
 /* delete button in its confirmation state (inverted per theme) */
 @utility btn-confirm{
   @apply cursor-pointer bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200;
