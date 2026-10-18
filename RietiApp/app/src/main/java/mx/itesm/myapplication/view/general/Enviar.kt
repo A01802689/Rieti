@@ -108,7 +108,7 @@ fun Enviar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (procesando) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                else Text(if (foto == null) "Adjuntar fotografía" else "Cambiar fotografía")
+                else Text(if (foto == null) "Adjuntar fotografía (Opcional)" else "Cambiar fotografía")
             }
             Text(
                 "Solo fotografías del lugar. Nunca de niñas, niños ni adolescentes.",

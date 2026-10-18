@@ -24,7 +24,7 @@ fun SeguimientoEnviar(navController: NavController, vm: ReporteViewModel){
     (state.envio as? EnvioUiState.Success)?.let { exito ->
         DialogoReporteEnviado(
             folio = exito.folio,
-            mensaje = if (exito.folio != null) "Tu reporte de seguimiento:\n${exito.folio}" else "Gracias por tu reporte"
+            mensaje = if (exito.folio != null) "¡Gracias por ayudar a proteger los derechos de niñas, niños y adolescentes!\nTu reporte de seguimiento:\n${exito.folio}" else "¡Gracias por ayudar a proteger los derechos de niñas, niños y adolescentes!\n"
         ) {
             navController.popBackStack(Pantalla.RUTA_MAIN, inclusive = false)
         }

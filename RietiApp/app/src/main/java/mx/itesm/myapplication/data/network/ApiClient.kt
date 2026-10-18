@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
 
     /** URL base por defecto pointing a localhost a través de `adb reverse` en emulador. */
-    private const val DEFAULT_BASE_URL = "http://127.0.0.1:8000/"
+    private const val DEFAULT_BASE_URL = "https://qwnm6keof2iainppzpq4dwooea0viytp.lambda-url.us-east-1.on.aws/"
 
     private var baseUrl: String = DEFAULT_BASE_URL
 
