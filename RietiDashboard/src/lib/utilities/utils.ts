@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge"
  * Joins class names and resolves Tailwind conflicts (the last one wins)
  *
  * @param inputs - Class names, conditions or objects
+ * @returns The merged class string
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

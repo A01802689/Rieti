@@ -3,9 +3,7 @@ import { isForbidden } from '@/lib/api/client'
 import { getLogs } from '@/lib/api/logs'
 import { ENTITY_LABELS, ENTITY_TYPES, type EntityType, type Log, type LogsQuery } from '@/lib/types/Log'
 import { useDebouncedValue } from '@/lib/utilities/useDebouncedValue'
-
-/** Filter option that shows every kind of record */
-export const ALL_OPTION = 'Todos'
+import { ALL_OPTION } from '@/lib/utilities/filters'
 
 /** Value of a filter button: a kind of record, or ALL_OPTION for no filter */
 export type LogFilter = EntityType | typeof ALL_OPTION
@@ -91,7 +89,11 @@ export function useLogs() {
   // until the current filter and search have an answer, the view shows the loading state
   const loaded = page && page.filter === selectedFilter && page.search === search ? page : null
 
-  /** Selects a filter button and collapses the open row */
+  /**
+   * Selects a filter button and collapses the open row
+   *
+   * @param filter - Filter to apply
+   */
   const selectFilter = (filter: LogFilter) => {
     setSelectedFilter(filter)
     setExpandedId(null)
@@ -107,7 +109,11 @@ export function useLogs() {
     setExpandedId(null)
   }
 
-  /** Expands the detail of a log, or collapses it when it is already open */
+  /**
+   * Expands the detail of a log, or collapses it when it is already open
+   *
+   * @param id - Id of the log
+   */
   const toggleExpanded = (id: number) => setExpandedId((current) => (current === id ? null : id))
 
   /** Asks for the next page and adds it after the loaded logs */

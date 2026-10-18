@@ -1,96 +1,6 @@
-/* 
-* JSON de Reporte, endpoint GET (/reportes/{id})
-{
-  "id_reporte": "number",
-  "id_usuario": "number | null",
-  "id_caso": "number | null",
-  "ubicacion": {
-    "municipio": "string",
-    "colonia": "string",
-    "calle": "string",
-    "lat": "number",
-    "lng": "number"
-  },
-  "folio_reporte": "string",
-  "estatus_seguimiento": "'Recibido' | 'En revisión' | 'Canalizado' | 'En atención' | 'Concluido' | 'Rechazado' | null",
-  "cantidad_nna": "1 | 2 | 3 | 4 | '5 o más' | 'No sé'",
-  "edad_aproximada": "'0-5' | '6-11' | '12-14' | '15-17' | 'No sé' | null",
-  "tipo_trabajo": "'Venta ambulante' | 'Limpieza de parabrisas' | 'Mendicidad' | 'Carga y descarga' | 'Trabajo en comercio' | 'Campo' | 'Construcción' | 'Trabajo doméstico' | 'Recolección de residuos' | 'Otra actividad' | 'No sé'",
-  "descripcion": "string | null",
-  "fecha_reporte": "string (ISO 8601 TIMESTAMP)",
-  "imagen": "string | null",
-  "riesgo": "'Bajo' | 'Medio' | 'Alto' | null"
-}
-
-* JSON de Reporte, endpoint GET (/reportes) (lista; admite ?id_caso={id} para los reportes de un caso)
-[{
-  "id_reporte": "number",
-  "id_caso": "number | null",
-  "ubicacion": {
-    "municipio": "string",
-    "colonia": "string",
-    "calle": "string",
-    "lat": "number",
-    "lng": "number"
-  },
-  "folio_reporte": "string",
-  "estatus_seguimiento": "'Recibido' | 'En revisión' | 'Canalizado' | 'En atención' | 'Concluido' | 'Rechazado' | null",
-  "cantidad_nna": "1 | 2 | 3 | 4 | '5 o más' | 'No sé'",
-  "edad_aproximada": "'0-5' | '6-11' | '12-14' | '15-17' | 'No sé' | null",
-  "tipo_trabajo": "'Venta ambulante' | 'Limpieza de parabrisas' | 'Mendicidad' | 'Carga y descarga' | 'Trabajo en comercio' | 'Campo' | 'Construcción' | 'Trabajo doméstico' | 'Recolección de residuos' | 'Otra actividad' | 'No sé'",
-  "fecha_reporte": "string (ISO 8601 TIMESTAMP)",
-  "riesgo": "'Bajo' | 'Medio' | 'Alto' | null"
-}, ...]
-
-* Aceptar un reporte (crea un caso), endpoint POST (/reportes/{id}/aceptar)
-sin cuerpo; respuesta:
-{
-  "id_caso": "number",
-  "id_reporte": "number",
-  "estatus_seguimiento": "'Canalizado'"
-}
-
-* Fusionar un reporte con un caso existente, endpoint POST (/reportes/{id}/fusionar)
-cuerpo:
-{
-  "id_caso": "number"
-}
-respuesta:
-{
-  "id_reporte": "number",
-  "id_caso": "number",
-  "estatus_seguimiento": "'Canalizado'"
-}
-
-* Rechazar un reporte, endpoint POST (/reportes/{id}/rechazar)
-sin cuerpo; respuesta:
-{
-  "id_reporte": "number",
-  "id_caso": "null",
-  "estatus_seguimiento": "'Rechazado'"
-}
-
-* Cambiar el seguimiento de un reporte que ya tiene caso, endpoint PATCH (/reportes/{id}/estatus)
-cuerpo:
-{
-  "estatus_seguimiento": "'Recibido' | 'En revisión' | 'Canalizado' | 'En atención' | 'Concluido' | 'Rechazado'"
-}
-respuesta:
-{
-  "id_reporte": "number",
-  "estatus_seguimiento": "'Recibido' | 'En revisión' | 'Canalizado' | 'En atención' | 'Concluido' | 'Rechazado'"
-}
-
-* Sacar un reporte de su caso, endpoint POST (/reportes/{id}/desvincular)
-sin cuerpo; respuesta:
-{
-  "id_reporte": "number",
-  "id_caso": "null",
-  "estatus_seguimiento": "'En revisión'"
-}
-*/
-
-import type { FeatureCollection, Point } from "geojson";
+import type { FeatureCollection, Point } from "geojson"
+import { hasValidLocation } from "../utilities/location"
+import { dashboardHourAndWeekday, parseApiDate } from "../utilities/date"
 
 /** Follow-up status of a report */
 export type ReportState =
@@ -99,15 +9,32 @@ export type ReportState =
   | "Canalizado"
   | "En atención"
   | "Concluido"
-  | "Rechazado";
+  | "Rechazado"
+/** Statuses a report can have, used as dropdown options */
+export const REPORT_STATUS = ['Recibido', 'En revisión', 'Canalizado', 'En atención', 'Concluido', 'Rechazado']
+
+/** Numbers of minors a report or case can have, also used as dropdown options */
+export const CANTIDAD_NNA = [1, 2, 3, 4, "5 o más", "No sé"] as const
 
 /** Number of minors in a report */
-export type CantidadNNA = 1 | 2 | 3 | 4 | "5 o más" | "No sé";
+export type CantidadNNA = (typeof CANTIDAD_NNA)[number]
+
+/**
+ * Converts the number of minors of a report, which the API sends as text, into the type the dashboard uses
+ *
+ * @param value - "1", "2", "3", "4", "5 o más" or "No sé" (the number itself is also accepted)
+ * @returns The matching option of CANTIDAD_NNA, or "No sé" when the value is not one of them
+ */
+export const parseCantidadNNA = (value: unknown): CantidadNNA =>
+  CANTIDAD_NNA.find((option) => String(option) === String(value)) ?? "No sé"
+
+/** Age ranges a report or case can have, also used as dropdown options */
+export const EDAD_APROXIMADA = ["0-5", "6-11", "12-14", "15-17", "No sé"] as const
 
 /** Approximate age range of the minors */
-export type EdadAproximada = "0-5" | "6-11" | "12-14" | "15-17" | "No sé";
+export type EdadAproximada = (typeof EDAD_APROXIMADA)[number]
 
-// lists also used as dropdown options
+/** Work types of a report, also used as dropdown options */
 export const WORK_TYPES = [
   "Venta ambulante",
   "Limpieza de parabrisas",
@@ -120,66 +47,77 @@ export const WORK_TYPES = [
   "Recolección de residuos",
   "Otra actividad",
   "No sé",
-] as const;
+] as const
 
-export type TipoTrabajo = (typeof WORK_TYPES)[number];
+/** Type of work a minor does */
+export type TipoTrabajo = (typeof WORK_TYPES)[number]
 
-export const RISK_LEVELS = ["Bajo", "Medio", "Alto"] as const;
+/** Risk levels of a report, also used as dropdown options */
+export const RISK_LEVELS = ["Bajo", "Medio", "Alto"] as const
 
-export type Riesgo = (typeof RISK_LEVELS)[number];
+/** Risk level of a report */
+export type Riesgo = (typeof RISK_LEVELS)[number]
 
-/** Report as the API returns it */
+/** Report as the dashboard uses it; getReports and getReport build it from the API one */
 export interface Reporte {
-  id_reporte: number;
-  id_usuario: number | null;
-  id_caso: number | null;
-  ubicacion: Ubicacion;
-  folio_reporte: string;
-  estatus_seguimiento: ReportState | null;
-  cantidad_nna: CantidadNNA;
-  edad_aproximada: EdadAproximada | null;
-  tipo_trabajo: TipoTrabajo;
-  descripcion: string | null;
-  fecha_reporte: string; // ISO 8601 TIMESTAMP
-  imagen: string | null;
-  riesgo: Riesgo | null;
+  id_reporte: number
+  id_usuario: number | null
+  id_caso: number | null
+  ubicacion: Ubicacion
+  folio_reporte: string
+  estatus_seguimiento: ReportState | null
+  cantidad_nna: CantidadNNA
+  edad_aproximada: EdadAproximada | null
+  tipo_trabajo: TipoTrabajo
+  descripcion: string | null
+  fecha_reporte: string // ISO 8601 TIMESTAMP, UTC without zone
+  imagen: string | null
+  riesgo: Riesgo | null
+  /** Only the detail endpoint sends it */
+  tiene_imagen?: boolean
+  /** Only the detail endpoint sends it */
+  url_descarga_imagen?: string | null
 }
 
+/** Report as the API sends it: the number of minors is text */
+export type ReporteApi = Omit<Reporte, "cantidad_nna"> & { cantidad_nna: string }
 
-/** Place of a report or case */
+/** Place of a report */
 export interface Ubicacion {
-  municipio: string;
-  colonia: string;
-  calle: string;
-  lat: number;
-  lng: number;
+  municipio: string
+  colonia: string
+  calle: string
+  lat: number
+  lng: number
+  /** Only the detail endpoint sends it */
+  referencia?: string | null
 }
 
-
-/** Properties of each report point of the map. Only flat and minimal data is sent; the detail is requested on selection */
+/** Properties of each report point of the map; only flat and minimal data is sent, the detail is requested on selection */
 export type FeatureReportProps = {
-  id: string;
-  risk: Riesgo | null;
-  nna: CantidadNNA;
-  approx_age: EdadAproximada | null;
-  status: ReportState | null;
-  report_date: string;
-  hour: number;                    // 0-23 hrs
-  weekday: number;                 // 0 = sunday ... 6 = saturday
-  days_unattended: number | null;  // null if the report already has a case
-};
+  id: string
+  risk: Riesgo | null
+  nna: CantidadNNA
+  approx_age: EdadAproximada | null
+  status: ReportState | null
+  report_date: string
+  hour: number                    // 0-23 hrs in Mexico City time
+  weekday: number                 // 0 = sunday ... 6 = saturday in Mexico City time
+  days_unattended: number | null  // null if the report already has a case
+}
 
-// property of FeatureReportProps used to color the report circles
-export type ReportVisual = "risk" | "nna" | "approx_age" | "days_unattended";
+/** Property of FeatureReportProps used to color the report circles */
+export type ReportVisual = "risk" | "nna" | "approx_age" | "days_unattended"
 
 /** Milliseconds in a day */
-export const MS_DAY = 1000 * 60 * 60 * 24;
+export const MS_DAY = 1000 * 60 * 60 * 24
 
 /**
- * Converts reports to GeoJSON points for the map
+ * Converts reports to GeoJSON points for the map; reports without valid coordinates are left out
  *
  * @param reports - Reports to draw
  * @param currDate - Date used to count the days unattended
+ * @returns A point per report with its map properties
  */
 export const reports2GeoJSON = (
   reports: Reporte[],
@@ -188,12 +126,14 @@ export const reports2GeoJSON = (
     type: "FeatureCollection",
     features: reports.flatMap((r) => {
       const { ubicacion } = r
-      const date = new Date(r.fecha_reporte);
-      const noCase = r.id_caso === null;
+      if (!hasValidLocation(ubicacion)) return []
+      const date = parseApiDate(r.fecha_reporte)
+      const { hour, weekday } = dashboardHourAndWeekday(date)
+      const noCase = r.id_caso === null
 
       return [{
         type: "Feature" as const,
-        geometry: { type: "Point" as const, coordinates: [ubicacion.lng, ubicacion.lat] }, 
+        geometry: { type: "Point" as const, coordinates: [ubicacion.lng, ubicacion.lat] },
         properties: {
           id: String(r.id_reporte),
           risk: r.riesgo,
@@ -201,12 +141,12 @@ export const reports2GeoJSON = (
           approx_age: r.edad_aproximada,
           status: r.estatus_seguimiento,
           report_date: r.fecha_reporte,
-          hour: date.getHours(),
-          weekday: date.getDay(),
+          hour,
+          weekday,
           days_unattended: noCase
             ? Math.floor((currDate.getTime() - date.getTime()) / MS_DAY)
             : null,
         }
-      }];
+      }]
     }),
   })

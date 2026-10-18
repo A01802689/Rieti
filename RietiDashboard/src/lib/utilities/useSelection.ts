@@ -50,6 +50,7 @@ export function useSelection(enabled: boolean, visibleIds: number[]) {
    * Tells if an id is picked
    *
    * @param id - Id of the item
+   * @returns True when the item is picked
    */
   const isSelected = (id: number) => ids.includes(id)
 

@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react"
 
+/** Media query that matches the system dark mode */
 const q = "(prefers-color-scheme: dark)"
 
 /**

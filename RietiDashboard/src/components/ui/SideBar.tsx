@@ -1,19 +1,22 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/auth';
+import { useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '@/context/auth'
+import type { PermissionKey } from '@/lib/types/Permission'
 
-/** Links of the Dashboard submenu */
-const dashboardLinks = [
-    { label: 'Mapa de Calor', path: '/map' },
-    { label: 'Reportes', path: '/reports' },
-    { label: 'Logs', path: '/logs' },
-];
+/** Links of the Dashboard submenu; each one is shown only to a user with its permission */
+const dashboardLinks: { label: string; path: string; permission: PermissionKey }[] = [
+    { label: 'Mapa de Calor', path: '/map', permission: 'map.view' },
+    { label: 'Reportes', path: '/reports', permission: 'reports.view' },
+    { label: 'Logs', path: '/logs', permission: 'logs.view' },
+]
 
+/** Classes shared by every entry of the menu */
 const itemBaseClass =
     'flex w-full items-center rounded-lg p-3 text-start leading-tight outline-none transition-all duration-200 ' +
     'hover:bg-component hover:text-blue-gray-900 hover:shadow-md md:hover:scale-105 ' +
-    'focus-visible:ring-2 focus-visible:ring-blue-gray-300 cursor-pointer';
+    'focus-visible:ring-2 focus-visible:ring-blue-gray-300 cursor-pointer'
 
+/** Icon of the Dashboard entry */
 function DashboardIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-5 w-5">
@@ -23,16 +26,17 @@ function DashboardIcon() {
                 clipRule="evenodd"
             />
         </svg>
-    );
+    )
 }
 
+/** Icon of the Home entry */
 function HomeIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-5 w-5">
             <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
             <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
         </svg>
-    );
+    )
 }
 
 /**
@@ -53,17 +57,19 @@ function ChevronIcon({ isOpen }: { isOpen: boolean }) {
         >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
-    );
+    )
 }
 
+/** Icon of the Cases entry */
 function CasesIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-5 w-5">
             <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-15a3 3 0 00-3 3V18a3 3 0 003 3h15zM1.5 10.146V6a3 3 0 013-3h5.379a2.25 2.25 0 011.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 013 3v1.146A4.483 4.483 0 0019.5 9h-15a4.483 4.483 0 00-3 1.146z" />
         </svg>
-    );
+    )
 }
 
+/** Icon of the Users entry */
 function UsersIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-5 w-5">
@@ -73,9 +79,10 @@ function UsersIcon() {
                 clipRule="evenodd"
             />
         </svg>
-    );
+    )
 }
 
+/** Icon of the Log Out entry */
 function LogOutIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-5 w-5">
@@ -85,47 +92,60 @@ function LogOutIcon() {
                 clipRule="evenodd"
             />
         </svg>
-    );
+    )
 }
 
+/** Icon of the button that opens the mobile menu */
 function MenuIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" aria-hidden="true" className="h-6 w-6 dark:text-white">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
         </svg>
-    );
+    )
 }
 
+/** Icon of the button that closes the mobile menu */
 function CloseIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" aria-hidden="true" className="h-6 w-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
-    );
+    )
 }
 
 /**
  * Navigation menu: a fixed column from md and a drawer on mobile
- * The Users entry only shows to admins, and Log Out closes the session
+ * Each entry shows only to a user with the permission of its page, the Users entry only to admins, and Log Out closes the session
  */
 export default function SideBar() {
-    const [isDashboardOpen, setIsDashboardOpen] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { isAdmin, logout } = useAuth();
+    const [isDashboardOpen, setIsDashboardOpen] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const navigate = useNavigate()
+    const location = useLocation()
+    const { isAdmin, can, logout } = useAuth()
+    const visibleLinks = dashboardLinks.filter((link) => can(link.permission))
 
+    /**
+     * Navigates to a route and closes the mobile menu
+     *
+     * @param path - Route to go to
+     */
     const goTo = (path: string) => {
-        navigate(path);
-        setIsMobileMenuOpen(false);
-    };
+        navigate(path)
+        setIsMobileMenuOpen(false)
+    }
 
+    /**
+     * Highlights the entry of the current route
+     *
+     * @param path - Route of the entry
+     * @returns The classes of the entry, highlighted when its route is the current one
+     */
     const activeClass = (path: string) =>
-        location.pathname === path ? 'bg-component text-blue-gray-900 font-medium' : 'text-blue-gray-700';
+        location.pathname === path ? 'bg-component text-blue-gray-900 font-medium' : 'text-blue-gray-700'
 
     return (
         <>
-            {/* Mobile menu button */}
             <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(true)}
@@ -135,8 +155,6 @@ export default function SideBar() {
             >
                 <MenuIcon />
             </button>
-
-            {/* Mobile overlay */}
             <div
                 onClick={() => setIsMobileMenuOpen(false)}
                 aria-hidden="true"
@@ -166,61 +184,60 @@ export default function SideBar() {
                     </div>
 
                     <nav className="flex min-w-0 flex-col gap-1 p-2 font-sans text-base font-normal font-clear">
-                        {/* Home */}
-                        <button type="button" onClick={() => goTo('/home')} className={`${itemBaseClass} ${activeClass('/home')}`}>
-                            <span className="mr-4 grid place-items-center">
-                                <HomeIcon />
-                            </span>
-                            Home
-                        </button>
-
-                        {/* Dashboard dropdown */}
-                        <div className="w-full">
-                            <button
-                                type="button"
-                                onClick={() => setIsDashboardOpen(!isDashboardOpen)}
-                                aria-expanded={isDashboardOpen}
-                                className={`${itemBaseClass} justify-between text-blue-gray-700`}
-                            >
+                        {can('stats.view') && (
+                            <button type="button" onClick={() => goTo('/home')} className={`${itemBaseClass} ${activeClass('/home')}`}>
                                 <span className="mr-4 grid place-items-center">
-                                    <DashboardIcon />
+                                    <HomeIcon />
                                 </span>
-                                <span className="mr-auto">Dashboard</span>
-                                <span className="ml-4">
-                                    <ChevronIcon isOpen={isDashboardOpen} />
-                                </span>
+                                Home
                             </button>
+                        )}
+                        {visibleLinks.length > 0 && (
+                            <div className="w-full">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDashboardOpen(!isDashboardOpen)}
+                                    aria-expanded={isDashboardOpen}
+                                    className={`${itemBaseClass} justify-between text-blue-gray-700`}
+                                >
+                                    <span className="mr-4 grid place-items-center">
+                                        <DashboardIcon />
+                                    </span>
+                                    <span className="mr-auto">Dashboard</span>
+                                    <span className="ml-4">
+                                        <ChevronIcon isOpen={isDashboardOpen} />
+                                    </span>
+                                </button>
 
-                            <div
-                                className={`overflow-hidden transition-all duration-300 ${
-                                    isDashboardOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                                }`}
-                            >
-                                <div className="flex flex-col gap-1 py-1 pl-9">
-                                    {dashboardLinks.map((link) => (
-                                        <button
-                                            key={link.path}
-                                            type="button"
-                                            onClick={() => goTo(link.path)}
-                                            tabIndex={isDashboardOpen ? 0 : -1}
-                                            className={`${itemBaseClass} text-sm ${activeClass(link.path)}`}
-                                        >
-                                            {link.label}
-                                        </button>
-                                    ))}
+                                <div
+                                    className={`overflow-hidden transition-all duration-300 ${
+                                        isDashboardOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                    }`}
+                                >
+                                    <div className="flex flex-col gap-1 py-1 pl-9">
+                                        {visibleLinks.map((link) => (
+                                            <button
+                                                key={link.path}
+                                                type="button"
+                                                onClick={() => goTo(link.path)}
+                                                tabIndex={isDashboardOpen ? 0 : -1}
+                                                className={`${itemBaseClass} text-sm ${activeClass(link.path)}`}
+                                            >
+                                                {link.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Cases */}
-                        <button type="button" onClick={() => goTo('/case')} className={`${itemBaseClass} ${location.pathname.startsWith('/case') ? 'bg-component text-blue-gray-900 font-medium' : 'text-blue-gray-700'}`}>
-                            <span className="mr-4 grid place-items-center">
-                                <CasesIcon />
-                            </span>
-                            Casos
-                        </button>
-
-                        {/* Users (admins only) */}
+                        )}
+                        {can('cases.view') && (
+                            <button type="button" onClick={() => goTo('/cases')} className={`${itemBaseClass} ${location.pathname.startsWith('/case') ? 'bg-component text-blue-gray-900 font-medium' : 'text-blue-gray-700'}`}>
+                                <span className="mr-4 grid place-items-center">
+                                    <CasesIcon />
+                                </span>
+                                Casos
+                            </button>
+                        )}
                         {isAdmin && (
                             <button type="button" onClick={() => goTo('/users')} className={`${itemBaseClass} ${activeClass('/users')}`}>
                                 <span className="mr-4 grid place-items-center">
@@ -229,8 +246,6 @@ export default function SideBar() {
                                 Usuarios
                             </button>
                         )}
-
-                        {/* Log out */}
                         <button type="button" onClick={async () => { await logout(); goTo('/login') }} className={`${itemBaseClass} text-blue-gray-700`}>
                             <span className="mr-4 grid place-items-center">
                                 <LogOutIcon />
@@ -241,5 +256,5 @@ export default function SideBar() {
                 </div>
             </aside>
         </>
-    );
+    )
 }

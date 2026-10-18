@@ -1,71 +1,14 @@
-/*
-* JSON de Usuario, endpoint GET (/usuarios/{id})
-c
-* JSON de Usuario, endpoint GET (/usuarios)
-[{
-  "id_usuario": "number",
-  "nombre": "string",
-  "apellido": "string",
-  "correo": "string",
-  "rol": "'Administrador' | 'Alimentador' | null",
-  "id_municipio": "number | null",
-  "municipio": {
-    "id_municipio": "number",
-    "nombre": "string",
-    "clave": "string"
-  } | null,
-  "ultimo_acceso": "string (ISO 8601 TIMESTAMP) | null",
-  "permisos": "PermissionKey[] (ver lib/types/Permission.ts)"
-}, ...]
-* JSON de alta de Usuario, endpoint POST (/usuarios)
-body : {
-  "nombre": "string",
-  "apellido": "string",
-  "correo": "string",
-  "rol": "'Administrador' | 'Alimentador'",
-  "id_municipio": "number",
-  "permisos": "PermissionKey[]"
-}
-respuesta :
-el Usuario creado (mismo JSON que un elemento de la lista)
-
-* JSON de Usuario de la sesión, endpoint GET (/usuarios/me) (propuesto: hoy la sesión se pierde al recargar)
-{
-  "id_usuario": "number",
-  "nombre": "string",
-  "apellido": "string",
-  "correo": "string",
-  "rol": "'Administrador' | 'Alimentador' | null",
-  "id_municipio": "number | null"
-}
-
-* Cambiar los permisos de un Usuario, endpoint PUT (/usuarios/{id}/permisos) (propuesto)
-cuerpo:
-{
-  "permisos": "PermissionKey[]"
-}
-respuesta: el Usuario completo (JSON de GET /usuarios/{id})
-
-* Eliminar un Usuario, endpoint DELETE (/usuarios/{id}) (propuesto)
-sin cuerpo; respuesta 204 sin contenido
-
-* Cerrar la sesión, endpoint POST (/usuarios/logout) (ya existe en la API)
-sin cuerpo; respuesta:
-{
-  "message": "string"
-}
-*/
-
-import type { Municipio } from "./Municipio";
-import type { PermissionKey } from "@/lib/types/Permission";
+import type { Municipio } from "./Municipio"
+import { ADMIN_ONLY_PERMISSIONS, type PermissionKey } from "@/lib/types/Permission"
 
 /** Roles of the API */
-export const ROLES = ["Administrador", "Alimentador"] as const;
+export const ROLES = ["Administrador", "Alimentador"] as const
 
-export type Role = (typeof ROLES)[number];
+/** Role of a user */
+export type Role = (typeof ROLES)[number]
 
-/** User of the session, as the API login returns it */
-export interface SessionUser {
+/** User as the create endpoint (POST /usuarios) returns it: it has no permissions */
+export interface CreatedUser {
   id_usuario: number
   nombre: string
   apellido: string
@@ -74,37 +17,40 @@ export interface SessionUser {
   id_municipio: number | null
 }
 
-/** Work done by a user */
-export interface UserActivity {
-  reportes_atendidos: number
-  casos_revisados: number
-  notas_registradas: number
-}
-
-/** User shown in the users page; municipio, ultimo_acceso, permisos and actividad exist only in the front for now */
-export interface User extends SessionUser {
-  municipio: Municipio | null
-  ultimo_acceso: string | null // ISO 8601 TIMESTAMP
+/** User as the login and the session (/usuarios/me) endpoints return it; permisos are the effective ones, so an Administrador has all of them */
+export interface SessionUser extends CreatedUser {
   permisos: PermissionKey[]
-  actividad: UserActivity // omitted by the list endpoint in the real API
 }
 
-/** Payload to create a user (the API also needs contrasena) */
+/** User as the users endpoints (GET /usuarios, GET /usuarios/{id}, PUT /usuarios/{id}/permisos) return it; permisos are the stored ones, which are empty for an Administrador */
+export interface User extends Omit<CreatedUser, "rol"> {
+  rol: Role
+  municipio: Municipio | null
+  ultimo_acceso: string | null // ISO 8601 TIMESTAMP without zone (UTC), read it with parseApiDate
+  permisos: PermissionKey[]
+}
+
+/** Payload to create a user; contrasena only travels in the create request, and is never stored or shown */
 export interface UserCreate {
   nombre: string
   apellido: string
   correo: string
+  contrasena: string // min 8 characters with a number, a special character and an uppercase letter (see lib/utilities/password.ts)
   rol: Role
-  id_municipio: number | null
+  id_municipio: number | null // the API requires an existing municipio when rol is sent, the form does not send null
   permisos: PermissionKey[]
 }
 
-// /** State of the create form while it is being filled */
-// export interface UserCreateForm {
-//   nombre: string
-//   apellido: string
-//   correo: string
-//   rol: Role
-//   id_municipio: number | null
-//   permisos: PermissionKey[]
-// }
+/**
+ * Tells if the user of the session has a permission
+ *
+ * An Administrador has all of them, and a session without the list (an API that does not send it yet) counts as having none
+ *
+ * @param user - User of the session, null when there is none
+ * @param key - Permission to check
+ * @returns True when the user may do what the permission allows
+ */
+export const userCan = (user: SessionUser | null, key: PermissionKey) =>
+  user?.rol === "Administrador" || (
+    user?.rol === "Alimentador" && !ADMIN_ONLY_PERMISSIONS.includes(key) && (user.permisos ?? []).includes(key)
+  )

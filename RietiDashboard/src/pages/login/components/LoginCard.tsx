@@ -1,22 +1,21 @@
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { Eye, EyeClosed } from 'lucide-react'
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/auth';
-import { ApiError } from '@/lib/api/client';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/context/auth'
+import { ApiError } from '@/lib/api/client'
+import { landingRoute } from '@/lib/routes'
 
 /** Fields of the login form */
 interface LoginInputs {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
-/** Sign-in form: validates the fields, logs in with the API and goes home, or shows the error */
+/** Sign-in form: validates the fields, logs in with the API and goes to the first page the user can see, or shows the error */
 export const LoginCard = () => {
-  const { login } = useAuth();
-  const go = useNavigate();
-
-  // // const [passwordChange, setPasswordChange] = useState(false);
+  const { login } = useAuth()
+  const go = useNavigate()
 
   const {
     register,
@@ -25,15 +24,18 @@ export const LoginCard = () => {
     formState: { errors, isSubmitting },
   } = useForm<LoginInputs>({
     defaultValues: { email: '', password: '' },
-  });
+  })
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
-  // log in and go home
+  /**
+   * Signs in and goes to the page where the user starts; a failure, also a ciudadano trying the panel, is shown as the form error
+   *
+   * @param values - Email and password typed in the form
+   */
   const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
     try {
-      await login(email, password)
-      go('/home')
+      go(landingRoute(await login(email, password)))
     } catch (err) {
       setError('root', { message: err instanceof ApiError ? err.message : 'No se pudo iniciar sesión' })
     }
@@ -108,5 +110,5 @@ return (
       </button>
     </form>
   </div>
-);
-};
+)
+}

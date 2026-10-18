@@ -1,12 +1,13 @@
 import { useMemo, useState, useEffect } from 'react'
 import { REPORT_STATUS, type Reporte } from '@/lib/types/Report'
+import { useAuth } from '@/context/auth'
+import { isForbidden } from '@/lib/api/client'
 import { deleteReports, getReport, getReports } from '@/lib/api/reports'
+import { parseApiDate } from '@/lib/utilities/date'
 import { useDetail } from '@/lib/utilities/useDetail'
 import { useSelection } from '@/lib/utilities/useSelection'
-import { isAdmin, useRole } from '@/lib/utilities/useRole'
-
-/** Filter option that shows every report */
-export const ALL_OPTION = 'Todos'
+import { normalizeText } from '@/lib/utilities/text'
+import { ALL_OPTION } from '@/lib/utilities/filters'
 
 /** Status whose reports an admin can select to delete them */
 const DELETABLE_STATUS = 'Rechazado'
@@ -15,29 +16,18 @@ const DELETABLE_STATUS = 'Rechazado'
 const STATUS_WORKFLOW_ORDER = [...REPORT_STATUS].filter( (status) => status != "Rechazado" )
 
 /**
- * Lowercases a text and removes its accents for searching
- *
- * @param text - Text to normalize
- * @returns The normalized text
- */
-function normalizeString(text: string | null | undefined): string {
-  return (text ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-}
-
-/**
  * View model of the reports list: filters by status, searches by folio, colonia, calle or work type, and sorts by newest
  *
- * @returns The visible reports, loading flag, `reload` to fetch them again, filter options with their setters, search text with its setter, `canSelect` (an admin looking at the rejected reports), the `selection` of reports and `removeSelected`, which deletes the picked ones, drops the selection and reloads
+ * @returns The visible reports, loading flag, `forbidden` (the API refused to list them), `reload` to fetch them again, filter options with their setters, search text with its setter, `canSelect` (an admin looking at the rejected reports), the `selection` of reports and `removeSelected`, which deletes the picked ones, drops the selection and reloads
  */
 export function useReports() {
-  const role = useRole()
+  const { isAdmin } = useAuth()
   const [selectedFilter, setSelectedFilter] = useState<string>(ALL_OPTION)
   const [searchQuery, setSearchQuery] = useState('')
   const [reports, setReports] = useState<Reporte[]>([])
   const [loading, setLoading] = useState<boolean>(true)
+  const [forbidden, setForbidden] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
   // bumping it re-runs the effect, which reloads the list
   const [version, setVersion] = useState(0)
 
@@ -45,24 +35,33 @@ export function useReports() {
   const reload = () => setVersion((v) => v + 1)
 
   useEffect(() => {
+    let stale = false
     const getData = async () => {
       try {
         const reports = await getReports()
+        if (stale) return
         setReports(reports)
+        setForbidden(false)
+        setLoadFailed(false)
       } catch (e) {
         console.error(`Error fetching reports and case from api ${e}`)
+        if (stale) return
+        setReports([])
+        setForbidden(isForbidden(e))
+        setLoadFailed(!isForbidden(e))
       } finally {
-        setLoading(false)
+        if (!stale) setLoading(false)
       }
     }
 
     getData()
+    return () => { stale = true }
   }, [version])
 
   const filterOptions = useMemo(() => {
     const countsMap = new Map<string, number>()
     reports.forEach((report) => {
-      const status = report.estatus_seguimiento ?? ''
+      const status = report.estatus_seguimiento ?? 'Sin estatus'
       countsMap.set(status, (countsMap.get(status) ?? 0) + 1)
     })
 
@@ -93,29 +92,29 @@ export function useReports() {
   const activeFilter = filterOptions.some((option) => option.value === selectedFilter) ? selectedFilter : ALL_OPTION
 
   const filteredReports = useMemo(() => {
-    const query = normalizeString(searchQuery.trim())
+    const query = normalizeText(searchQuery.trim())
     return reports
       .filter(
         (report) =>
           activeFilter === ALL_OPTION ||
-          report.estatus_seguimiento === activeFilter
+          (report.estatus_seguimiento ?? 'Sin estatus') === activeFilter
       )
       .filter(
         (report) =>
           !query ||
-          normalizeString(report.folio_reporte).includes(query) ||
-          normalizeString(report.ubicacion.colonia).includes(query) ||
-          normalizeString(report.ubicacion.calle).includes(query) ||
-          normalizeString(report.tipo_trabajo).includes(query)
+          normalizeText(report.folio_reporte).includes(query) ||
+          normalizeText(report.ubicacion.colonia).includes(query) ||
+          normalizeText(report.ubicacion.calle).includes(query) ||
+          normalizeText(report.tipo_trabajo).includes(query)
       )
       .sort(
         (a, b) =>
-          new Date(b.fecha_reporte).getTime() -
-          new Date(a.fecha_reporte).getTime()
+          parseApiDate(b.fecha_reporte).getTime() -
+          parseApiDate(a.fecha_reporte).getTime()
       )
   }, [reports, activeFilter, searchQuery])
 
-  const canSelect = isAdmin(role) && activeFilter === DELETABLE_STATUS
+  const canSelect = isAdmin && activeFilter === DELETABLE_STATUS
   const selection = useSelection(canSelect, filteredReports.map((report) => report.id_reporte))
 
   /**
@@ -133,6 +132,8 @@ export function useReports() {
   return {
     reports: filteredReports,
     loading,
+    forbidden,
+    loadFailed,
     reload,
     filterOptions,
     selectedFilter: activeFilter,
@@ -149,10 +150,10 @@ export function useReports() {
  * View model of one report page
  *
  * @param id - Report id, as it comes from the route
- * @returns The report (undefined if missing), the loading flag, `mutate` to change it and `reload` to fetch it again
+ * @returns The report (undefined if missing), the loading flag, `forbidden` (the API refused to show it), `mutate` to change it and `reload` to fetch it again
  */
 export function useReport(id: number) {
-  const { data, loading, mutate, reload } = useDetail(id, getReport)
+  const { data, loading, forbidden, error, mutate, reload } = useDetail(id, getReport)
 
-  return { report: data, loading, mutate, reload }
+  return { report: data, loading, forbidden, error, mutate, reload }
 }

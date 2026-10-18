@@ -6,10 +6,13 @@ import "maplibre-gl/dist/maplibre-gl.css"
 import { reports2GeoJSON, type Reporte, type ReportVisual, type FeatureReportProps } from "@/lib/types/Report"
 import { cases2GeoJSON, type Caso, type CaseVisual, type FeatureCaseProps } from "@/lib/types/Case"
 import { locations2Zones, type ZoneCollection } from "@/lib/types/Zone"
+import { isForbidden } from "@/lib/api/client"
 import { getReports } from "@/lib/api/reports"
 import type { Selected } from "@/lib/types/Selected"
 import { reportColor, caseColor, ZONE_FILL_COLOR, SELECTED_STROKE } from "@/lib/map/colors"
+import { MAP_STYLE } from "@/lib/map/style"
 import { ColorLegend } from "@/components/ui/ColorLegend"
+import { Forbidden } from "@/components/ui/Forbidden"
 
 
 
@@ -43,7 +46,6 @@ interface PointsLayerProps<P> {
   selectedId: string | null
 }
 
-// selected report/case styling
 /**
  * Circle layer of the reports
  *
@@ -54,7 +56,6 @@ const ReportsLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureRepo
     <Layer
       id="reportes"
       type="circle"
-      // filter={filtroCapa}
       paint={{
         'circle-radius': ['case', ['==', ['get', 'id'], selectedId ?? ''], 10, 7],
         'circle-color': reportColor(visual),
@@ -85,27 +86,6 @@ const CasesLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureCasePr
   </Source>
 )
 
-
-/**
- * Fetches the reports of the default preview
- *
- * @param enabled - Only fetches when true (HeatMap received neither reports nor cases)
- * @returns The reports, or undefined while they load
- */
-const useDefaultReports = (enabled: boolean): Reporte[] | undefined => {
-  const [data, setData] = useState<Reporte[]>()
-
-  useEffect(() => {
-    if (!enabled) return
-    let cancelled = false
-    Promise.resolve(getReports())
-      .then((r) => { if (!cancelled) setData(r) })
-      .catch(console.error)
-    return () => { cancelled = true }
-  }, [enabled])
-
-  return data
-}
 
 
 
@@ -139,7 +119,7 @@ interface HeatMapProps {
 /**
  * Heat map of reports and cases with density zones
  *
- * Without reportsArr and casesArr it loads and shows all the reports (default preview)
+ * Without reportsArr and casesArr it loads and shows all the reports (default preview), or tells the user has no permission to see them
  * Zones count the reports, or the cases when there are no reports
  */
 const HeatMap = ({
@@ -160,10 +140,27 @@ const HeatMap = ({
   const [mapLoaded, setMapLoaded] = useState(false)
   const mapRef = useRef<MapRef>(null)
   const hasFitted = useRef(false)
-
   const isDefault = reportsArr === undefined && casesArr === undefined
-  const defaultReports = useDefaultReports(isDefault)
-  const reports = isDefault ? defaultReports : reportsArr
+  const [fetchedReports, setFetchedReports] = useState<Reporte[]>([])
+  const [forbidden, setForbidden] = useState(false)
+
+  // the default preview loads its own reports; with props nothing is fetched
+  useEffect(() => {
+    if (!isDefault) return
+
+    const getData = async () => {
+      try {
+        setFetchedReports(await getReports())
+      } catch (e) {
+        console.error(`Error fetching reports from api ${e}`)
+        setForbidden(isForbidden(e))
+      }
+    }
+
+    getData()
+  }, [isDefault])
+
+  const reports = isDefault ? fetchedReports : reportsArr
 
   const mapReports = useMemo(() => (reports ? reports2GeoJSON(reports) : undefined), [reports])
   const mapCases = useMemo(() => (casesArr ? cases2GeoJSON(casesArr) : undefined), [casesArr])
@@ -173,7 +170,6 @@ const HeatMap = ({
     return showZones && items ? locations2Zones(items, zoneCellKm) : undefined
   }, [reports, casesArr, showZones, zoneCellKm])
 
-  // hide the layers that are turned off
   const shownReports = showReports ? mapReports : undefined
   const shownCases = showCases ? mapCases : undefined
 
@@ -183,7 +179,6 @@ const HeatMap = ({
     [shownReports, shownCases],
   )
 
-  // box that contains every point shown (reports and cases)
   const bounds = useMemo(() => {
     const features: Feature<Point>[] = [...(shownReports?.features ?? []), ...(shownCases?.features ?? [])]
     if (features.length === 0) return undefined
@@ -200,29 +195,30 @@ const HeatMap = ({
 
   // one handler for both layers: feature.layer.id tells which one was clicked
   const onClick = useCallback((e: MapLayerMouseEvent) => {
-    const feature = e.features?.[0];
+    const feature = e.features?.[0]
 
     if (!feature) {
-      setSelected?.(null);
-      return;
+      setSelected?.(null)
+      return
     }
 
-    const id = feature.properties?.id;
-    if (id == null) return;
+    const id = feature.properties?.id
+    if (id == null) return
     setSelected?.({ type: feature.layer.id === 'casos' ? 'case' : 'report', id: String(id) })
 
-    const geom = feature.geometry;
-    if (geom.type !== 'Point') return;
+    const geom = feature.geometry
+    if (geom.type !== 'Point') return
 
-    const [lng, lat] = geom.coordinates;
+    const [lng, lat] = geom.coordinates
 
     e.target.flyTo({
       center: [lng, lat],
       zoom: Math.max(e.target.getZoom(), 14),
       duration: 600,
-    });
-  }, [setSelected]);
+    })
+  }, [setSelected])
 
+  if (forbidden) return <Forbidden className="h-full" />
 
   return (
     // no cambies el estilo, si necesitas que se vea diferente, cambialo en el contenedor que contenga a HeatMap
@@ -231,7 +227,7 @@ const HeatMap = ({
         ref={mapRef}
         onLoad={() => setMapLoaded(true)}
         initialViewState={{ longitude: -99.6559, latitude: 19.4969, zoom: 8 }}
-        mapStyle={"https://tiles.openfreemap.org/styles/positron"}
+        mapStyle={MAP_STYLE}
         interactiveLayerIds={interactiveLayerIds}
         onClick={onClick}
         onMouseEnter={() => setCursor('pointer')}
@@ -243,7 +239,6 @@ const HeatMap = ({
         {shownCases && <CasesLayer data={shownCases} selectedId={selected?.type === 'case' ? selected.id : null} visual={caseVisual} />}
       </Map>
 
-      {/* show the colors of the layers that are on */}
       {showLegend && (
         <div className={`absolute z-10 ${legendClassName}`}>
           <ColorLegend
@@ -256,7 +251,7 @@ const HeatMap = ({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 export default HeatMap

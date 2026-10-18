@@ -24,7 +24,6 @@ interface ColorLegendProps {
 const LegendBlock = ({ name, legend }: { name: string; legend: Legend }) => (
   <div className="flex flex-col gap-1">
     <p className="p-0 text-xs font-medium">{name}: {legend.title}</p>
-    {/* draw the gradient from the lightest to the darkest color */}
     <div
       className="h-2 w-full rounded-full"
       style={{ background: `linear-gradient(to right, ${legend.colors.join(", ")})` }}

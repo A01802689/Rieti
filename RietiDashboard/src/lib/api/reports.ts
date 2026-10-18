@@ -1,65 +1,79 @@
-import type { Ubicacion, Reporte, ReportState } from "../types/Report"
+import { parseCantidadNNA, type Reporte, type ReporteApi, type ReportState } from "../types/Report"
+import type { BatchDeleteResult } from "../types/BatchDelete"
 import { api } from "./client"
+import { logInvalidLocation } from "../utilities/location"
 
-// this one works as api fetcher
-// here will be the fetch done
-// export async function getReports(): Promise<Reporte[]> {
+/**
+ * Converts a report as the API sends it into the one the dashboard uses
+ *
+ * @param report - Report whose number of minors is text
+ * @returns The same report with its number of minors as CantidadNNA
+ */
+const normalizeReport = ({ cantidad_nna, ...report }: ReporteApi): Reporte => ({
+  ...report,
+  cantidad_nna: parseCantidadNNA(cantidad_nna),
+})
 
-
-export class ApiError extends Error {
-  status: number
-  constructor(status: number, message: string) {
-    super(message)
-    this.status = status
-  }
+/**
+ * Fetches the reports
+ *
+ * @param id_case - When passed, only the reports of that case are fetched
+ * @returns The reports; the ones with coordinates out of range are kept and only logged
+ */
+export const getReports = async (id_case?: number) => {
+  const sent = await api<ReporteApi[]>(`/reportes` + (id_case !== undefined ? `?id_caso=${id_case}` : ``), {method: "GET"})
+  const reports = sent.map(normalizeReport)
+  reports.forEach((r) => logInvalidLocation('Report', r.id_reporte, r.ubicacion))
+  return reports
 }
-// const API_URL = import.meta.env.VITE_API_URL // enable with the real fetch
-// export const fecthReports
-/**
- * Fetches api cases array, if id_case is passed the array fetched are reports related with the id_case passed
- * @returns Reporte[]
- */
-export const getReports = (id_case?: number) => api<Reporte[]>(`/reportes` + id_case !== undefined ? `?id_caso=${id_case}` : ``,{method: "GET"})
 
 /**
- * 
- * @param id of report
- * @returns report detail
+ * Fetches one report
+ *
+ * @param id - Id of the report
+ * @returns The report detail
  */
-export const getReport = (id: number) => api<Reporte>(`/reportes/${id}`, {method: "GET"})
+export const getReport = async (id: number) => {
+  const report = normalizeReport(await api<ReporteApi>(`/reportes/${id}`, {method: "GET"}))
+  logInvalidLocation('Report', report.id_reporte, report.ubicacion)
+  return report
+}
 
 /**
- * 
- * @param id of report
- * @returns report and case id with the status updated
+ * Accepts a report, which opens its case with only the municipio of the report as location
+ *
+ * @param id - Id of the report
+ * @returns Report and case ids with the new status
  */
 export const acceptReport = (id: number) => api<{
-  id_reporte: number,
   id_caso: number,
+  id_reporte: number,
   estatus_seguimiento: ReportState
-}> (`/reportes/${id}/aceptar`, {method: "POST"})
+}> (`/reportes/${id}/abrir-caso`, {method: "POST"})
 
 /**
- * 
- * @param id_report to be accepted
- * @param id_case to be fused with
- * @returns report and case id with the status updated
+ * Accepts a report and fuses it into an existing case
+ *
+ * @param id_report - Id of the report to accept
+ * @param id_case - Id of the case to fuse it with
+ * @returns Report and case ids with the new status
  */
 export const fuseReport = (id_report: number, id_case: number) => api<{
   id_reporte: number,
   id_caso: number,
   estatus_seguimiento: ReportState
-}> (`/reportes/${id_report}/fusionar`, {
-  method: "POST",
+}> (`/reportes/${id_report}/caso`, {
+  method: "PUT",
   body: JSON.stringify({
     id_caso: id_case
   })
 })
 
 /**
- * 
- * @param id of report to be declined
- * @returns report and case id with the status updated (declined)
+ * Declines a report
+ *
+ * @param id - Id of the report
+ * @returns Report id with the new status; it has no case
  */
 export const declineReport = (id: number) => api<{
   id_reporte: number,
@@ -67,635 +81,54 @@ export const declineReport = (id: number) => api<{
   estatus_seguimiento: ReportState
 }> (`/reportes/${id}/rechazar`, {method: "POST"})
 
+/**
+ * Reopens a rejected report, which goes back to "Recibido"; only an Administrador can
+ *
+ * @param id - Id of the report
+ * @returns Report id with the new status; it has no case
+ */
+export const reopenReport = (id: number) => api<{
+  id_reporte: number,
+  id_caso: null,
+  estatus_seguimiento: ReportState
+}> (`/reportes/${id}/reabrir`, {method: "POST"})
 
+/**
+ * Changes the status of a report
+ *
+ * @param id - Id of the report
+ * @param state - New status
+ * @returns Report id with the new status
+ */
 export const changeReportState = (id: number, state: ReportState) => api<{
   id_reporte: number
   estatus_seguimiento: ReportState
-}> (`/reportes/${id}`,
+}> (`/reportes/${id}/estatus`,
   { method: "PATCH",
     body: JSON.stringify({
       estatus_seguimiento: state
     })
   })
 
+/**
+ * Removes a report from its case, which leaves it "En revisión"
+ *
+ * @param id - Id of the report
+ * @returns Report id with the new status; it has no case
+ */
 export const unlinkReport = (id: number) => api<{
   id_reporte: number,
   id_caso: null,
   estatus_seguimiento: ReportState
-}> (`/reportes/${id}/desvincular`)
+}> (`/reportes/${id}/desvincular`, {method: "POST"})
 
-
-
-
-
-/** Hardcoded locations referenced by the mock reports */
-export const ubicaciones: Ubicacion[] = [
-  { municipio: "Atizapán de Zaragoza", colonia: "Centro", calle: "Av. Adolfo López Mateos", lat: 19.5631, lng: -99.2538 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Bellavista", calle: "Blvd. Manuel Ávila Camacho", lat: 19.553, lng: -99.231 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Las Alamedas", calle: "Av. Las Alamedas", lat: 19.5805, lng: -99.2365 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Condado de Sayavedra", calle: "Av. Sayavedra", lat: 19.556, lng: -99.266 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Villas de la Hacienda", calle: "Calle Hacienda de Santa Fe", lat: 19.592, lng: -99.24 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Ciudad López Mateos", calle: "Av. Calacoaya", lat: 19.57, lng: -99.278 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Atizapán", calle: "Calle Lomas Verdes", lat: 19.547, lng: -99.254 },
-  { municipio: "Atizapán de Zaragoza", colonia: "El Capulín", calle: "Calle Capulín", lat: 19.552, lng: -99.248 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Mayorazgos del Bosque", calle: "Calle Mayorazgo", lat: 19.575, lng: -99.266 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Las Américas", calle: "Av. de las Américas", lat: 19.544, lng: -99.262 },
-  { municipio: "Atizapán de Zaragoza", colonia: "San Mateo Tecoloapan", calle: "Camino a San Mateo", lat: 19.581, lng: -99.274 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Jardines de Atizapán", calle: "Calle Jardín Central", lat: 19.56, lng: -99.24 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Calacoaya", calle: "Av. Calacoaya Norte", lat: 19.5935, lng: -99.293 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Las Águilas", calle: "Calle Águila Real", lat: 19.542, lng: -99.215 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Margarita Maza de Juárez", calle: "Calle Benito Juárez", lat: 19.605, lng: -99.261 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Prados de Atizapán", calle: "Calle Prados Sur", lat: 19.533, lng: -99.275 },
-  { municipio: "Atizapán de Zaragoza", colonia: "El Potrero", calle: "Camino al Potrero", lat: 19.599, lng: -99.22 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Pirules", calle: "Calle Pirul", lat: 19.528, lng: -99.24 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Rinconada San Felipe", calle: "Calle San Felipe", lat: 19.612, lng: -99.247 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Monte María", calle: "Calle Monte María", lat: 19.536, lng: -99.305 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Vista Hermosa", calle: "Av. Vista Hermosa", lat: 19.575, lng: -99.215 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Fuentes de Atizapán", calle: "Calle de las Fuentes", lat: 19.6, lng: -99.3 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Centro", calle: "Calle Allende", lat: 19.5636, lng: -99.2531 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Centro", calle: "Calle Hidalgo", lat: 19.5627, lng: -99.2545 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Centro", calle: "Calle Morelos", lat: 19.564, lng: -99.2542 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Centro", calle: "Av. Ruiz Cortines", lat: 19.5622, lng: -99.253 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Bellavista", calle: "Blvd. Manuel Ávila Camacho esq. Calle 5", lat: 19.5534, lng: -99.2305 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Bellavista", calle: "Calle 7 de Bellavista", lat: 19.5526, lng: -99.2316 },
-  { municipio: "Atizapán de Zaragoza", colonia: "Lomas de Bellavista", calle: "Calle 9 de Bellavista", lat: 19.5538, lng: -99.2318 },
-];
-
-// 
-// Reglas de consistencia usadas:
-// - "Recibido" / "En revisión" -> id_caso null (sin caso)
-// - "Canalizado" / "En atención" / "Concluido" -> con id_caso
-// - id_usuario null = reporte anónimo
-// - Hay reportes repetidos en el mismo lugar/caso para probar agrupación
-// - ubicacion apunta a ubicaciones[n] (id_ubicacion anterior = n + 1)
-
-/** Hardcoded reports used while the endpoint does not exist */
-export const reportes: Reporte[] = [
-  {
-    id_reporte: 1, id_usuario: 12, id_caso: 1, ubicacion: ubicaciones[0],
-    folio_reporte: "RIETI-2026-00001", estatus_seguimiento: "Concluido",
-    cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Venta ambulante",
-    descripcion: "Dos niños vendiendo dulces entre las mesas de un corredor peatonal.",
-    fecha_reporte: "2026-08-03T18:42:10-06:00", imagen: "https://picsum.photos/seed/rieti-001/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 2, id_usuario: null, id_caso: 2, ubicacion: ubicaciones[1],
-    folio_reporte: "RIETI-2026-00002", estatus_seguimiento: "En atención",
-    cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando cajas de fruta desde camiones al interior del mercado.",
-    fecha_reporte: "2026-08-05T06:15:33-06:00", imagen: "https://picsum.photos/seed/rieti-002/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 3, id_usuario: 7, id_caso: 2, ubicacion: ubicaciones[1],
-    folio_reporte: "RIETI-2026-00003", estatus_seguimiento: "En atención",
-    cantidad_nna: 2, edad_aproximada: "12-14", tipo_trabajo: "Carga y descarga",
-    descripcion: "Mismo punto del mercado, adolescentes descargando mercancía temprano.",
-    fecha_reporte: "2026-08-06T06:40:02-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 4, id_usuario: 3, id_caso: null, ubicacion: ubicaciones[4],
-    folio_reporte: "RIETI-2026-00004", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
-    descripcion: "Niño pequeño pidiendo dinero entre autos en un semáforo de noche.",
-    fecha_reporte: "2026-09-25T21:10:45-06:00", imagen: "https://picsum.photos/seed/rieti-004/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 5, id_usuario: null, id_caso: null, ubicacion: ubicaciones[5],
-    folio_reporte: "RIETI-2026-00005", estatus_seguimiento: "En revisión",
-    cantidad_nna: 1, edad_aproximada: "12-14", tipo_trabajo: "Limpieza de parabrisas",
-    descripcion: "Adolescente limpiando parabrisas en el crucero principal.",
-    fecha_reporte: "2026-09-20T13:05:12-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 6, id_usuario: 21, id_caso: 3, ubicacion: ubicaciones[2],
-    folio_reporte: "RIETI-2026-00006", estatus_seguimiento: "Canalizado",
-    cantidad_nna: "5 o más", edad_aproximada: "6-11", tipo_trabajo: "Trabajo en comercio",
-    descripcion: "Varios niños atendiendo puestos de ropa en horario escolar.",
-    fecha_reporte: "2026-08-18T17:30:00-06:00", imagen: "https://picsum.photos/seed/rieti-006/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 7, id_usuario: 9, id_caso: null, ubicacion: ubicaciones[3],
-    folio_reporte: "RIETI-2026-00007", estatus_seguimiento: "Recibido",
-    cantidad_nna: 4, edad_aproximada: "15-17", tipo_trabajo: "Carga y descarga",
-    descripcion: "Adolescentes cargando bultos pesados en la madrugada.",
-    fecha_reporte: "2026-09-02T04:55:21-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 8, id_usuario: null, id_caso: null, ubicacion: ubicaciones[6],
-    folio_reporte: "RIETI-2026-00008", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Venta ambulante",
-    descripcion: "Niña vendiendo chicles en el paradero acompañada de un adulto.",
-    fecha_reporte: "2026-09-26T08:12:44-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 9, id_usuario: 14, id_caso: 4, ubicacion: ubicaciones[7],
-    folio_reporte: "RIETI-2026-00009", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Limpieza de parabrisas",
-    descripcion: "Adolescente en crucero cercano a la terminal de autobuses.",
-    fecha_reporte: "2026-07-28T16:20:05-06:00", imagen: "https://picsum.photos/seed/rieti-009/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 10, id_usuario: 2, id_caso: null, ubicacion: ubicaciones[8],
-    folio_reporte: "RIETI-2026-00010", estatus_seguimiento: "En revisión",
-    cantidad_nna: 2, edad_aproximada: "12-14", tipo_trabajo: "Campo",
-    descripcion: "Menores trabajando en parcelas de hortalizas en la zona periférica.",
-    fecha_reporte: "2026-09-13T10:02:37-06:00", imagen: "https://picsum.photos/seed/rieti-010/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 11, id_usuario: null, id_caso: null, ubicacion: ubicaciones[9],
-    folio_reporte: "RIETI-2026-00011", estatus_seguimiento: "Recibido",
-    cantidad_nna: "No sé", edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    descripcion: null,
-    fecha_reporte: "2026-09-24T19:47:59-06:00", imagen: null, riesgo: null,
-  },
-  {
-    id_reporte: 12, id_usuario: 5, id_caso: 5, ubicacion: ubicaciones[10],
-    folio_reporte: "RIETI-2026-00012", estatus_seguimiento: "En atención",
-    cantidad_nna: 3, edad_aproximada: "6-11", tipo_trabajo: "Recolección de residuos",
-    descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-08-29T07:33:18-06:00", imagen: "https://picsum.photos/seed/rieti-012/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 13, id_usuario: 18, id_caso: null, ubicacion: ubicaciones[11],
-    folio_reporte: "RIETI-2026-00013", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-09-10T11:45:00-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 14, id_usuario: null, id_caso: null, ubicacion: ubicaciones[0],
-    folio_reporte: "RIETI-2026-00014", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
-    descripcion: "Dos niños pequeños pidiendo dinero afuera de un centro comercial.",
-    fecha_reporte: "2026-09-27T12:30:15-06:00", imagen: "https://picsum.photos/seed/rieti-014/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 15, id_usuario: 11, id_caso: 3, ubicacion: ubicaciones[2],
-    folio_reporte: "RIETI-2026-00015", estatus_seguimiento: "Canalizado",
-    cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Trabajo en comercio",
-    descripcion: "Mismos puestos del reporte anterior, ahora adolescentes.",
-    fecha_reporte: "2026-08-19T18:05:40-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 16, id_usuario: 4, id_caso: null, ubicacion: ubicaciones[5],
-    folio_reporte: "RIETI-2026-00016", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "12-14", tipo_trabajo: "Limpieza de parabrisas",
-    descripcion: "Adolescente en el mismo crucero, ahora de noche.",
-    fecha_reporte: "2026-09-21T20:18:27-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 17, id_usuario: null, id_caso: null, ubicacion: ubicaciones[4],
-    folio_reporte: "RIETI-2026-00017", estatus_seguimiento: "En revisión",
-    cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Venta ambulante",
-    descripcion: "Niños vendiendo flores entre autos después de las 10 pm.",
-    fecha_reporte: "2026-09-15T22:40:09-06:00", imagen: "https://picsum.photos/seed/rieti-017/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 18, id_usuario: 16, id_caso: 6, ubicacion: ubicaciones[3],
-    folio_reporte: "RIETI-2026-00018", estatus_seguimiento: "Canalizado",
-    cantidad_nna: "5 o más", edad_aproximada: "15-17", tipo_trabajo: "Carga y descarga",
-    descripcion: "Grupo de adolescentes trabajando como cargadores en andenes.",
-    fecha_reporte: "2026-08-12T05:20:48-06:00", imagen: "https://picsum.photos/seed/rieti-018/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 19, id_usuario: 8, id_caso: null, ubicacion: ubicaciones[7],
-    folio_reporte: "RIETI-2026-00019", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "No sé", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-09-18T15:55:30-06:00", imagen: null, riesgo: null,
-  },
-  {
-    id_reporte: 20, id_usuario: null, id_caso: null, ubicacion: ubicaciones[1],
-    folio_reporte: "RIETI-2026-00020", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Venta ambulante",
-    descripcion: "Niño vendiendo bolsas a la entrada del mercado.",
-    fecha_reporte: "2026-09-01T14:10:22-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 21, id_usuario: 10, id_caso: 7, ubicacion: ubicaciones[11],
-    folio_reporte: "RIETI-2026-00021", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "12-14", tipo_trabajo: "Trabajo doméstico",
-    descripcion: "Adolescente realizando labores domésticas en horario escolar.",
-    fecha_reporte: "2026-07-15T09:30:00-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 22, id_usuario: 19, id_caso: null, ubicacion: ubicaciones[8],
-    folio_reporte: "RIETI-2026-00022", estatus_seguimiento: "Recibido",
-    cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Campo",
-    descripcion: "Menores cosechando en parcelas por la mañana.",
-    fecha_reporte: "2026-09-23T07:05:51-06:00", imagen: "https://picsum.photos/seed/rieti-022/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 23, id_usuario: null, id_caso: null, ubicacion: ubicaciones[10],
-    folio_reporte: "RIETI-2026-00023", estatus_seguimiento: "En revisión",
-    cantidad_nna: 2, edad_aproximada: "12-14", tipo_trabajo: "Recolección de residuos",
-    descripcion: "Adolescentes recolectando basura de un camión en movimiento.",
-    fecha_reporte: "2026-09-08T08:40:33-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 24, id_usuario: 6, id_caso: 5, ubicacion: ubicaciones[10],
-    folio_reporte: "RIETI-2026-00024", estatus_seguimiento: "En atención",
-    cantidad_nna: 4, edad_aproximada: "6-11", tipo_trabajo: "Recolección de residuos",
-    descripcion: "Mismo punto de reciclaje, más niños que en el reporte anterior.",
-    fecha_reporte: "2026-08-30T09:12:14-06:00", imagen: "https://picsum.photos/seed/rieti-024/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 25, id_usuario: 13, id_caso: null, ubicacion: ubicaciones[9],
-    folio_reporte: "RIETI-2026-00025", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Limpieza de parabrisas",
-    descripcion: "Niño limpiando parabrisas cerca de la medianoche.",
-    fecha_reporte: "2026-09-26T23:02:08-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 26, id_usuario: null, id_caso: null, ubicacion: ubicaciones[0],
-    folio_reporte: "RIETI-2026-00026", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Venta ambulante",
-    descripcion: "Menor vendiendo dulces y botanas cerca de una esquina concurrida.",
-    fecha_reporte: "2026-07-01T00:00:00-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 27, id_usuario: 8, id_caso: null, ubicacion: ubicaciones[0],
-    folio_reporte: "RIETI-2026-00027", estatus_seguimiento: "En revisión",
-    cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-12T07:13:17-06:00", imagen: "https://picsum.photos/seed/rieti-027/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 28, id_usuario: 15, id_caso: null, ubicacion: ubicaciones[0],
-    folio_reporte: "RIETI-2026-00028", estatus_seguimiento: "Recibido",
-    cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-08-23T14:26:34-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 29, id_usuario: null, id_caso: 8, ubicacion: ubicaciones[0],
-    folio_reporte: "RIETI-2026-00029", estatus_seguimiento: "Canalizado",
-    cantidad_nna: 4, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-07-06T21:39:51-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 30, id_usuario: 4, id_caso: 8, ubicacion: ubicaciones[0],
-    folio_reporte: "RIETI-2026-00030", estatus_seguimiento: "En atención",
-    cantidad_nna: "5 o más", edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
-    descripcion: "Niño pidiendo dinero entre los autos detenidos.",
-    fecha_reporte: "2026-09-17T04:52:08-06:00", imagen: "https://picsum.photos/seed/rieti-030/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 31, id_usuario: 11, id_caso: null, ubicacion: ubicaciones[22],
-    folio_reporte: "RIETI-2026-00031", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Trabajo doméstico",
-    descripcion: "Adolescente realizando labores domésticas durante el día.",
-    fecha_reporte: "2026-08-28T11:05:25-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 32, id_usuario: null, id_caso: null, ubicacion: ubicaciones[22],
-    folio_reporte: "RIETI-2026-00032", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Venta ambulante",
-    descripcion: "Menor vendiendo dulces y botanas cerca de una esquina concurrida.",
-    fecha_reporte: "2026-07-11T18:18:42-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 33, id_usuario: 25, id_caso: null, ubicacion: ubicaciones[22],
-    folio_reporte: "RIETI-2026-00033", estatus_seguimiento: "En revisión",
-    cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-22T01:31:59-06:00", imagen: "https://picsum.photos/seed/rieti-033/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 34, id_usuario: 7, id_caso: null, ubicacion: ubicaciones[22],
-    folio_reporte: "RIETI-2026-00034", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-08-05T08:44:16-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 35, id_usuario: null, id_caso: 9, ubicacion: ubicaciones[23],
-    folio_reporte: "RIETI-2026-00035", estatus_seguimiento: "En atención",
-    cantidad_nna: 3, edad_aproximada: "0-5", tipo_trabajo: "Venta ambulante",
-    descripcion: "Menor vendiendo dulces y botanas cerca de una esquina concurrida.",
-    fecha_reporte: "2026-07-16T15:57:33-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 36, id_usuario: 21, id_caso: 9, ubicacion: ubicaciones[23],
-    folio_reporte: "RIETI-2026-00036", estatus_seguimiento: "Concluido",
-    cantidad_nna: 4, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-27T22:10:50-06:00", imagen: "https://picsum.photos/seed/rieti-036/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 37, id_usuario: 3, id_caso: null, ubicacion: ubicaciones[23],
-    folio_reporte: "RIETI-2026-00037", estatus_seguimiento: "Recibido",
-    cantidad_nna: "5 o más", edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-08-10T05:23:07-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 38, id_usuario: null, id_caso: null, ubicacion: ubicaciones[23],
-    folio_reporte: "RIETI-2026-00038", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-07-21T12:36:24-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 39, id_usuario: 17, id_caso: null, ubicacion: ubicaciones[24],
-    folio_reporte: "RIETI-2026-00039", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-04T19:49:41-06:00", imagen: "https://picsum.photos/seed/rieti-039/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 40, id_usuario: 24, id_caso: 10, ubicacion: ubicaciones[24],
-    folio_reporte: "RIETI-2026-00040", estatus_seguimiento: "Canalizado",
-    cantidad_nna: 1, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-08-15T02:02:58-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 41, id_usuario: null, id_caso: 11, ubicacion: ubicaciones[24],
-    folio_reporte: "RIETI-2026-00041", estatus_seguimiento: "En atención",
-    cantidad_nna: 2, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-07-26T09:15:15-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 42, id_usuario: 13, id_caso: null, ubicacion: ubicaciones[25],
-    folio_reporte: "RIETI-2026-00042", estatus_seguimiento: "Recibido",
-    cantidad_nna: 3, edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-09T16:28:32-06:00", imagen: "https://picsum.photos/seed/rieti-042/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 43, id_usuario: 20, id_caso: null, ubicacion: ubicaciones[25],
-    folio_reporte: "RIETI-2026-00043", estatus_seguimiento: "Recibido",
-    cantidad_nna: 4, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-08-20T23:41:49-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 44, id_usuario: null, id_caso: null, ubicacion: ubicaciones[25],
-    folio_reporte: "RIETI-2026-00044", estatus_seguimiento: "En revisión",
-    cantidad_nna: "5 o más", edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-07-03T06:54:06-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 45, id_usuario: 9, id_caso: null, ubicacion: ubicaciones[1],
-    folio_reporte: "RIETI-2026-00045", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Recolección de residuos",
-    descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-09-14T13:07:23-06:00", imagen: "https://picsum.photos/seed/rieti-045/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 46, id_usuario: 16, id_caso: null, ubicacion: ubicaciones[1],
-    folio_reporte: "RIETI-2026-00046", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Limpieza de parabrisas",
-    descripcion: "Adolescente limpiando parabrisas en un semáforo.",
-    fecha_reporte: "2026-08-25T20:20:40-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 47, id_usuario: null, id_caso: 11, ubicacion: ubicaciones[26],
-    folio_reporte: "RIETI-2026-00047", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-07-08T03:33:57-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 48, id_usuario: 5, id_caso: null, ubicacion: ubicaciones[26],
-    folio_reporte: "RIETI-2026-00048", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
-    descripcion: "Niño pidiendo dinero entre los autos detenidos.",
-    fecha_reporte: "2026-09-19T10:46:14-06:00", imagen: "https://picsum.photos/seed/rieti-048/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 49, id_usuario: 12, id_caso: null, ubicacion: ubicaciones[27],
-    folio_reporte: "RIETI-2026-00049", estatus_seguimiento: "En revisión",
-    cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-08-02T17:59:31-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 50, id_usuario: null, id_caso: null, ubicacion: ubicaciones[27],
-    folio_reporte: "RIETI-2026-00050", estatus_seguimiento: "Recibido",
-    cantidad_nna: 4, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-07-13T00:12:48-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 51, id_usuario: 1, id_caso: 11, ubicacion: ubicaciones[28],
-    folio_reporte: "RIETI-2026-00051", estatus_seguimiento: "En atención",
-    cantidad_nna: "5 o más", edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-09-24T07:25:05-06:00", imagen: "https://picsum.photos/seed/rieti-051/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 52, id_usuario: 8, id_caso: 11, ubicacion: ubicaciones[28],
-    folio_reporte: "RIETI-2026-00052", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-08-07T14:38:22-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 53, id_usuario: null, id_caso: 12, ubicacion: ubicaciones[12],
-    folio_reporte: "RIETI-2026-00053", estatus_seguimiento: "En atención",
-    cantidad_nna: 2, edad_aproximada: "15-17", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-07-18T21:51:39-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 54, id_usuario: 22, id_caso: 12, ubicacion: ubicaciones[12],
-    folio_reporte: "RIETI-2026-00054", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-09-01T04:04:56-06:00", imagen: "https://picsum.photos/seed/rieti-054/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 55, id_usuario: 4, id_caso: null, ubicacion: ubicaciones[12],
-    folio_reporte: "RIETI-2026-00055", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-08-12T11:17:13-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 56, id_usuario: null, id_caso: null, ubicacion: ubicaciones[13],
-    folio_reporte: "RIETI-2026-00056", estatus_seguimiento: "En revisión",
-    cantidad_nna: 3, edad_aproximada: "15-17", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-07-23T18:30:30-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 57, id_usuario: 18, id_caso: null, ubicacion: ubicaciones[13],
-    folio_reporte: "RIETI-2026-00057", estatus_seguimiento: "Recibido",
-    cantidad_nna: 4, edad_aproximada: "0-5", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-09-06T01:43:47-06:00", imagen: "https://picsum.photos/seed/rieti-057/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 58, id_usuario: 25, id_caso: 13, ubicacion: ubicaciones[13],
-    folio_reporte: "RIETI-2026-00058", estatus_seguimiento: "Canalizado",
-    cantidad_nna: "5 o más", edad_aproximada: "6-11", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-08-17T08:56:04-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 59, id_usuario: null, id_caso: 14, ubicacion: ubicaciones[14],
-    folio_reporte: "RIETI-2026-00059", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-07-28T15:09:21-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 60, id_usuario: 14, id_caso: null, ubicacion: ubicaciones[14],
-    folio_reporte: "RIETI-2026-00060", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-09-11T22:22:38-06:00", imagen: "https://picsum.photos/seed/rieti-060/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 61, id_usuario: 21, id_caso: null, ubicacion: ubicaciones[15],
-    folio_reporte: "RIETI-2026-00061", estatus_seguimiento: "En revisión",
-    cantidad_nna: 1, edad_aproximada: "12-14", tipo_trabajo: "Venta ambulante",
-    descripcion: "Menor vendiendo dulces y botanas cerca de una esquina concurrida.",
-    fecha_reporte: "2026-08-22T05:35:55-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 62, id_usuario: null, id_caso: null, ubicacion: ubicaciones[15],
-    folio_reporte: "RIETI-2026-00062", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "15-17", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-07-05T12:48:12-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 63, id_usuario: 10, id_caso: 14, ubicacion: ubicaciones[16],
-    folio_reporte: "RIETI-2026-00063", estatus_seguimiento: "En atención",
-    cantidad_nna: 3, edad_aproximada: "6-11", tipo_trabajo: "Trabajo doméstico",
-    descripcion: "Adolescente realizando labores domésticas durante el día.",
-    fecha_reporte: "2026-09-16T19:01:29-06:00", imagen: "https://picsum.photos/seed/rieti-063/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 64, id_usuario: 17, id_caso: 14, ubicacion: ubicaciones[16],
-    folio_reporte: "RIETI-2026-00064", estatus_seguimiento: "Concluido",
-    cantidad_nna: 4, edad_aproximada: "12-14", tipo_trabajo: "Venta ambulante",
-    descripcion: "Menor vendiendo dulces y botanas cerca de una esquina concurrida.",
-    fecha_reporte: "2026-08-27T02:14:46-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 65, id_usuario: null, id_caso: null, ubicacion: ubicaciones[17],
-    folio_reporte: "RIETI-2026-00065", estatus_seguimiento: "Recibido",
-    cantidad_nna: "5 o más", edad_aproximada: "0-5", tipo_trabajo: "Trabajo en comercio",
-    descripcion: "Menor atendiendo un puesto durante el horario escolar.",
-    fecha_reporte: "2026-07-10T09:27:03-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 66, id_usuario: 6, id_caso: null, ubicacion: ubicaciones[17],
-    folio_reporte: "RIETI-2026-00066", estatus_seguimiento: "En revisión",
-    cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Trabajo doméstico",
-    descripcion: "Adolescente realizando labores domésticas durante el día.",
-    fecha_reporte: "2026-09-21T16:40:20-06:00", imagen: "https://picsum.photos/seed/rieti-066/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 67, id_usuario: 13, id_caso: 15, ubicacion: ubicaciones[18],
-    folio_reporte: "RIETI-2026-00067", estatus_seguimiento: "Canalizado",
-    cantidad_nna: 2, edad_aproximada: "15-17", tipo_trabajo: "Limpieza de parabrisas",
-    descripcion: "Adolescente limpiando parabrisas en un semáforo.",
-    fecha_reporte: "2026-08-04T23:53:37-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 68, id_usuario: null, id_caso: 15, ubicacion: ubicaciones[19],
-    folio_reporte: "RIETI-2026-00068", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "6-11", tipo_trabajo: "Campo",
-    descripcion: "Menores trabajando en una parcela cercana.",
-    fecha_reporte: "2026-07-15T06:06:54-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 69, id_usuario: 2, id_caso: null, ubicacion: ubicaciones[19],
-    folio_reporte: "RIETI-2026-00069", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "12-14", tipo_trabajo: "Recolección de residuos",
-    descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-09-26T13:19:11-06:00", imagen: "https://picsum.photos/seed/rieti-069/640/400", riesgo: "Bajo",
-  },
-  {
-    id_reporte: 70, id_usuario: 9, id_caso: null, ubicacion: ubicaciones[20],
-    folio_reporte: "RIETI-2026-00070", estatus_seguimiento: "En revisión",
-    cantidad_nna: 3, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
-    descripcion: "Niño pidiendo dinero entre los autos detenidos.",
-    fecha_reporte: "2026-08-09T20:32:28-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 71, id_usuario: null, id_caso: null, ubicacion: ubicaciones[20],
-    folio_reporte: "RIETI-2026-00071", estatus_seguimiento: "Recibido",
-    cantidad_nna: 4, edad_aproximada: "6-11", tipo_trabajo: "Campo",
-    descripcion: "Menores trabajando en una parcela cercana.",
-    fecha_reporte: "2026-07-20T03:45:45-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 72, id_usuario: 23, id_caso: 16, ubicacion: ubicaciones[20],
-    folio_reporte: "RIETI-2026-00072", estatus_seguimiento: "Canalizado",
-    cantidad_nna: "5 o más", edad_aproximada: "12-14", tipo_trabajo: "Recolección de residuos",
-    descripcion: "Niños separando material reciclable sin protección.",
-    fecha_reporte: "2026-09-03T10:58:02-06:00", imagen: "https://picsum.photos/seed/rieti-072/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 73, id_usuario: 5, id_caso: 17, ubicacion: ubicaciones[21],
-    folio_reporte: "RIETI-2026-00073", estatus_seguimiento: "Concluido",
-    cantidad_nna: 1, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
-    descripcion: "Niño pidiendo dinero entre los autos detenidos.",
-    fecha_reporte: "2026-08-14T17:11:19-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 74, id_usuario: null, id_caso: null, ubicacion: ubicaciones[21],
-    folio_reporte: "RIETI-2026-00074", estatus_seguimiento: "Recibido",
-    cantidad_nna: 2, edad_aproximada: "6-11", tipo_trabajo: "Campo",
-    descripcion: "Menores trabajando en una parcela cercana.",
-    fecha_reporte: "2026-07-25T00:24:36-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 75, id_usuario: 19, id_caso: null, ubicacion: ubicaciones[2],
-    folio_reporte: "RIETI-2026-00075", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-09-08T07:37:53-06:00", imagen: "https://picsum.photos/seed/rieti-075/640/400", riesgo: "Medio",
-  },
-  {
-    id_reporte: 76, id_usuario: 1, id_caso: 17, ubicacion: ubicaciones[2],
-    folio_reporte: "RIETI-2026-00076", estatus_seguimiento: "Canalizado",
-    cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Mendicidad",
-    descripcion: "Niño pidiendo dinero entre los autos detenidos.",
-    fecha_reporte: "2026-08-19T14:50:10-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 77, id_usuario: null, id_caso: 18, ubicacion: ubicaciones[3],
-    folio_reporte: "RIETI-2026-00077", estatus_seguimiento: "Concluido",
-    cantidad_nna: 3, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-07-02T21:03:27-06:00", imagen: null, riesgo: "Bajo",
-  },
-  {
-    id_reporte: 78, id_usuario: 15, id_caso: null, ubicacion: ubicaciones[3],
-    folio_reporte: "RIETI-2026-00078", estatus_seguimiento: "Recibido",
-    cantidad_nna: 4, edad_aproximada: "15-17", tipo_trabajo: "Otra actividad",
-    descripcion: "Menor repartiendo volantes durante varias horas.",
-    fecha_reporte: "2026-09-13T04:16:44-06:00", imagen: "https://picsum.photos/seed/rieti-078/640/400", riesgo: "Alto",
-  },
-  {
-    id_reporte: 79, id_usuario: 22, id_caso: null, ubicacion: ubicaciones[4],
-    folio_reporte: "RIETI-2026-00079", estatus_seguimiento: "En revisión",
-    cantidad_nna: "5 o más", edad_aproximada: "6-11", tipo_trabajo: "Carga y descarga",
-    descripcion: "Menores cargando mercancía en la entrada de un negocio.",
-    fecha_reporte: "2026-08-24T11:29:01-06:00", imagen: null, riesgo: "Alto",
-  },
-  {
-    id_reporte: 80, id_usuario: null, id_caso: null, ubicacion: ubicaciones[4],
-    folio_reporte: "RIETI-2026-00080", estatus_seguimiento: "Recibido",
-    cantidad_nna: 1, edad_aproximada: "12-14", tipo_trabajo: "Construcción",
-    descripcion: "Adolescente acarreando material en una obra.",
-    fecha_reporte: "2026-07-07T18:42:18-06:00", imagen: null, riesgo: "Medio",
-  },
-  {
-    id_reporte: 81, id_usuario: 11, id_caso: 18, ubicacion: ubicaciones[5],
-    folio_reporte: "RIETI-2026-00081", estatus_seguimiento: "En atención",
-    cantidad_nna: 2, edad_aproximada: "0-5", tipo_trabajo: "Venta ambulante",
-    descripcion: "Menor vendiendo dulces y botanas cerca de una esquina concurrida.",
-    fecha_reporte: "2026-09-18T01:55:35-06:00", imagen: "https://picsum.photos/seed/rieti-081/640/400", riesgo: "Medio",
-  },
-];
+/**
+ * Deletes rejected reports and their S3 images; the API skips the rest
+ *
+ * @param ids - Ids of the reports to delete
+ * @returns The ids deleted and the ids skipped
+ */
+export const deleteReports = (ids: number[]) => api<BatchDeleteResult>(`/reportes`, {
+  method: "DELETE",
+  body: JSON.stringify({ ids })
+})

@@ -1,8 +1,7 @@
 import type { BBox, FeatureCollection, Polygon } from "geojson"
 import { featureCollection, hexGrid, point, pointsWithinPolygon } from "@turf/turf"
-import type { Ubicacion } from "./Report"
+import { hasValidLocation, type MaybeLocation } from "../utilities/location"
 
-// area covered by the heatMap, aprocimated to Atizapán
 /** Area covered by the zone grid (approximately Atizapán), as [west, south, east, north] */
 export const ZONE_BBOX: BBox = [-99.32, 19.52, -99.19, 19.63]
 
@@ -15,15 +14,16 @@ export type FeatureZoneProps = {
 /** Zone hexagons as a GeoJSON collection */
 export type ZoneCollection = FeatureCollection<Polygon, FeatureZoneProps>
 
-// Anything with a location (Reporte, Case...) can be counted
-type WithLocation = { ubicacion: Ubicacion }
+/** Anything with a location (Reporte, Caso) can be counted; the coordinates of a case can be missing */
+type WithLocation = { ubicacion: MaybeLocation }
 
 /**
  * Counts how many items fall in each hexagon of a grid
  *
- * @param items - Reports or cases, anything with a `ubicacion`
+ * @param items - Reports or cases, anything with a `ubicacion`; the ones without valid coordinates are not counted
  * @param cellSideKm - Side of each hexagon, in km
  * @param bbox - Grid area
+ * @returns The hexagons with their number of items
  */
 export function locations2Zones(
   items: WithLocation[],
@@ -31,12 +31,11 @@ export function locations2Zones(
   bbox: BBox = ZONE_BBOX,
 ): ZoneCollection {
   const points = featureCollection(
-    items.map((r) => point([r.ubicacion.lng, r.ubicacion.lat]))
+    items.flatMap(({ ubicacion }) => (hasValidLocation(ubicacion) ? [point([ubicacion.lng, ubicacion.lat])] : []))
   )
 
   const features = hexGrid(bbox, cellSideKm, { units: "kilometers" }).features.flatMap((hex, i) => {
     const count = pointsWithinPolygon(points, hex).features.length
-    // if (count === 0) return []
 
     return [{
       type: "Feature" as const,

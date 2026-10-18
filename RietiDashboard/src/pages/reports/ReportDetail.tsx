@@ -1,26 +1,31 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { DetailLayout } from '@/components/layout/DetailLayout'
 import { ReportDetails } from '@/components/ui/ReportDetails'
+import { useAuth } from '@/context/auth'
 import { RISK_LEVEL_STYLES, formatDateTime, statusStyle } from '@/lib/utilities/reportStyles'
 import { ReportActions } from './components/ReportActions'
 import { useReport } from './useReports'
 
-/** Page of one report (id from the URL): header with its status and risk, every field with map and photo, and the triage actions */
+/** Page of one report (id from the URL): header with its status and risk, every field with map and photo, a select to assign the risk and the triage actions; the links to the list and to the case, the risk select and each action need their permissions */
 const ReportDetailPage = () => {
     const navigate = useNavigate()
+    const { can } = useAuth()
     const { id } = useParams()
-    const { report, loading, reload } = useReport(Number(id))
+    const { report, loading, forbidden, error, reload } = useReport(Number(id))
     const style = statusStyle(report?.estatus_seguimiento)
+    const backTo = can('reports.view') ? '/reports' : undefined
 
     return (
-        <DetailLayout loading={loading} found={!!report} notFound="Reporte no encontrado" backTo="/reports">
+        <DetailLayout loading={loading} found={!!report} forbidden={forbidden} error={error} onRetry={reload} notFound="Reporte no encontrado" backTo={backTo}>
             {report && (
                 <div className="flex flex-col gap-4 sm:gap-6">
                     <header className="flex flex-col gap-4 rounded-xl border border-card bg-card px-5 py-5 shadow-sm transition-colors duration-300 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
                         <div className="min-w-0">
-                            <button type="button" onClick={() => navigate('/reports')} className="text-sm font-diffuse hover:underline">
-                                ← Volver
-                            </button>
+                            {backTo && (
+                                <button type="button" onClick={() => navigate(backTo)} className="text-sm font-diffuse hover:underline">
+                                    ← Volver
+                                </button>
+                            )}
                             <div className="mt-1 flex flex-wrap items-center gap-3">
                                 <h1 className="p-0 text-2xl font-semibold sm:text-3xl">{report.folio_reporte}</h1>
                                 <span
@@ -34,7 +39,7 @@ const ReportDetailPage = () => {
                                         report.riesgo ? RISK_LEVEL_STYLES[report.riesgo] ?? 'font-diffuse' : 'font-diffuse'
                                     }`}
                                 >
-                                    {report.riesgo ? `Riesgo ${report.riesgo.toLowerCase()}` : 'Riesgo sin evaluar'}
+                                    {report.riesgo ? `Riesgo ${report.riesgo.toLowerCase()}` : 'Riesgo sin dato'}
                                 </span>
                             </div>
                             <p className="font-sight p-0 pt-1">
@@ -42,7 +47,7 @@ const ReportDetailPage = () => {
                             </p>
                         </div>
 
-                        {report.id_caso !== null && (
+                        {report.id_caso !== null && can('cases.view') && (
                             <button
                                 type="button"
                                 onClick={() => navigate(`/cases/${report.id_caso}`)}

@@ -1,36 +1,57 @@
-import { useState } from 'react';
-import type { Reporte } from '../../../lib/types/Report';
-import { ReportDetails } from '@/components/ui/ReportDetails';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import type { Reporte } from '@/lib/types/Report'
+import { ReportDetails } from '@/components/ui/ReportDetails'
+import { SelectCheckbox } from '@/components/ui/SelectCheckbox'
+import { useAuth } from '@/context/auth'
 import {
     RISK_LEVEL_STYLES,
     formatDateTime,
     formatMinorDetails,
     isUnknown,
     statusStyle,
-} from '@/lib/utilities/reportStyles';
-import { ReportActions } from './ReportActions';
+} from '@/lib/utilities/reportStyles'
+import { cn } from '@/lib/utilities/utils'
+import type { CardSelection } from '@/lib/utilities/useSelection'
+import { ReportActions } from './ReportActions'
 
-const iconClass = 'mt-0.5 h-4 w-4 shrink-0 font-diffuse';
-const labelClass = 'font-semibold';
+/** Classes of the icon next to each summary line */
+const iconClass = 'mt-0.5 h-4 w-4 shrink-0 font-diffuse'
+/** Classes of the label of each summary line */
+const labelClass = 'font-semibold'
 
 interface Props {
     /** Report shown */
-    report: Reporte;
-    /** Called with the id of the case created when the report is accepted */
-    onCaseCreated: (caseId: number) => void;
+    report: Reporte
+    /** Called with the id of the case created when the report is accepted, if the user can see cases */
+    onCaseCreated: (caseId: number) => void
+    /** Called after a triage action, so the list reloads */
+    onChanged: () => void
+    /** Passed only while the list is in selection mode: the card shows a checkbox, toggles when clicked and hides its buttons */
+    selection?: CardSelection
 }
 
-/** Card of a report with its summary, an expandable detail and the triage actions */
-export function ReportCard({ report, onCaseCreated }: Props) {
-    const [expanded, setExpanded] = useState(false);
-    const style = statusStyle(report.estatus_seguimiento);
-    const detailsId = `report-details-${report.id_reporte}`;
+/** Card of a report with its summary, an expandable detail and the triage actions; the page button and the risk select need their permissions */
+export function ReportCard({ report, onCaseCreated, onChanged, selection }: Props) {
+    const navigate = useNavigate()
+    const { can } = useAuth()
+    const [expanded, setExpanded] = useState(false)
+    const style = statusStyle(report.estatus_seguimiento)
+    const detailsId = `report-details-${report.id_reporte}`
 
     return (
-        <article className="flex flex-col gap-4 rounded-xl border border-card bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6">
+        <article
+            onClick={selection?.onToggle}
+            className={cn(
+                'flex flex-col gap-4 rounded-xl border border-card bg-card p-4 shadow-sm transition-colors duration-300 sm:p-6',
+                selection && 'cursor-pointer',
+                selection?.selected && 'card-selected',
+            )}
+        >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-3">
+                        {selection && <SelectCheckbox label={`Seleccionar ${report.folio_reporte}`} selection={selection} />}
                         <h2 className="font-mono text-lg font-bold font-accent">{report.folio_reporte}</h2>
                         <span
                             className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ring-1 ${style.pill}`}
@@ -48,7 +69,7 @@ export function ReportCard({ report, onCaseCreated }: Props) {
                                 report.riesgo ? RISK_LEVEL_STYLES[report.riesgo] ?? 'font-diffuse' : 'font-diffuse'
                             }`}
                         >
-                            {report.riesgo ? `Riesgo ${report.riesgo.toLowerCase()}` : 'Riesgo sin evaluar'}
+                            {report.riesgo ? `Riesgo ${report.riesgo.toLowerCase()}` : 'Riesgo sin dato'}
                         </span>
                     </div>
 
@@ -56,7 +77,7 @@ export function ReportCard({ report, onCaseCreated }: Props) {
                         {report.ubicacion.colonia} · {formatDateTime(report.fecha_reporte)}
                     </p>
 
-                    {!expanded && (
+                    {(!expanded || selection) && (
                         <div className="mt-3 space-y-2 text-sm">
                             <p className="flex gap-2">
                                 <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
@@ -86,25 +107,36 @@ export function ReportCard({ report, onCaseCreated }: Props) {
                     )}
                 </div>
 
-                <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
-                    <button
-                        type="button"
-                        onClick={() => setExpanded((v) => !v)}
-                        aria-expanded={expanded}
-                        aria-controls={detailsId}
-                        className="btn-primary rounded-lg px-4 py-2 text-sm font-medium"
-                    >
-                        {expanded ? 'Ocultar detalle ↑' : 'Detalle ↓'}
-                    </button>
-                </div>
+                {!selection && (
+                    <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
+                        <button
+                            type="button"
+                            onClick={() => setExpanded((v) => !v)}
+                            aria-expanded={expanded}
+                            aria-controls={detailsId}
+                            className="btn-primary rounded-lg px-4 py-2 text-sm font-medium"
+                        >
+                            {expanded ? 'Ocultar detalle ↑' : 'Detalle ↓'}
+                        </button>
+                        {can('reports.view_detail') && (
+                            <button
+                                type="button"
+                                onClick={() => navigate(`/reports/${report.id_reporte}`)}
+                                className="btn-secondary rounded-lg px-4 py-2 text-sm"
+                            >
+                                Abrir página
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {expanded && (
+            {expanded && !selection && (
                 <div id={detailsId} className="flex flex-col gap-4 border-t border-card pt-4">
                     <ReportDetails report={report} />
-                    <ReportActions report={report} onAccepted={onCaseCreated} />
+                    <ReportActions report={report} onAccepted={onCaseCreated} onChanged={onChanged} />
                 </div>
             )}
         </article>
-    );
+    )
 }
