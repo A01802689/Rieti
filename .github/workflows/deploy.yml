@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    path: 
+      - 'RietiDashboard/**'
   workflow_dispatch:
 
 concurrency:
@@ -23,18 +25,21 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: RietiDashboard/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+      - name: Test api url
+        run: test -n "$VITE_API_URL" || (echo "Falta la variable VITE_API_URL" && exit 1)
+        env: 
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Build project
         run: npm run build
         env:
-          # URL de la API (variable del repositorio: Settings > Secrets and variables > Actions > Variables)
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: SPA fallback
         run: cp dist/index.html dist/404.html
