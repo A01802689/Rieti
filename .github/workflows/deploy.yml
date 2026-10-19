@@ -32,6 +32,9 @@ jobs:
 
       - name: Build project
         run: npm run build
+        env:
+          # URL de la API (variable del repositorio: Settings > Secrets and variables > Actions > Variables)
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
 
       - name: SPA fallback
         run: cp dist/index.html dist/404.html

@@ -31,14 +31,14 @@ enum class RangoEdad(val etiqueta: String) {
 enum class Actividad(val etiqueta: String) {
     VENTA_AMBULANTE("Venta ambulante"),
     LIMPIEZA_PARABRISAS("Limpieza de parabrisas"),
-    MENDICIDAD("Mendicidad"),
+    MENDICIDAD("Mendicidad Forzada"),
     CARGA_DESCARGA("Carga y descarga"),
     TRABAJO_EN_COMERCIO("Trabajo en comercio"),
     CAMPO("Campo"),
     CONSTRUCCION("Construcción"),
-    TRABAJO_DOMESTICO("Trabajo doméstico"),
+    EXPLOTACION_SEXUAL("Explotación sexual"),
     RECOLECCION_RESIDUOS("Recolección de residuos"),
-    OTRA_ACTIVIDAD("Otra actividad"),
+    OTRA_SITUACION("Otra situación"),
     NO_SE("No sé")
 }
 
@@ -46,9 +46,9 @@ enum class Actividad(val etiqueta: String) {
  * Opciones para el nivel de riesgo observado en la situación.
  */
 enum class Riesgo(val etiqueta: String) {
-    SI("Sí"),
-    NO("No"),
-    NO_SE("No se")
+    ALTO("Alto"),
+    MEDIO("Medio"),
+    BAJO("Bajo")
 }
 
 /**
@@ -88,7 +88,8 @@ data class ReporteCreateRequest(
     @SerializedName("tipo_trabajo") val tipoTrabajo: String,
     @SerializedName("descripcion") val descripcion: String? = null,
     @SerializedName("imagen_content_type") val imagenContentType: String? = null,
-    @SerializedName("con_seguimiento") val conSeguimiento: Boolean
+    @SerializedName("con_seguimiento") val conSeguimiento: Boolean,
+    @SerializedName("riesgo") val riesgo: String? = null
 )
 
 /**

@@ -74,7 +74,7 @@ for common components (they work as classes)
   @apply border-slate-200 dark:border-slate-700;
 }
 
-/* ---------- Text colors. They do not set size, so they combine with text-xs, text-lg... ---------- */
+/* Text colors. They do not set size, so they combine with text-xs, text-lg... */
 
 /* main text, for elements that are not h1/h2/p (those already get it from the base layer) */
 @utility font-clear{
@@ -91,7 +91,7 @@ for common components (they work as classes)
   @apply text-blue-600 dark:text-blue-400;
 }
 
-/* ---------- Buttons: colors only, set the radius and padding in the component ---------- */
+/* Buttons: colors only, set the radius and padding in the component */
 
 /* same blue as the login button */
 @utility btn-primary{
@@ -107,7 +107,7 @@ for common components (they work as classes)
   @apply border-slate-200 bg-white text-gray-900 placeholder-gray-500 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:placeholder-gray-400;
 }
 
-/* ---------- Form controls (slider, select) ---------- */
+/* Form controls (slider, select) */
 
 /* empty part of a slider track, separators */
 @utility bg-track{
@@ -152,6 +152,11 @@ for common components (they work as classes)
 /* small uppercase section label */
 @utility section-label{
   @apply text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400;
+}
+
+/* card picked while a list is in selection mode */
+@utility card-selected{
+  @apply ring-2 ring-blue-500 dark:ring-blue-400;
 }
 
 /* delete button in its confirmation state (inverted per theme) */

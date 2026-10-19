@@ -74,7 +74,7 @@ data class ReporteUiState(
 
     /** Las cuatro preguntas del formulario respondidas. */
     val formularioValido: Boolean
-        get() = cantidad != null && edad != null && actividad != null
+        get() = cantidad != null && edad != null && actividad != null && riesgo != null
     val ubicacionValida: Boolean
         get() = latitud != null && longitud != null && municipio.isNotBlank() && colonia.isNotBlank() && calle.isNotBlank()
     val puedeEnviar: Boolean
@@ -94,6 +94,7 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
     val actividad = actividad ?: return null
     val latitud = latitud ?: return null
     val longitud = longitud ?: return null
+    val riesgo = riesgo ?: return null
 
 
     val direccion = listOf(calle, colonia, municipio)
@@ -115,7 +116,8 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
         tipoTrabajo = actividad.etiqueta,
         descripcion = descripcion.ifBlank { null },
         imagenContentType = if (foto != null) "image/jpeg" else null,
-        conSeguimiento = !esAnonimo
+        conSeguimiento = !esAnonimo,
+        riesgo = riesgo.etiqueta
     )
 }
 

@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -108,7 +106,7 @@ fun Enviar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (procesando) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                else Text(if (foto == null) "Adjuntar fotografía" else "Cambiar fotografía")
+                else Text(if (foto == null) "Adjuntar fotografía (Opcional)" else "Cambiar fotografía")
             }
             Text(
                 "Solo fotografías del lugar. Nunca de niñas, niños ni adolescentes.",
@@ -147,14 +145,12 @@ fun Enviar(
         if (envio is EnvioUiState.SubiendoImagen) {
             Text("Subiendo fotografía…", style = MaterialTheme.typography.bodySmall)
         }
-        Button(
+        BotonPrincipal(
+            texto = "Enviar Reporte",
             onClick = onEnviar,
             enabled = puedeEnviar,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-        ) {
-            if (enviando) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-            else Text("Enviar reporte")
-        }
+            cargando = enviando
+        )
     }
 
     if (mostrarAviso) {

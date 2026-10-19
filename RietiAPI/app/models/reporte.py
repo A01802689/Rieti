@@ -31,6 +31,12 @@ class EstatusSeguimiento(str, Enum):
     CANALIZADO = "Canalizado"
     EN_ATENCION = "En atención"
     CONCLUIDO = "Concluido"
+    RECHAZADO = "Rechazado"
+
+class RiesgoReporte(str, Enum):
+    BAJO = "Bajo"
+    MEDIO = "Medio"
+    ALTO = "Alto"
 
 class CantidadNNA(str, Enum):
     UNO = "1"
@@ -101,4 +107,14 @@ class Reporte(Base):
     imagen_key = Column(
         String(255),
         nullable=True,
+    )
+    riesgo = Column(
+        SQLEnum(
+            RiesgoReporte,
+            name = "riesgo_reporte",
+            values_callable = lambda enum_class: [
+                item.value for item in enum_class
+            ]
+        ),
+        nullable = True
     )

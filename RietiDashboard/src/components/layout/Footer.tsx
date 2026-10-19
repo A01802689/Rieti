@@ -8,5 +8,5 @@ export function Footer() {
             </p>
             <p className="font-sight p-0">Todos los derechos reservados.</p>
         </footer>
-    );
+    )
 }

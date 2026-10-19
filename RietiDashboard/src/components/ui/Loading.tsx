@@ -1,4 +1,5 @@
-import { Spinner } from "./Spinner";
+import { Spinner } from "./Spinner"
+
 /** Spinner with the text "Cargando", used while data is being loaded */
 const Loading = () => (
   <>

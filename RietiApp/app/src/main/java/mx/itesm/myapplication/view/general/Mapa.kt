@@ -49,7 +49,7 @@ fun MapaInteractivo(
             modifier = mapModifier.background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Mapa Interactivo (Vista Previa)",) }
+            Text(text = "Mapa Interactivo (Vista Previa)") }
     } else {
         /** Estado de la cámara del mapa, con la posición y el zoom iniciales. */
         val camara = rememberCameraState(

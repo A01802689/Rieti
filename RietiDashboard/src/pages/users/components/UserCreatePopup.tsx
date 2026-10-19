@@ -1,9 +1,10 @@
 import { Popup } from "@/components/layout/Popup"
 import { CheckboxField } from "@/components/ui/CheckboxField"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/NativeSelect"
-import { ROLES, type Role, type UserCreateForm } from "@/lib/types/User"
+import { ROLES, type Role, type UserCreate } from "@/lib/types/User"
 import type { Municipio } from "@/lib/types/Municipio"
-import { ALL_PERMISSION_KEYS, PERMISSION_GROUPS, permissionsByGroup, type PermissionKey } from "@/lib/types/Permission"
+import { ALL_PERMISSION_KEYS, PERMISSION_GROUPS, permissionNote, permissionsByGroup, type PermissionKey } from "@/lib/types/Permission"
+import { PasswordField } from "./PasswordField"
 
 interface UserCreatePopupProps {
   /** Whether the popup is visible */
@@ -11,21 +12,29 @@ interface UserCreatePopupProps {
   /** Called when the popup is closed or cancelled */
   onClose: () => void
   /** Current values of the form */
-  form: UserCreateForm
+  form: UserCreate
   /** Called with the field and its new value */
-  onChange: <K extends keyof UserCreateForm>(field: K, value: UserCreateForm[K]) => void
-  /** Called when an initial permission is toggled */
+  onChange: <K extends keyof UserCreate>(field: K, value: UserCreate[K]) => void
+  /** Called when an initial permission is toggled; the form applies the dependencies between permissions */
   onTogglePermission: (key: PermissionKey) => void
   /** Options of the municipio select */
   municipios: Municipio[]
+  /** Whether every field is valid; the "Registrar usuario" button stays disabled until then */
+  canSubmit: boolean
   /** Called by the "Registrar usuario" button */
   onSubmit: () => void
+  /** Whether the user is being registered; the buttons are disabled meanwhile */
+  submitting: boolean
+  /** Message of the last registration that failed, empty when there is none */
+  error: string
 }
 
+/** Classes of the label that wraps each field */
 const labelClass = "flex flex-col gap-1 text-sm font-clear"
+/** Classes of the text inputs */
 const inputClass = "input-field h-9 w-full rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
 
-/** Popup with the form to register a new user; an Administrador gets every permission, locked on */
+/** Popup with the form to register a new user, including a password that follows the rule; an Administrador gets every permission, locked on */
 export function UserCreatePopup({
   open,
   onClose,
@@ -33,7 +42,10 @@ export function UserCreatePopup({
   onChange,
   onTogglePermission,
   municipios,
+  canSubmit,
   onSubmit,
+  submitting,
+  error,
 }: UserCreatePopupProps) {
   const groups = permissionsByGroup()
   const isAdmin = form.rol === "Administrador"
@@ -75,6 +87,11 @@ export function UserCreatePopup({
               onChange={(e) => onChange("correo", e.target.value)}
             />
           </label>
+          <PasswordField
+            className="sm:col-span-2"
+            value={form.contrasena}
+            onChange={(value) => onChange("contrasena", value)}
+          />
           <label className={labelClass}>
             Rol del sistema *
             <NativeSelect
@@ -116,6 +133,7 @@ export function UserCreatePopup({
                     label={permission.label}
                     checked={active.includes(permission.key)}
                     disabled={isAdmin}
+                    hint={permissionNote(permission.key)}
                     setChecked={() => onTogglePermission(permission.key)}
                   />
                 ))}
@@ -124,13 +142,26 @@ export function UserCreatePopup({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-card pt-4">
-          <button type="button" onClick={onClose} className="btn-secondary rounded-lg px-4 py-2 text-sm">
-            Cancelar
-          </button>
-          <button type="button" onClick={onSubmit} className="btn-primary rounded-lg px-4 py-2 text-sm font-medium">
-            Registrar usuario
-          </button>
+        <div className="flex flex-col gap-3 border-t border-card pt-4">
+          {error && <p className="p-0 text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>}
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={submitting}
+              className="btn-secondary rounded-lg px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={onSubmit}
+              disabled={!canSubmit || submitting}
+              className="btn-primary rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? "Registrando..." : "Registrar usuario"}
+            </button>
+          </div>
         </div>
       </div>
     </Popup>

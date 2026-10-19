@@ -1,7 +1,8 @@
 import { Popup } from "@/components/layout/Popup"
-import { Toggle } from "@/components/ui/Toggle"
+import { Toggle } from "./Toggle"
 import type { User } from "@/lib/types/User"
-import { ALL_PERMISSION_KEYS, PERMISSION_GROUPS, permissionsByGroup, type PermissionKey } from "@/lib/types/Permission"
+import { ALL_PERMISSION_KEYS, PERMISSION_GROUPS, permissionNote, permissionsByGroup, type PermissionKey } from "@/lib/types/Permission"
+import { formatDateTime } from "@/lib/utilities/reportStyles"
 
 interface UserDetailPopupProps {
   /** User shown; the popup is closed when null */
@@ -10,9 +11,9 @@ interface UserDetailPopupProps {
   onClose: () => void
   /** Whether the permission switches are enabled */
   editing: boolean
-  /** Permissions the switches show */
+  /** Permissions the switches show while editing; the rest of the time they show the ones the user has */
   draftPermissions: PermissionKey[]
-  /** Called when a switch is toggled */
+  /** Called when a switch is toggled; the page applies the dependencies between permissions */
   onTogglePermission: (key: PermissionKey) => void
   /** Called by the "Editar permisos" button */
   onStartEditing: () => void
@@ -22,18 +23,13 @@ interface UserDetailPopupProps {
   confirmingDelete: boolean
   /** Called on every click of the delete button */
   onDelete: () => void
+  /** Whether a request is running; the buttons are disabled meanwhile */
+  busy: boolean
+  /** Message of the last request that failed, empty when there is none */
+  error: string
 }
 
-const dateFormat = new Intl.DateTimeFormat("es-MX", { dateStyle: "medium", timeStyle: "short" })
-
-/**
- * Formats the last access date; "Sin registro" when there is none
- *
- * @param iso - ISO 8601 date or null
- */
-const formatAccess = (iso: string | null) => (iso ? dateFormat.format(new Date(iso)) : "Sin registro")
-
-/** Popup with the data, permissions and recent activity of a user. The permissions of an Administrador are locked on */
+/** Popup with the data and permissions of a user. Only an Alimentador has permissions to edit: those of an Administrador are locked on */
 export function UserDetailPopup({
   user,
   onClose,
@@ -44,18 +40,15 @@ export function UserDetailPopup({
   onSave,
   confirmingDelete,
   onDelete,
+  busy,
+  error,
 }: UserDetailPopupProps) {
   const groups = permissionsByGroup()
   const isAdmin = user?.rol === "Administrador"
-  const active = isAdmin ? ALL_PERMISSION_KEYS : draftPermissions
-
-  const activity = user
-    ? [
-        { label: "Reportes atendidos", value: user.actividad.reportes_atendidos },
-        { label: "Casos revisados", value: user.actividad.casos_revisados },
-        { label: "Notas hechas", value: user.actividad.notas_registradas },
-      ]
-    : []
+  const canEditPermissions = user?.rol === "Alimentador"
+  const active = isAdmin ? ALL_PERMISSION_KEYS : editing ? draftPermissions : (user?.permisos ?? [])
+  const saveLabel = editing ? (busy ? "Guardando..." : "Guardar") : "Editar permisos"
+  const deleteLabel = confirmingDelete ? (busy ? "Eliminando..." : "Confirmar") : "Eliminar usuario"
 
   return (
     <Popup open={user !== null} onClose={onClose}>
@@ -66,18 +59,19 @@ export function UserDetailPopup({
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-xl font-semibold">{user.nombre} {user.apellido}</h2>
                 <span className="rounded-full bg-component px-2.5 py-0.5 text-xs font-medium font-accent">
-                  {user.rol ?? "Sin rol"}
+                  {user.rol}
                 </span>
               </div>
               <p className="text-sm font-diffuse break-all">{user.correo}</p>
               <p className="text-sm font-diffuse">
-                {user.municipio?.nombre ?? "Sin municipio"} · Último acceso: {formatAccess(user.ultimo_acceso)}
+                {user.municipio?.nombre ?? "Sin municipio"} · Último acceso: {user.ultimo_acceso ? formatDateTime(user.ultimo_acceso) : "Sin registro"}
               </p>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="btn-secondary shrink-0 rounded-lg px-3 py-1 text-sm"
+              disabled={busy}
+              className="btn-secondary shrink-0 rounded-lg px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cerrar
             </button>
@@ -86,13 +80,14 @@ export function UserDetailPopup({
           <div className="border-t border-card pt-4">
             <div className="mb-3 flex items-center justify-between gap-3">
               <span className="section-label">Permisos del sistema</span>
-              {!isAdmin && (
+              {canEditPermissions && (
                 <button
                   type="button"
                   onClick={editing ? onSave : onStartEditing}
-                  className="btn-primary rounded-lg px-3 py-1.5 text-sm"
+                  disabled={busy}
+                  className="btn-primary rounded-lg px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {editing ? "Guardar" : "Editar permisos"}
+                  {saveLabel}
                 </button>
               )}
             </div>
@@ -102,11 +97,16 @@ export function UserDetailPopup({
                   <span className="text-sm font-semibold">{group}</span>
                   {groups[group].map((permission) => (
                     <div key={permission.key} className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-clear">{permission.label}</span>
+                      <span className="min-w-0 text-sm font-clear">
+                        {permission.label}
+                        {permissionNote(permission.key) && (
+                          <span className="block text-xs font-diffuse">{permissionNote(permission.key)}</span>
+                        )}
+                      </span>
                       <Toggle
                         label={permission.label}
                         checked={active.includes(permission.key)}
-                        disabled={isAdmin || !editing}
+                        disabled={isAdmin || !editing || busy}
                         onChange={() => onTogglePermission(permission.key)}
                       />
                     </div>
@@ -116,26 +116,18 @@ export function UserDetailPopup({
             </div>
           </div>
 
-          <div className="border-t border-card pt-4">
-            <span className="section-label">Actividad reciente</span>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {activity.map((item) => (
-                <div key={item.label} className="rounded-xl bg-component p-3 text-center">
-                  <p className="text-2xl font-semibold">{item.value}</p>
-                  <p className="text-xs font-diffuse">{item.label}</p>
-                </div>
-              ))}
+          <div className="flex flex-col gap-3 border-t border-card pt-4">
+            {error && <p className="p-0 text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={busy}
+                className={`${confirmingDelete ? "btn-confirm" : "btn-danger"} rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                {deleteLabel}
+              </button>
             </div>
-          </div>
-
-          <div className="flex justify-end border-t border-card pt-4">
-            <button
-              type="button"
-              onClick={onDelete}
-              className={`${confirmingDelete ? "btn-confirm" : "btn-danger"} rounded-lg px-4 py-2 text-sm font-medium`}
-            >
-              {confirmingDelete ? "Confirmar" : "Eliminar usuario"}
-            </button>
           </div>
         </div>
       )}

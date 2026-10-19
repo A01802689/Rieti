@@ -11,21 +11,28 @@ interface CheckboxFieldProps {
   setChecked: Dispatch<SetStateAction<boolean>>
   /** Blocks the interaction and dims the field */
   disabled?: boolean
+  /** Shows only the box; the label stays available to screen readers */
+  hideLabel?: boolean
+  /** Small note under the label, e.g. what the option requires */
+  hint?: string
 }
 
 /** Controlled checkbox with its label */
-export function CheckboxField({ label, checked, setChecked, disabled = false }: CheckboxFieldProps) {
+export function CheckboxField({ label, checked, setChecked, disabled = false, hideLabel = false, hint }: CheckboxFieldProps) {
   return (
-    <label className={`flex w-full items-center gap-2 py-1 ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
+    <label className={`flex w-full gap-2 py-1 ${hint ? "items-start" : "items-center"} ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
       <Checkbox.Root
         checked={checked}
         disabled={disabled}
         onCheckedChange={(value) => setChecked(value)}
-        className="flex size-4 shrink-0 items-center justify-center rounded border border-slate-300 outline-none focus-visible:ring-3 focus-visible:ring-brand data-checked:border-brand data-checked:bg-brand dark:border-slate-600"
+        className={`flex size-4 shrink-0 items-center justify-center rounded border border-slate-300 outline-none focus-visible:ring-3 focus-visible:ring-brand data-checked:border-brand data-checked:bg-brand dark:border-slate-600 ${hint ? "mt-0.5" : ""}`}
       >
         <Checkbox.Indicator render={<CheckIcon className="size-3 text-white" />} />
       </Checkbox.Root>
-      <span className="text-sm font-clear">{label}</span>
+      <span className={hideLabel ? "sr-only" : "min-w-0 text-sm font-clear"}>
+        {label}
+        {hint && <span className="block text-xs font-diffuse">{hint}</span>}
+      </span>
     </label>
   )
 }

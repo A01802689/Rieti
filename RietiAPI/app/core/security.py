@@ -1,10 +1,10 @@
-from jose import jwt   # esto ap rimportyar el json web token
+from jose import JWTError, jwt   # esto ap rimportyar el json web token
 from datetime import datetime, timedelta, timezone  #me servira para importar fechas para sber 
 #cundo deberia expriar el token.
 from app.core.config import settings
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440 
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -16,5 +16,5 @@ def verify_token(token: str):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except jwt.JWTError:
+    except JWTError:
         return None

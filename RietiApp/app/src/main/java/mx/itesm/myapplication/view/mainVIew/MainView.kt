@@ -28,14 +28,13 @@ import mx.itesm.myapplication.viewModel.ReportesViewModel
 fun MainView(navController: NavController, modifier: Modifier = Modifier) {
     val vm: ReportesViewModel = viewModel()
     val estado by vm.uiState.collectAsState()
-
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {vm.cargar()}
+
     Scaffold(
         modifier = modifier.padding(16.dp, 8.dp),
         topBar = { TopMainView(navController) },
-        content = { innerPadding ->
-            ContentMainView(estado, vm::cargar, modifier.padding(innerPadding))
-        },
-        bottomBar = { GenerateReportMainView(navController) }
-    )
+        bottomBar = { GenerateReportMainView(navController) })
+        { innerPadding ->
+            ContentMainView(estado, vm::cargar, Modifier.padding(innerPadding))
+        }
 }

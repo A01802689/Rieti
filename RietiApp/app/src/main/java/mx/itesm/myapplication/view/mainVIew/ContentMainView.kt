@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mx.itesm.myapplication.viewModel.ReporteUiState
@@ -79,6 +81,7 @@ fun ContentMainView(
 
         else -> LazyColumn(
             modifier = modifier,
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -165,12 +168,21 @@ fun ReportSummaryCard(
 
 @Composable
 fun StatusChip(status: String, modifier: Modifier = Modifier) {
+    val (bgColor, contentColor) = when (status.lowercase().trim()) {
+        "recibido" -> Pair(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
+        "en revisión", "en revision" -> Pair(Color(0xFFFFF8E1), Color(0xFFF57F17)) // Ámbar / Amarillo
+        "canalizado" -> Pair(Color(0xFFE3F2FD), Color(0xFF1565C0))                // Azul
+        "en atención", "en atencion" -> Pair(Color(0xFFFBE9E7), Color(0xFFD84315)) // Naranja oscuro
+        "concluido" -> Pair(Color(0xFFE8F5E9), Color(0xFF2E7D32))                 // Verde
+        else -> Pair(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.primary)
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
             .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = bgColor,
                 shape = RoundedCornerShape(50)
             )
             .padding(horizontal = 12.dp, vertical = 6.dp)
@@ -178,9 +190,9 @@ fun StatusChip(status: String, modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .size(8.dp)
-                .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                .background(color = contentColor, shape = CircleShape)
         )
-        Text(text = status, color = MaterialTheme.colorScheme.primary)
+        Text(text = status, color = contentColor)
     }
 }
 

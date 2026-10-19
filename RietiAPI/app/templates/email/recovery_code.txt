@@ -1,0 +1,12 @@
+Recuperación de contraseña - $app_name
+
+Recibimos una solicitud para restablecer tu contraseña.
+
+Tu código de verificación es:
+
+    $code
+
+El código vence en $minutes minutos y solo se puede usar una vez.
+
+Si no fuiste tú, ignora este mensaje: tu contraseña no cambiará.
+Nunca compartas este código con nadie.

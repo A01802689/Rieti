@@ -47,7 +47,7 @@ fun formatearFecha(iso: String): String {
             return iso
         }
     }
-    return instante.atZone(ZoneId.systemDefault()).format(formatoFecha)
+    return instante.atZone(zona_backend).format(formatoFecha)
 }
 
 fun ReporteListadoResponse.toResumen(): ReporteResumen {

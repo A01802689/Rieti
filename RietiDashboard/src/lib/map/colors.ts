@@ -2,10 +2,11 @@ import type { ExpressionSpecification } from "maplibre-gl"
 import type { ReportVisual } from "@/lib/types/Report"
 import type { CaseVisual } from "@/lib/types/Case"
 
-// Circle palettes (low -> high). Reports are blue->violet and cases are pink so they
-// are not confused with each other or with the yellow/red zones.
+/** Circle palette of the reports, low to high; blue and violet so they are not confused with the cases or with the yellow and red zones */
 const REPORT_RAMP = ['#2dd4bf', '#38bdf8', '#6366f1', '#7c3aed', '#4c1d95']
+/** Circle palette of the cases, low to high; pink for the same reason */
 const CASE_RAMP = ['#f9a8d4', '#f472b6', '#ec4899', '#be185d', '#831843']
+/** Color of a circle whose value is missing or unknown */
 const NO_DATA = '#9ca3af'
 
 /** Border color of the selected circle */
@@ -15,22 +16,20 @@ export const SELECTED_STROKE = '#111827'
  * Builds the `circle-color` expression of the reports
  *
  * @param visual - Property used to color
+ * @returns The expression for the circle layer
  */
 export const reportColor = (visual: ReportVisual): ExpressionSpecification => {
   const c = REPORT_RAMP
   switch (visual) {
     case 'risk':
-      // risker -> darker
       return ['match', ['get', 'risk'], 'Bajo', c[0], 'Medio', c[2], 'Alto', c[4], NO_DATA]
     case 'nna':
-      // more nna -> darker
       return ['match', ['to-string', ['get', 'nna']],
         '1', c[0], '2', c[1], '3', c[2], '4', c[3], '5 o más', c[4], NO_DATA]
     case 'approx_age':
-      // younger -> darker
       return ['match', ['get', 'approx_age'], '0-5', c[4], '6-11', c[3], '12-14', c[2], '15-17', c[0], NO_DATA]
     case 'days_unattended':
-      // null (report has a case) -> -1 -> no data. Cuts: 0-6, 7-29, 30+
+      // null (the report has a case) becomes -1, which means no data; cuts: 0-6, 7-29, 30+
       return ['step', ['coalesce', ['get', 'days_unattended'], -1], NO_DATA, 0, c[0], 7, c[2], 30, c[4]]
   }
 }
@@ -39,6 +38,7 @@ export const reportColor = (visual: ReportVisual): ExpressionSpecification => {
  * Builds the `circle-color` expression of the cases
  *
  * @param visual - Property used to color
+ * @returns The expression for the circle layer
  */
 export const caseColor = (visual: CaseVisual): ExpressionSpecification => {
   const c = CASE_RAMP
@@ -67,6 +67,7 @@ export type Legend = {
  * Describes the scale of reportColor
  *
  * @param visual - Property used to color
+ * @returns Title, colors and end labels of the legend
  */
 export const reportLegend = (visual: ReportVisual): Legend => {
   const c = REPORT_RAMP
@@ -86,6 +87,7 @@ export const reportLegend = (visual: ReportVisual): Legend => {
  * Describes the scale of caseColor
  *
  * @param visual - Property used to color
+ * @returns Title, colors and end labels of the legend
  */
 export const caseLegend = (visual: CaseVisual): Legend => {
   const c = CASE_RAMP
@@ -103,7 +105,11 @@ export const caseLegend = (visual: CaseVisual): Legend => {
 export const ZONE_FILL_COLOR: ExpressionSpecification =
   ['step', ['get', 'count'], '#ffffff', 1, '#fbbf24', 10, '#ff4626', 20, '#b00323']
 
-/** Describes the scale of ZONE_FILL_COLOR */
+/**
+ * Describes the scale of ZONE_FILL_COLOR
+ *
+ * @returns Title, gradient colors and end labels of the zones
+ */
 export const zoneLegend = (): Legend => ({
   title: 'Concentración',
   colors: ['#fbbf24', '#ff4626', '#b00323'],

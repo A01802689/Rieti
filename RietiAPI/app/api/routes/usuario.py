@@ -1,11 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, get_current_user
+from app.api.deps import (
+    exigir_administrador,
+    get_current_user,
+    get_current_user_opcional,
+    get_db,
+    permisos_efectivos,
+)
 from app.services import usuario_service
 from app.schemas.usuario import (
     UsuarioCreate,
     UsuarioResponse,
+    SesionResponse,
     UsuarioLogin,
     UsuarioCreateAdmin,
     UsuarioDashboardResponse,
@@ -18,13 +25,31 @@ from app.core.limiter import limiter
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
 
+def _sesion(usuario: Usuario) -> SesionResponse:
+    return SesionResponse(
+        **UsuarioResponse.model_validate(usuario).model_dump(),
+        permisos=permisos_efectivos(usuario),
+    )
+
+
 @router.post("", response_model=UsuarioResponse)
 @limiter.limit("10/minute")
-def crear_usuario(request: Request, datos: UsuarioCreate, db: Session = Depends(get_db)):
+def crear_usuario(
+    request: Request,
+    datos: UsuarioCreate,
+    db: Session = Depends(get_db),
+    usuario_actual: Usuario | None = Depends(get_current_user_opcional),
+):
+    if usuario_actual is not None and usuario_actual.rol == "Alimentador":
+        raise HTTPException(status_code=403, detail="Un alimentador no puede crear usuarios")
+    if usuario_actual is not None and usuario_actual.rol == "Administrador":
+        if datos.rol is not None:
+            return usuario_service.create_usuario_admin(db, datos, usuario_actual.id_usuario)
+        return usuario_service.create_usuario(db, datos, usuario_actual.id_usuario)
     return usuario_service.create_usuario(db, datos)
 
 
-@router.post("/login", response_model=UsuarioResponse)
+@router.post("/login", response_model=SesionResponse)
 @limiter.limit("5/minute")
 def login(request: Request, datos: UsuarioLogin, response: Response, db: Session = Depends(get_db)):
     usuario = usuario_service.login(db, datos.correo, datos.contrasena)
@@ -38,7 +63,7 @@ def login(request: Request, datos: UsuarioLogin, response: Response, db: Session
         secure=settings.PRODUCTION,
         samesite="none" if settings.PRODUCTION else "lax",
     )
-    return usuario
+    return _sesion(usuario)
 
 
 @router.post("/logout")
@@ -47,9 +72,9 @@ def logout(response: Response):
     return {"message": "Sesión cerrada"}
 
 
-@router.get("/me", response_model=UsuarioResponse)
+@router.get("/me", response_model=SesionResponse)
 def obtener_sesion(usuario_actual: Usuario = Depends(get_current_user)):
-    return usuario_actual
+    return _sesion(usuario_actual)
 
 
 
@@ -58,30 +83,45 @@ def obtener_sesion(usuario_actual: Usuario = Depends(get_current_user)):
 def crear_usuario_con_rol(
     datos: UsuarioCreateAdmin,
     db: Session = Depends(get_db),
-    usuario_actual: Usuario = Depends(get_current_user),
+    usuario_actual: Usuario = Depends(exigir_administrador),
 ):
-    if usuario_actual.rol != "Administrador":
-        raise HTTPException(status_code=403, detail="Solo un Administrador puede crear nuevos Administradores o Alimentadores")
-    return usuario_service.create_usuario_admin(db, datos)
+    return usuario_service.create_usuario_admin(db, datos, usuario_actual.id_usuario)
 
 
-@router.get("/dashboard", response_model=list[UsuarioDashboardResponse], tags=["Dashboard - Usuarios"])
-def listar_usuarios(
-    db: Session = Depends(get_db),
-    usuario_actual: Usuario = Depends(get_current_user),
-):
-    if usuario_actual.rol != "Administrador":
-        raise HTTPException(status_code=403, detail="Solo un Administrador puede ver los usuarios")
+@router.get(
+    "",
+    response_model=list[UsuarioDashboardResponse],
+    tags=["Dashboard - Usuarios"],
+    dependencies=[Depends(exigir_administrador)],
+)
+def listar_usuarios(db: Session = Depends(get_db)):
     return usuario_service.get_usuarios(db)
 
 
-@router.put("/{id_usuario}/permisos", response_model=UsuarioDashboardResponse, tags=["Usuarios"])
+@router.get(
+    "/{id_usuario}",
+    response_model=UsuarioDashboardResponse,
+    tags=["Dashboard - Usuarios"],
+    dependencies=[Depends(exigir_administrador)],
+)
+def obtener_usuario(id_usuario: int, db: Session = Depends(get_db)):
+    return usuario_service.get_usuario(db, id_usuario)
+
+
+@router.delete("/{id_usuario}", status_code=status.HTTP_204_NO_CONTENT, tags=["Dashboard - Usuarios"])
+def eliminar_usuario(
+    id_usuario: int,
+    db: Session = Depends(get_db),
+    usuario_actual: Usuario = Depends(exigir_administrador),
+):
+    usuario_service.delete_usuario(db, id_usuario, usuario_actual.id_usuario)
+
+
+@router.put("/{id_usuario}/permisos", response_model=UsuarioDashboardResponse)
 def actualizar_permisos(
     id_usuario: int,
     datos: UsuarioPermisosUpdate,
     db: Session = Depends(get_db),
-    usuario_actual: Usuario = Depends(get_current_user),
+    usuario_actual: Usuario = Depends(exigir_administrador),
 ):
-    if usuario_actual.rol != "Administrador":
-        raise HTTPException(status_code=403, detail="Solo un Administrador puede cambiar permisos")
-    return usuario_service.update_permisos(db, id_usuario, datos)
+    return usuario_service.update_permisos(db, id_usuario, datos, usuario_actual.id_usuario)

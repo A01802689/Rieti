@@ -28,7 +28,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import mx.itesm.myapplication.view.Pantalla
-import mx.itesm.myapplication.view.general.BotonContinuar
+import mx.itesm.myapplication.view.general.BotonPrincipal
 import mx.itesm.myapplication.view.general.PasoReporte
 import mx.itesm.myapplication.viewModel.ReporteViewModel
 
@@ -90,8 +90,10 @@ fun ReporteSeguimiento(navController: NavController, vm: ReporteViewModel)
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        BotonContinuar(enabled = state.contactoValido) {
-            navController.navigate(Pantalla.RUTA_SEGFORM)
-        }
+        BotonPrincipal(
+            texto = "Continuar",
+            enabled = state.contactoValido,
+            onClick = { navController.navigate(Pantalla.RUTA_SEGFORM) }
+        )
     }
 }

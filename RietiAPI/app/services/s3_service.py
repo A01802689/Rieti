@@ -7,6 +7,14 @@ def obtener_cliente_s3():
         "s3",
         region_name = settings.AWS_REGION)
 
+
+def eliminar_imagen(*, imagen_key: str) -> None:
+    obtener_cliente_s3().delete_object(
+        Bucket=settings.S3_REPORTES_BUCKET,
+        Key=imagen_key,
+    )
+
+
 def generar_url_subida(*, imagen_key: str, content_type: str) -> str:
     return obtener_cliente_s3().generate_presigned_url(
         ClientMethod="put_object",
