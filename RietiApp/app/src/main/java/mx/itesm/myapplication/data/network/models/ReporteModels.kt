@@ -36,9 +36,9 @@ enum class Actividad(val etiqueta: String) {
     TRABAJO_EN_COMERCIO("Trabajo en comercio"),
     CAMPO("Campo"),
     CONSTRUCCION("Construcción"),
-    EXPLOTACION_SEXUAL("Explotación sexual"),
+    TRABAJO_DOMESTICO("Trabajo Doméstico"),
     RECOLECCION_RESIDUOS("Recolección de residuos"),
-    OTRA_SITUACION("Otra situación"),
+    OTRA_ACTIVIDAD("Otra actividad"),
     NO_SE("No sé")
 }
 
