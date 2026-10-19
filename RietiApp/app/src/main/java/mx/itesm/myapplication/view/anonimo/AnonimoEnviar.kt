@@ -28,7 +28,7 @@ fun AnonimoEnviar(navController: NavController, vm: ReporteViewModel){
     if (state.envio is EnvioUiState.Success) {
         DialogoReporteEnviado(
             folio = null,
-            mensaje = "Gracias por tu reporte"
+            mensaje = "¡Gracias por ayudar a proteger los derechos de niñas, niños y adolescentes!"
         ) {
             navController.popBackStack(Pantalla.RUTA_MAIN, inclusive = false)
         }
