@@ -1,13 +1,14 @@
+import { Footer } from "@/components/layout/Footer"
 import { InfoCard } from "./components/InfoCard"
 import { LoginCard } from "./components/LoginCard"
 import { useLoginIndicators } from "./useLoginIndicators"
 
-/** Login page: presentation panel with the totals of the system next to the sign-in card */
+/** Login page: presentation panel with the totals of the system next to the sign-in card, which has the footer under it */
 const Login = () => {
   const indicators = useLoginIndicators()
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-screen ">
+    <div className="flex min-h-screen w-full flex-col md:flex-row">
       <div className="flex-2 flex flex-col bg-blue-600 dark:bg-[#1d4ed8] justify-between p-2">
         
         <div className="flex flex-col justify-evenly">
@@ -29,9 +30,12 @@ const Login = () => {
         </div>
       </div>
 
-    <div className="flex-3 bg-panel content-center">
-      <LoginCard />
-    </div>
+      <div className="flex flex-3 flex-col bg-panel p-4">
+        <div className="flex flex-1 items-center justify-center">
+          <LoginCard />
+        </div>
+        <Footer />
+      </div>
     </div>
   )
 }
