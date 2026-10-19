@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,7 @@ import androidx.navigation.NavController
 import mx.itesm.myapplication.R
 import mx.itesm.myapplication.ui.theme.DegradadoEncabezado
 import mx.itesm.myapplication.ui.theme.DegradadoEncabezadoOscuro
+import androidx.compose.foundation.layout.statusBarsPadding
 import mx.itesm.myapplication.view.Pantalla
 import mx.itesm.myapplication.viewModel.AuthViewModel
 
@@ -48,35 +50,53 @@ import mx.itesm.myapplication.viewModel.AuthViewModel
 fun TopMainView(navController: NavController, modifier: Modifier = Modifier) {
     val authVm: AuthViewModel = viewModel()
     Row(
-        modifier = modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+        modifier = modifier
+            .fillMaxWidth()
             .background(if (isSystemInDarkTheme()) DegradadoEncabezadoOscuro else DegradadoEncabezado)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .statusBarsPadding()
+            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Surface(
-            shape = RoundedCornerShape(14.dp), color = Color.White
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_rieti_atizapan),
-                contentDescription = "Logo RIETI",
-                modifier = Modifier.size(52.dp).padding(6.dp)
-            )
-        }
-        Column(
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.weight(1f)
         ) {
-            Text("Sistema RIETI", style = MaterialTheme.typography.headlineSmall, color = Color.White)
-            Text("Mis Reportes", style = MaterialTheme.typography.titleMedium, color = Color.White)
+            Image(
+                painter = painterResource(id = R.drawable.logo_sipinna),
+                contentDescription = "Logo SIPINNA",
+                modifier = Modifier.size(52.dp),
+                contentScale = ContentScale.Fit
+            )
+            Column {
+                Text(
+                    "Sistema RIETI",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White
+                )
+                Text(
+                    "Mis Reportes",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
         }
+
         IconButton(
             onClick = {
                 authVm.logout()
                 navController.navigate(Pantalla.Login.ruta) {
-                    popUpTo(0) { inclusive = true } }
-            }) {
-            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Cerrar sesión", tint = Color.White)
+                    popUpTo(0) { inclusive = true }
+                }
             }
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Cerrar sesión",
+                tint = Color.White
+            )
         }
     }
+}

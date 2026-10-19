@@ -45,9 +45,7 @@ fun AppPrincipal(modifier: Modifier = Modifier) {
     ) {
         AppNavHost(
             navController = navController,
-            modifier = modifier
-                .statusBarsPadding()
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         )
     }
 }

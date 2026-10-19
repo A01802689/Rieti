@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -45,40 +47,34 @@ import mx.itesm.myapplication.view.Pantalla
 @Composable
 fun GenerateReportMainView(navController: NavController, modifier: Modifier = Modifier) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 8.dp
-    ){
+    ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Text(
                 "¿Qué tipo de reporte quieres enviar?",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
             Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Max),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 ReportCard(true, navController, Modifier.weight(1f).fillMaxHeight())
                 ReportCard(false, navController, Modifier.weight(1f).fillMaxWidth())
             }
         }
     }
-
 }
-
-/**
- * Tarjeta seleccionable que representa una opción de tipo de reporte.
- *
- * Su apariencia y destino dependen de [anonymous]
- *
- * @param anonymous `true` para la opción de reporte anónimo; `false` para la opción de reporte
- * con seguimiento.
- * @param navController Controlador de navegación usado para ir a la pantalla de la opción elegida.
- */
 
 @Composable
 fun ReportCard(anonymous: Boolean, navController: NavController, modifier: Modifier = Modifier) {
@@ -92,21 +88,27 @@ fun ReportCard(anonymous: Boolean, navController: NavController, modifier: Modif
     Card(
         onClick = { navController.navigate(ruta) },
         modifier = modifier,
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.5.dp, acento),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 14.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Box(
-                modifier = Modifier.size(40.dp).background(fondoIcono, CircleShape),
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(fondoIcono, CircleShape),
                 contentAlignment = Alignment.Center
-            ) { Icon(icono, contentDescription = null, tint = acento) }
-            Text(titulo, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+            ) {
+                Icon(icono, contentDescription = null, tint = acento, modifier = Modifier.size(20.dp))
+            }
+            Text(titulo, style = MaterialTheme.typography.titleSmall, textAlign = TextAlign.Center)
             Text(
                 descripcion,
                 style = MaterialTheme.typography.bodySmall,

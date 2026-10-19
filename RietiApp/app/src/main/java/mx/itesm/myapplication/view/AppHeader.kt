@@ -33,14 +33,8 @@ fun AppHeader() {
             contentDescription = "Logo RIETI",
             contentScale = ContentScale.Fit,
             modifier = Modifier
-                .height(80.dp)
+                .height(150.dp)
                 .padding(bottom = 8.dp)
-        )
-
-        Text(
-            text = "RIETI",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.height(4.dp))

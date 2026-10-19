@@ -31,7 +31,7 @@ fun MainView(navController: NavController, modifier: Modifier = Modifier) {
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {vm.cargar()}
 
     Scaffold(
-        modifier = modifier.padding(16.dp, 8.dp),
+        modifier = modifier,
         topBar = { TopMainView(navController) },
         bottomBar = { GenerateReportMainView(navController) })
         { innerPadding ->
