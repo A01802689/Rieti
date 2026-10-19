@@ -1,5 +1,6 @@
 import Map, { Marker } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import '@/lib/map/worker'
 import { MapPinOff } from 'lucide-react'
 import { hasValidLocation } from '@/lib/utilities/location'
 import { MAP_STYLE, MARKER_COLOR } from '@/lib/map/style'

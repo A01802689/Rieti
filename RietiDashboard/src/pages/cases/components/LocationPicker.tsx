@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import Map, { Marker, NavigationControl, type LngLat, type MapRef } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import '@/lib/map/worker'
 import SearchInput from '@/components/ui/SearchInput'
 import type { GeocodedPlace } from '@/lib/api/geocoding'
 import { MAP_STYLE, MARKER_COLOR } from '@/lib/map/style'
