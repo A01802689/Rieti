@@ -1,5 +1,5 @@
-import { InfoCard } from "./InfoCard"
-import { LoginCard } from "./LoginCard"
+import { InfoCard } from "./components/InfoCard"
+import { LoginCard } from "./components/LoginCard"
 
 /** Login page: presentation panel next to the sign-in card */
 const Login = () => (

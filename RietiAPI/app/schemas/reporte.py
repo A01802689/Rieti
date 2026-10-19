@@ -5,7 +5,7 @@ from enum import Enum
 from app.schemas.ubicacion import UbicacionCreate
 from typing import Literal
 
-from app.models.reporte import EstatusSeguimiento
+from app.models.reporte import EstatusSeguimiento, RiesgoReporte
 
 class CantidadNna(str, Enum):
     UNO = "1"
@@ -35,6 +35,11 @@ class TipoTrabajo(str, Enum):
     OTRA_ACTIVIDAD = "Otra actividad"
     NO_SE = "No sé"
 
+class ProyeccionReporte(str, Enum):
+    COMPLETA = "completa"
+    REDUCIDA = "reducida"
+    CIUDADANO = "ciudadano"
+
 class ReporteCreate(BaseModel):
     ubicacion: UbicacionCreate
     cantidad_nna: CantidadNna
@@ -43,6 +48,7 @@ class ReporteCreate(BaseModel):
     descripcion: str | None = None
     imagen_content_type: Literal["image/jpeg", "image/png"] | None = None
     con_seguimiento: bool
+    riesgo: RiesgoReporte | None = None
 
 
 class ActualizarReporte(BaseModel):
@@ -51,12 +57,39 @@ class ActualizarReporte(BaseModel):
     estatus_seguimiento: EstatusSeguimiento | None = None
 
 
+class CambiarEstatusReporte(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    estatus_seguimiento: EstatusSeguimiento
+
+
+class EstatusReporteResponse(BaseModel):
+    id_reporte: int
+    estatus_seguimiento: EstatusSeguimiento
+
+
 class AsociarReporteACaso(BaseModel):
     id_caso: int = Field(gt=0)
 
 class ReporteCasoResponse(BaseModel):
     id_reporte: int
     id_caso: int
+    estatus_seguimiento: EstatusSeguimiento
+
+
+class ReporteEstatusCasoResponse(BaseModel):
+    id_reporte: int
+    id_caso: int | None
+    estatus_seguimiento: EstatusSeguimiento
+
+
+class EliminarReportes(BaseModel):
+    ids: list[int] = Field(min_length=1, max_length=200)
+
+
+class EliminarReportesResponse(BaseModel):
+    eliminados: list[int]
+    omitidos: list[int]
 
 
 class UbicacionReporteListado(BaseModel):
@@ -65,6 +98,7 @@ class UbicacionReporteListado(BaseModel):
     calle: str
     lat: float
     lng: float
+    riesgo: RiesgoReporte | None = None
 
 
 class UbicacionReporteDetalle(UbicacionReporteListado):
@@ -73,6 +107,7 @@ class UbicacionReporteDetalle(UbicacionReporteListado):
 
 class ReporteListado(BaseModel):
     id_reporte: int
+    id_usuario: int | None
     id_caso: int | None
     folio_reporte: str
     fecha_reporte: datetime
@@ -81,13 +116,14 @@ class ReporteListado(BaseModel):
     cantidad_nna: CantidadNna
     edad_aproximada: EdadAproximada
     tipo_trabajo: TipoTrabajo
+    riesgo: RiesgoReporte | None
+    imagen: str | None = None
     ubicacion: UbicacionReporteListado
 
 
 class ReporteDetalle(ReporteListado):
     ubicacion: UbicacionReporteDetalle
     tiene_imagen: bool
-    imagen: str | None = None
     url_descarga_imagen: str | None = None
 
 

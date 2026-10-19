@@ -4,22 +4,19 @@ import { useNavigate } from "react-router-dom"
 import type { Reporte } from "@/lib/types/Report"
 import type { Caso } from "@/lib/types/Case"
 import type { Selected } from "@/lib/types/Selected"
-
-/** Formats dates in Mexico City time */
-const dateFormat = new Intl.DateTimeFormat("es-MX", {
-  day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
-  timeZone: "America/Mexico_City",
-})
+import { useAuth } from "@/context/auth"
+import { formatDateTime } from "@/lib/utilities/reportStyles"
+import { formatAddress } from "@/lib/utilities/location"
 
 /**
  * Route of the detail page of a report or case
  *
  * @param type - Whether it is a report or a case
  * @param id - Id of the item
+ * @returns The route
  */
-//! update these routes when the detail pages exist
 const detailRoute = (type: Selected["type"], id: string) =>
-  type === "report" ? `/reports/id=${id}` : `/cases/id=${id}`
+  type === "report" ? `/reports/${id}` : `/cases/${id}`
 
 /**
  * Line with a label and its value
@@ -45,9 +42,10 @@ interface SelectionCardProps {
   onClose: () => void
 }
 
-/** Card with the summary of the selected report or case and a link to its page; it only shows the fields that the list endpoints return */
+/** Card with the summary of the selected report or case and a link to its page, only for users who can see that page; it only shows the fields that the list endpoints return */
 export const SelectionCard = ({ selected, reports, cases, onClose }: SelectionCardProps) => {
   const navigate = useNavigate()
+  const { can } = useAuth()
 
   if (!selected) return null
 
@@ -77,8 +75,8 @@ export const SelectionCard = ({ selected, reports, cases, onClose }: SelectionCa
             <Row label="Riesgo" value={report.riesgo ?? "Sin evaluar"} />
             <Row label="Menores" value={String(report.cantidad_nna)} />
             <Row label="Edad aproximada" value={report.edad_aproximada ?? "Sin dato"} />
-            <Row label="Ubicación" value={`${report.ubicacion.calle}, ${report.ubicacion.colonia}`} />
-            <Row label="Fecha" value={dateFormat.format(new Date(report.fecha_reporte))} />
+            <Row label="Ubicación" value={formatAddress({ calle: report.ubicacion.calle, colonia: report.ubicacion.colonia }) ?? "Sin dirección"} />
+            <Row label="Fecha" value={formatDateTime(report.fecha_reporte)} />
             <Row label="Caso" value={report.id_caso === null ? "Sin caso" : `#${report.id_caso}`} />
           </>
         )}
@@ -89,8 +87,8 @@ export const SelectionCard = ({ selected, reports, cases, onClose }: SelectionCa
             <Row label="Urgencia" value={caso.urgencia ?? "Sin urgencia"} />
             <Row label="Menores" value={String(caso.cantidad_nna)} />
             <Row label="Municipio" value={caso.municipio.nombre} />
-            <Row label="Ubicación" value={`${caso.ubicacion.calle}, ${caso.ubicacion.colonia}`} />
-            <Row label="Fecha" value={dateFormat.format(new Date(caso.fecha_caso))} />
+            <Row label="Ubicación" value={formatAddress({ calle: caso.ubicacion.calle, colonia: caso.ubicacion.colonia }) ?? "Sin dirección"} />
+            <Row label="Fecha" value={formatDateTime(caso.fecha_caso)} />
             {reports && (
               <Row label="Reportes asociados" value={reports.filter((r) => r.id_caso === caso.id_caso).length} />
             )}
@@ -98,13 +96,15 @@ export const SelectionCard = ({ selected, reports, cases, onClose }: SelectionCa
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={() => navigate(detailRoute(selected.type, selected.id))}
-        className="btn-primary mt-3 w-full rounded-lg py-1.5 text-sm font-medium"
-      >
-        Ver más
-      </button>
+      {can(selected.type === "report" ? "reports.view_detail" : "cases.view") && (
+        <button
+          type="button"
+          onClick={() => navigate(detailRoute(selected.type, selected.id))}
+          className="btn-primary mt-3 w-full rounded-lg py-1.5 text-sm font-medium"
+        >
+          Ver más
+        </button>
+      )}
     </div>
   )
 }

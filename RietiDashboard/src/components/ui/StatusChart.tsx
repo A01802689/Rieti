@@ -1,5 +1,5 @@
-import { Bar, BarChart, Cell, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import useIsDark from '@/lib/utilities/useTheme';
+import { Bar, BarChart, Cell, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import useIsDark from '@/lib/utilities/useIsDark'
 
 /** Bar color of each status (same hues as the status pills in reportStyles) */
 const STATUS_COLORS: Record<string, string> = {
@@ -12,29 +12,30 @@ const STATUS_COLORS: Record<string, string> = {
     'Abierto': '#f97316',
     'En desarrollo': '#2563eb',
     'Cerrado': '#22c55e',
-};
-const FALLBACK_COLOR = '#9ca3af';
+}
+/** Bar color of a status that has none of its own */
+const FALLBACK_COLOR = '#9ca3af'
 
 interface Props {
     /** Chart title, e.g. "Reportes por estatus" */
-    title: string;
+    title: string
     /** Filter options with their totals; the "all" option is not drawn */
-    options: { value: string; total: number }[];
+    options: { value: string; total: number }[]
     /** Value of the option that means "no filter" */
-    allValue: string;
+    allValue: string
     /** Currently selected filter, its bar is highlighted (default: none, all bars full) */
-    selected?: string;
+    selected?: string
     /** Called when a bar is clicked, to apply that filter */
-    onSelect?: (value: string) => void;
+    onSelect?: (value: string) => void
     /** Classes of the outer section, replaces the default top margin */
-    className?: string;
+    className?: string
 }
 
 /** Bar chart with the number of items of each status filter */
 export function StatusChart({ title, options, allValue, selected = allValue, onSelect, className = 'mt-4' }: Props) {
-    const dark = useIsDark();
-    const data = options.filter((o) => o.value !== allValue).map((o) => ({ name: o.value, total: o.total }));
-    const axisColor = dark ? '#9ca3af' : '#6b7280';
+    const dark = useIsDark()
+    const data = options.filter((o) => o.value !== allValue).map((o) => ({ name: o.value, total: o.total }))
+    const axisColor = dark ? '#9ca3af' : '#6b7280'
 
     return (
         <section aria-label={title} className={`rounded-xl bg-component p-4 ${className}`}>
@@ -53,6 +54,8 @@ export function StatusChart({ title, options, allValue, selected = allValue, onS
                                 borderRadius: 8,
                                 color: dark ? '#e5e7eb' : '#030712',
                             }}
+                            itemStyle={{ color: dark ? '#e5e7eb' : '#030712' }}
+                            labelStyle={{ color: dark ? '#e5e7eb' : '#030712' }}
                             formatter={(value) => [value, 'Total']}
                         />
                         <Bar dataKey="total" radius={[6, 6, 0, 0]} cursor={onSelect ? 'pointer' : 'default'} onClick={(d) => onSelect?.(String(d.name))}>
@@ -68,5 +71,5 @@ export function StatusChart({ title, options, allValue, selected = allValue, onS
                 </ResponsiveContainer>
             </div>
         </section>
-    );
+    )
 }

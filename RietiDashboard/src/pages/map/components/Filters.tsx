@@ -13,16 +13,16 @@ FILTROS:
 
 */
 
-import { SliderControlled } from "@/components/ui/SliderControlled";
-import { DropdownSelect } from "@/components/ui/DropdownSelect";
-import { DropdownMultiSelect } from "@/components/ui/DropdownMultiSelect";
-import { CheckboxField } from "@/components/ui/CheckboxField";
+import { SliderControlled } from "./SliderControlled"
+import { DropdownSelect } from "./DropdownSelect"
+import { DropdownMultiSelect } from "./DropdownMultiSelect"
+import { CheckboxField } from "@/components/ui/CheckboxField"
 import {
   AGE_RANGE, DAYS_RANGE, HOUR_RANGE,
   RISK_OPTIONS, WORK_TYPE_OPTIONS, WEEKDAY_OPTIONS,
   REPORT_VISUAL_OPTIONS, CASE_VISUAL_OPTIONS,
   type HeatMapState,
-} from "../useHeatMap";
+} from "../useHeatMap"
 
 /**
  * Filter panel of the map: layer visibility, color scheme and data filters
@@ -33,21 +33,18 @@ export const Filters = ({ state: s }: { state: HeatMapState }) => (
   <div className="flex h-full w-full flex-col gap-6">
     <h1 className="w-full">Filtros</h1>
 
-    {/* choose what to show */}
     <section className="flex flex-col gap-2">
       <h2>Visibilidad</h2>
       <CheckboxField label="Reportes" checked={s.showReports} setChecked={s.setShowReports} />
       <CheckboxField label="Casos" checked={s.showCases} setChecked={s.setShowCases} />
     </section>
 
-    {/* choose how to color */}
     <section className="flex flex-col gap-2">
       <h2>Colorimetría</h2>
       <DropdownSelect options={REPORT_VISUAL_OPTIONS} option={s.reportVisualOption} setOption={s.setReportVisualOption} label="Colorear reportes por:" />
       <DropdownSelect options={CASE_VISUAL_OPTIONS} option={s.caseVisualOption} setOption={s.setCaseVisualOption} label="Colorear casos por:" />
     </section>
 
-    {/* choose what to filter */}
     <section className="flex flex-col gap-2">
       <h2>Filtrar por</h2>
       <SliderControlled range={AGE_RANGE} value={s.ageRange} setValue={s.setAgeRange} text="Rango de edades" />

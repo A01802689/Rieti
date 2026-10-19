@@ -1,27 +1,37 @@
-import Map, { Marker } from 'react-map-gl/maplibre';
-import 'maplibre-gl/dist/maplibre-gl.css';
+import Map, { Marker } from 'react-map-gl/maplibre'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { MapPinOff } from 'lucide-react'
+import { hasValidLocation } from '@/lib/utilities/location'
+import { MAP_STYLE, MARKER_COLOR } from '@/lib/map/style'
+import { Unavailable } from './Unavailable'
 
 interface Props {
-    /** Latitude of the marker */
-    lat: number;
-    /** Longitude of the marker */
-    lng: number;
+    /** Latitude of the marker; null or undefined when the place has no coordinates */
+    lat?: number | null
+    /** Longitude of the marker; null or undefined when the place has no coordinates */
+    lng?: number | null
     /** Classes of the container; the default sets the height */
-    className?: string;
+    className?: string
 }
 
-/** Small map with a single marker that shows the location of a case or report */
+/** Small map with a single marker that shows the location of a case or report; a place without valid coordinates shows a card instead */
 export function LocationMap({ lat, lng, className = 'h-52' }: Props) {
+    const place = { lat, lng }
+
+    if (!hasValidLocation(place)) {
+        return <Unavailable message="Ubicación no disponible" icon={MapPinOff} className={className} />
+    }
+
     return (
         <div className={`w-full overflow-hidden rounded-lg ${className}`}>
             <Map
-                key={`${lat},${lng}`}
-                initialViewState={{ latitude: lat, longitude: lng, zoom: 15 }}
-                mapStyle="https://tiles.openfreemap.org/styles/positron"
+                key={`${place.lat},${place.lng}`}
+                initialViewState={{ latitude: place.lat, longitude: place.lng, zoom: 15 }}
+                mapStyle={MAP_STYLE}
                 scrollZoom={false}
             >
-                <Marker latitude={lat} longitude={lng} color="#2563eb" />
+                <Marker latitude={place.lat} longitude={place.lng} color={MARKER_COLOR} />
             </Map>
         </div>
-    );
+    )
 }

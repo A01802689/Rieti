@@ -1,204 +1,80 @@
-// import { type expression } from "maplibre-gl";
-import type { CaseState, CaseUrgency, Caso, CasoListado, CasoPatch, Municipio, Seguimiento } from "../types/Case"
-import type { CantidadNNA, EdadAproximada, TipoTrabajo } from "../types/Report"
-import { ubicaciones } from "./reports"
-import { api } from "./client";
+import type { Caso, CasoPatch, Seguimiento } from "../types/Case"
+import type { BatchDeleteResult } from "../types/BatchDelete"
+import { api } from "./client"
+import { logInvalidLocation } from "../utilities/location"
 
-/** Lista completa para que el VM filtre; getCases conserva el origen simulado actual. */
-export const listCases = () => api<CasoListado[]>("/casos")
-
-/** Los campos omitidos o null conservan su valor; devuelve el caso completo. */
+/**
+ * Updates a case; omitted or null fields keep their value
+ *
+ * @param id - Id of the case
+ * @param datos - Fields to change, including the location (colonia, calle and the point)
+ * @returns The full updated case
+ */
 export const updateCase = (id: number, datos: CasoPatch) =>
   api<Caso>(`/casos/${id}`, { method: "PATCH", body: JSON.stringify(datos) })
 
-export const changeCaseQuantity = (id: number, cantidad_nna: CantidadNNA) =>
-  updateCase(id, { cantidad_nna })
-
-export const changeCaseAge = (id: number, edad_aproximada: EdadAproximada) =>
-  updateCase(id, { edad_aproximada })
-
-export const changeCaseWorkType = (id: number, tipo_trabajo: TipoTrabajo) =>
-  updateCase(id, { tipo_trabajo })
-
-// this one works as api fetcher
-// here will be the fetch done
-
-
-/** Simulates the cases endpoint; it will become a fetch */
 /**
- * Fetches api cases array
- * @returns Caso[]
+ * Fetches multiple cases; the ones with coordinates out of range are kept and only logged
+ *
+ * @returns The cases array
+ * @throws The request error, so a failed request is not mistaken for an empty list
  */
-// export const getCases = () => api<Caso[]>(`/casos`, {method: "GET"})  
+export const getCases = async () => {
+  const cases = await api<Caso[]>(`/casos`, {method: "GET"})
+  cases.forEach((c) => logInvalidLocation('Case', c.id_caso, c.ubicacion))
+  return cases
+}
 
 /**
- * 
- * @param id of case
- * @returns case detail
+ * Fetches one case; if its coordinates are out of range it is kept and only logged
+ *
+ * @param id - Id of the case
+ * @returns The case detail
  */
-export const getCase = (id: number) => api<Caso>(`/casos/${id}`,{method: "GET"} )
+export const getCase = async (id: number) => {
+  const caseF = await api<Caso>(`/casos/${id}`, {method: "GET"})
+  logInvalidLocation('Case', caseF.id_caso, caseF.ubicacion)
+  return caseF
+}
 
 /**
- * 
- * @param id of case
- * @param state to be placed in the case
- * @returns case updated detail
+ * Transfers a case to another municipio; it does not add a timeline entry
+ *
+ * @param id - Id of the case
+ * @param id_municipio - Id of the municipio that receives the case
+ * @returns The updated case
  */
-export const changeCaseState = (id: number, state: CaseState) => updateCase(id, { estado: state })
-
-  /**
-   * 
-   * @param id of case
-   * @param municipality to be assigned 
-   * @returns case updated detail
-   */
-export const transferCase = (id: number, municipality: string) => api<Caso>(`/casos/${id}/transferir`, 
+export const transferCase = (id: number, id_municipio: number) => api<Caso>(`/casos/${id}/transferir`,
   { method: "PUT",
     body: JSON.stringify({
-      municipio: municipality
+      id_municipio
     })
   }
 )
 
 /**
- * 
- * @param id of case
- * @param note note to be assigned
- * @returns "seguimiento" log detail
+ * Adds a note to the timeline of a case
+ *
+ * @param id - Id of the case
+ * @param note - Text of the note
+ * @returns The created timeline entry
  */
-export const addNote2Case = (id: number, note: string) => api<Seguimiento>(`/casos/${id}/notas`,
+export const addNote2Case = (id: number, note: string) => api<Seguimiento>(`/casos/${id}/seguimientos`,
   { method: "POST",
     body: JSON.stringify({
-      nota: note
+      nota: note,
+      tipo: "Nota"
     })
   }
 )
 
 /**
- * 
- * @param id of case
- * @param urgency to be assigned
- * @returns case id and urgency updated
+ * Deletes closed cases and skips the rest; their reports keep their images and location, with no case or status
+ *
+ * @param ids - Ids of the cases to delete
+ * @returns The ids deleted and the ids skipped
  */
-export const changeUrgency = (id: number, urgency: CaseUrgency) => updateCase(id, { urgencia: urgency })
-
-
-
-    //? Emulator 
-export const getCases = async (): Promise<Caso[]>  => cases1
-
-const municipio: Municipio = { nombre: "Atizapán de Zaragoza" }
-
-/** Hardcoded cases used while the endpoint does not exist */
-const cases1: Caso[] = [
-  {
-    id_caso: 1, municipio: municipio, ubicacion: ubicaciones[0],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Cerrado", fecha_caso: "2026-08-03T18:42:10-06:00", urgencia: "Media", cantidad_nna: 2,
-    notas: "Caso concluido; se confirmó la atención y el seguimiento con la familia. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 2, municipio: municipio, ubicacion: ubicaciones[1],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "En desarrollo", fecha_caso: "2026-08-05T06:15:33-06:00", urgencia: "Alta", cantidad_nna: 3,
-    notas: "Caso en seguimiento por el equipo; se realizan visitas y entrevistas con la familia. Reportes asociados: 2.",
-  },
-  {
-    id_caso: 3, municipio: municipio, ubicacion: ubicaciones[2],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Abierto", fecha_caso: "2026-08-18T17:30:00-06:00", urgencia: "Media", cantidad_nna: "5 o más",
-    notas: "Caso canalizado a la instancia correspondiente; pendiente de primera visita. Reportes asociados: 2.",
-  },
-  {
-    id_caso: 4, municipio: municipio, ubicacion: ubicaciones[7],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Cerrado", fecha_caso: "2026-07-28T16:20:05-06:00", urgencia: "Baja", cantidad_nna: 1,
-    notas: "Caso concluido; se confirmó la atención y el seguimiento con la familia. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 5, municipio: municipio, ubicacion: ubicaciones[10],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "En desarrollo", fecha_caso: "2026-08-30T09:12:14-06:00", urgencia: "Alta", cantidad_nna: 4,
-    notas: "Caso en seguimiento por el equipo; se realizan visitas y entrevistas con la familia. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 6, municipio: municipio, ubicacion: ubicaciones[3],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Abierto", fecha_caso: "2026-08-12T05:20:48-06:00", urgencia: "Alta", cantidad_nna: "5 o más",
-    notas: "Caso canalizado a la instancia correspondiente; pendiente de primera visita. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 7, municipio: municipio, ubicacion: ubicaciones[11],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Cerrado", fecha_caso: "2026-07-15T09:30:00-06:00", urgencia: "Media", cantidad_nna: 1,
-    notas: "Caso concluido; se confirmó la atención y el seguimiento con la familia. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 8, municipio: municipio, ubicacion: ubicaciones[0],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "En desarrollo", fecha_caso: "2026-07-06T21:39:51-06:00", urgencia: "Alta", cantidad_nna: "5 o más",
-    notas: "Caso en seguimiento por el equipo; se realizan visitas y entrevistas con la familia. Reportes asociados: 2.",
-  },
-  {
-    id_caso: 9, municipio: municipio, ubicacion: ubicaciones[23],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Cerrado", fecha_caso: "2026-07-16T15:57:33-06:00", urgencia: "Alta", cantidad_nna: 4,
-    notas: "Caso concluido; se confirmó la atención y el seguimiento con la familia. Reportes asociados: 2.",
-  },
-  {
-    id_caso: 10, municipio: municipio, ubicacion: ubicaciones[24],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Abierto", fecha_caso: "2026-08-15T02:02:58-06:00", urgencia: "Media", cantidad_nna: 1,
-    notas: "Caso canalizado a la instancia correspondiente; pendiente de primera visita. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 11, municipio: municipio, ubicacion: ubicaciones[26],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "En desarrollo", fecha_caso: "2026-07-08T03:33:57-06:00", urgencia: "Alta", cantidad_nna: "5 o más",
-    notas: "Caso en seguimiento por el equipo; se realizan visitas y entrevistas con la familia. Reportes asociados: 4.",
-  },
-  {
-    id_caso: 12, municipio: municipio, ubicacion: ubicaciones[12],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Cerrado", fecha_caso: "2026-07-18T21:51:39-06:00", urgencia: "Alta", cantidad_nna: 2,
-    notas: "Caso concluido; se confirmó la atención y el seguimiento con la familia. Reportes asociados: 2.",
-  },
-  {
-    id_caso: 13, municipio: municipio, ubicacion: ubicaciones[13],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Abierto", fecha_caso: "2026-08-17T08:56:04-06:00", urgencia: "Alta", cantidad_nna: "5 o más",
-    notas: "Caso canalizado a la instancia correspondiente; pendiente de primera visita. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 14, municipio: municipio, ubicacion: ubicaciones[14],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "En desarrollo", fecha_caso: "2026-07-28T15:09:21-06:00", urgencia: "Alta", cantidad_nna: 4,
-    notas: "Caso en seguimiento por el equipo; se realizan visitas y entrevistas con la familia. Reportes asociados: 3.",
-  },
-  {
-    id_caso: 15, municipio: municipio, ubicacion: ubicaciones[19],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Abierto", fecha_caso: "2026-07-15T06:06:54-06:00", urgencia: "Media", cantidad_nna: 2,
-    notas: "Caso canalizado a la instancia correspondiente; pendiente de primera visita. Reportes asociados: 2.",
-  },
-  {
-    id_caso: 16, municipio: municipio, ubicacion: ubicaciones[20],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Abierto", fecha_caso: "2026-09-03T10:58:02-06:00", urgencia: "Media", cantidad_nna: "5 o más",
-    notas: "Caso canalizado a la instancia correspondiente; pendiente de primera visita. Reportes asociados: 1.",
-  },
-  {
-    id_caso: 17, municipio: municipio, ubicacion: ubicaciones[21],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "Abierto", fecha_caso: "2026-08-14T17:11:19-06:00", urgencia: "Media", cantidad_nna: 2,
-    notas: "Caso canalizado a la instancia correspondiente; pendiente de primera visita. Reportes asociados: 2.",
-  },
-  {
-    id_caso: 18, municipio: municipio, ubicacion: ubicaciones[3],
-    edad_aproximada: "No sé", tipo_trabajo: "No sé",
-    estado: "En desarrollo", fecha_caso: "2026-07-02T21:03:27-06:00", urgencia: "Media", cantidad_nna: 3,
-    notas: "Caso en seguimiento por el equipo; se realizan visitas y entrevistas con la familia. Reportes asociados: 2.",
-  },
-];
-
-
+export const deleteCases = (ids: number[]) => api<BatchDeleteResult>(`/casos`, {
+  method: "DELETE",
+  body: JSON.stringify({ ids })
+})

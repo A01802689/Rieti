@@ -1,8 +1,8 @@
-import { PlusIcon } from './CaseIcons';
-import type { Caso } from '@/lib/types/Case';
-import { timelineOf } from '@/lib/utilities/caseTimeline';
-import { formatDateTime } from '@/lib/utilities/reportStyles';
-import { Card } from './CaseInfo';
+import { PlusIcon } from './CaseIcons'
+import type { Caso } from '@/lib/types/Case'
+import { timelineOf } from '@/lib/utilities/caseTimeline'
+import { formatDateTime } from '@/lib/utilities/reportStyles'
+import { Card } from './CaseInfo'
 
 /**
  * Card with the follow-up entries of a case, in order
@@ -10,7 +10,7 @@ import { Card } from './CaseInfo';
  * @param caso - Case shown
  */
 export function CaseTimeline({ caso }: { caso: Caso }) {
-    const entries = timelineOf(caso);
+    const entries = timelineOf(caso)
 
     return (
         <Card title="Folios de seguimiento" icon={<PlusIcon />} tone="bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
@@ -36,5 +36,5 @@ export function CaseTimeline({ caso }: { caso: Caso }) {
                 ))}
             </ol>
         </Card>
-    );
+    )
 }

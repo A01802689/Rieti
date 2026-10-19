@@ -7,7 +7,7 @@ import { UserCard } from "./components/UserCard"
 import { UserDetailPopup } from "./components/UserDetailPopup"
 import { UserCreatePopup } from "./components/UserCreatePopup"
 import { useUsers } from "./useUsers"
-import { Footer } from '@/components/layout/Footer';
+import { Footer } from '@/components/layout/Footer'
 
 /** Users page for admins: cards with search and role filter, and the popups to see a user or create a new one */
 const UsersPage = () => {
@@ -52,6 +52,10 @@ const UsersPage = () => {
 
             {vm.loading ? (
               <Loading />
+            ) : vm.loadFailed ? (
+              <p role="alert" className="rounded-xl bg-card p-6 text-center text-red-700 sm:p-8 dark:text-red-300">
+                No se pudieron cargar los usuarios. Intenta de nuevo más tarde.
+              </p>
             ) : vm.users.length === 0 ? (
               <p className="rounded-xl bg-card p-6 text-center font-diffuse sm:p-8">
                 No hay usuarios que coincidan con la búsqueda.
@@ -78,6 +82,8 @@ const UsersPage = () => {
         onSave={vm.savePermissions}
         confirmingDelete={vm.confirmingDelete}
         onDelete={vm.requestDelete}
+        busy={vm.detailBusy}
+        error={vm.detailError}
       />
       <UserCreatePopup
         open={vm.createOpen}
@@ -86,7 +92,10 @@ const UsersPage = () => {
         onChange={vm.updateCreateForm}
         onTogglePermission={vm.toggleInitialPermission}
         municipios={vm.municipios}
+        canSubmit={vm.canSubmitCreate}
         onSubmit={vm.submitCreate}
+        submitting={vm.creating}
+        error={vm.createError}
       />
     </div>
   )

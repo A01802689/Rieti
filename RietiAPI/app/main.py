@@ -4,6 +4,7 @@ from app.api.routes import municipio as municipio_routes
 from app.api.routes import reporte as reporte_routes
 from app.api.routes import seguimiento as seguimiento_routes
 from app.api.routes import caso as caso_routes
+from app.api.routes import logs as logs_routes
 from app.api.routes import recovery as recovery_routes
 
 
@@ -16,6 +17,7 @@ from app.models import (
     reporte,
     folio_contador,
     seguimiento,
+    logs,
     password_reset,
 
 )
@@ -44,6 +46,7 @@ app.include_router(reporte_routes.router)
 app.include_router(seguimiento_routes.router)
 app.include_router(caso_routes.router)
 app.include_router(caso_routes.casos_router)
+app.include_router(logs_routes.router)
 app.include_router(recovery_routes.router)
 
 @app.get("/")
