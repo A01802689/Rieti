@@ -138,7 +138,6 @@ fun LoginForm(
             ) {
                 if (uiState is AuthUiState.Loading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.height(24.dp),
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {

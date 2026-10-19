@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,51 +56,57 @@ fun ContentMainView(
 ) {
     val reportes = estado.reportes
 
-    when {
-        reportes == null && estado.cargando -> Box(modifier.fillMaxSize(), Alignment.Center) {
-            CircularProgressIndicator()
-        }
-
-        reportes == null -> Column(
-            modifier = modifier.fillMaxSize().padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                estado.error ?: "No se pudieron cargar tus reportes.",
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center
-            )
-            TextButton(onClick = onReintentar) { Text("Reintentar") }
-        }
-
-        reportes.isEmpty() -> Box(modifier.fillMaxSize().padding(24.dp), Alignment.Center) {
-            Text(
-                "Aún no ha realizado ningún reporte con seguimiento.\nLos reportes que haga aparecerán aquí",
-                textAlign = TextAlign.Center
-            )
-        }
-
-        else -> LazyColumn(
-            modifier = modifier,
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Si falló una actualización pero ya había lista, se mantiene y se avisa arriba.
-            if (estado.error != null) {
-                item { Text(estado.error, color = MaterialTheme.colorScheme.error) }
+    PullToRefreshBox(
+        isRefreshing = estado.cargando && reportes != null,
+        onRefresh = onReintentar,
+        modifier = modifier
+    ) {
+        when {
+            reportes == null && estado.cargando -> Box(modifier.fillMaxSize(), Alignment.Center) {
+                CircularProgressIndicator()
             }
-            items(reportes, key = { it.idReporte }) { r ->
-                ReportSummaryCard(
-                    folio = r.folio,
-                    city = r.ciudad,
-                    location = r.ubicacion,
-                    tags = r.etiquetas,
-                    status = r.estatus,
-                    hasRisk = false, // el backend sigue sin devolver el riesgo
-                    dateText = r.fecha
+
+            reportes == null -> Column(
+                modifier = Modifier.fillMaxSize().padding(24.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    estado.error ?: "No se pudieron cargar tus reportes.",
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
                 )
+                TextButton(onClick = onReintentar) { Text("Reintentar") }
+            }
+
+            reportes.isEmpty() -> Box(modifier.fillMaxSize().padding(24.dp), Alignment.Center) {
+                Text(
+                    "Aún no ha realizado ningún reporte con seguimiento.\nLos reportes que haga aparecerán aquí",
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            else -> LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Si falló una actualización pero ya había lista, se mantiene y se avisa arriba.
+                if (estado.error != null) {
+                    item { Text(estado.error, color = MaterialTheme.colorScheme.error) }
+                }
+                items(reportes, key = { it.idReporte }) { r ->
+                    ReportSummaryCard(
+                        folio = r.folio,
+                        city = r.ciudad,
+                        location = r.ubicacion,
+                        tags = r.etiquetas,
+                        status = r.estatus,
+                        hasRisk = false, // el backend sigue sin devolver el riesgo
+                        dateText = r.fecha
+                    )
+                }
             }
         }
     }
