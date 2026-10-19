@@ -8,8 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -24,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -47,6 +53,7 @@ fun LoginForm(
     var password by remember { mutableStateOf("") }
     var localError by remember { mutableStateOf<String?>(null) }
 
+    val visible = remember { mutableStateOf(false) }
     val uiState by authViewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
@@ -92,7 +99,15 @@ fun LoginForm(
                     if (uiState is AuthUiState.Error) authViewModel.resetState()
                 },
                 isError = localError != null || uiState is AuthUiState.Error,
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (visible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { visible.value = !visible.value }) {
+                        Icon(
+                            imageVector = if (visible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                            contentDescription = if (visible.value) "Ocultar contraseña" else "Mostrar contraseña"
+                        )
+                    }
+                },
                 modifier = Modifier.fillMaxWidth().testTag("passwordInput")
             )
 
@@ -154,6 +169,7 @@ fun RegisterForm(
     var password by remember { mutableStateOf("") }
     var localError by remember { mutableStateOf<String?>(null) }
 
+    val visible = remember { mutableStateOf(false) }
     val uiState by authViewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
@@ -225,7 +241,15 @@ fun RegisterForm(
                     if (localError != null) localError = null
                     if (uiState is AuthUiState.Error) authViewModel.resetState()
                 },
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if(visible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { visible.value = !visible.value }) {
+                        Icon(
+                            imageVector = if (visible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                            contentDescription = if (visible.value) "Ocultar contraseña" else "Mostrar contraseña"
+                        )
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
