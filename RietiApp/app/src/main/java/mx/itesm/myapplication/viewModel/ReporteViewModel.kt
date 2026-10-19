@@ -21,6 +21,8 @@ import mx.itesm.myapplication.data.network.models.ReporteCreateRequest
 import mx.itesm.myapplication.data.network.models.Riesgo
 import mx.itesm.myapplication.data.network.models.UbicacionCreateRequest
 import mx.itesm.myapplication.data.network.subirImagen
+import org.json.JSONArray
+import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.Normalizer
@@ -96,17 +98,15 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
     val longitud = longitud ?: return null
     val riesgo = riesgo ?: return null
 
-
-    val direccion = listOf(calle, colonia, municipio)
-        .filter { it.isNotBlank() }
-        .joinToString(", ")
-        .ifBlank { null }
+    val mun = municipio.trim().ifBlank { null }
+    val col = colonia.trim().ifBlank { null }
+    val cal = calle.trim().ifBlank { null }
 
     return ReporteCreateRequest(
         ubicacion = UbicacionCreateRequest(
-            municipio = municipio.trim(),
-            colonia = colonia.trim(),
-            calle = calle.trim(),
+            municipio = mun,
+            colonia = col,
+            calle = cal,
             longitud = longitud,
             latitud = latitud,
             referencia = null
@@ -114,7 +114,7 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
         cantidadNna = cantidad.etiqueta,
         edadAproximada = edad.etiqueta,
         tipoTrabajo = actividad.etiqueta,
-        descripcion = descripcion.ifBlank { null },
+        descripcion = descripcion.trim().ifBlank { null },
         imagenContentType = if (foto != null) "image/jpeg" else null,
         conSeguimiento = !esAnonimo,
         riesgo = riesgo.etiqueta
@@ -210,31 +210,24 @@ class ReporteViewModel : ViewModel() {
                 val response = ApiClient.apiService.crearReporte(request)
                 val body = response.body()
                 if (response.isSuccessful && body != null) {
-                    val folio = if(state.esAnonimo) null else body.folioReporte
+                    val folio = if (state.esAnonimo) null else body.folioReporte
                     val foto = state.foto
                     val url = body.urlSubidaImagen
                     if (foto != null && url != null) {
                         _uiState.update { it.copy(envio = EnvioUiState.SubiendoImagen) }
                         val subida = subirImagen(url, foto.bytes)
-                        if(!subida) Log.w(TAG, "Error al subir la imagen")
+                        if (!subida) Log.w(TAG, "Error al subir la imagen")
                         _uiState.update { it.copy(envio = EnvioUiState.Success(folio, fotoPendiente = !subida)) }
                     } else {
                         _uiState.update { it.copy(envio = EnvioUiState.Success(folio, fotoPendiente = foto != null)) }
                     }
-                    _uiState.update { it.copy(envio = EnvioUiState.Success(body.folioReporte)) }
                 } else {
+                    val rawError = response.errorBody()?.string()
                     Log.e(
                         TAG,
-                        "Error en enviarReporte (HTTP ${response.code()}): ${
-                            response.errorBody()?.string()
-                        }"
+                        "Error en enviarReporte (HTTP ${response.code()}): $rawError"
                     )
-                    val mensaje = when (response.code()) {
-                        400, 422 -> "Revisa los datos del reporte e inténtalo de nuevo."
-                        401, 403 -> "Tu sesión ha expirado. Inicia sesión nuevamente."
-                        500 -> "Error interno del servidor (500). Intenta más tarde o verifica la base de datos."
-                        else -> "No se pudo enviar el reporte (${response.code()})."
-                    }
+                    val mensaje = parsearErrorBackend(rawError, response.code())
                     _uiState.update { it.copy(envio = EnvioUiState.Error(mensaje)) }
                 }
             } catch (e: CancellationException) {
@@ -249,6 +242,44 @@ class ReporteViewModel : ViewModel() {
                 Log.e(TAG, "Excepción en enviarReporte: ${e.localizedMessage}", e)
                 _uiState.update { it.copy(envio = EnvioUiState.Error("Ocurrió un error inesperado.")) }
             }
+        }
+    }
+
+    private fun parsearErrorBackend(rawError: String?, code: Int): String {
+        if (rawError.isNullOrBlank()) {
+            return when (code) {
+                400, 422 -> "Revisa los datos del reporte e inténtalo de nuevo."
+                401, 403 -> "Tu sesión ha expirado. Inicia sesión nuevamente."
+                500 -> "Error interno del servidor (500). Intenta más tarde o verifica la base de datos."
+                else -> "No se pudo enviar el reporte ($code)."
+            }
+        }
+        return try {
+            val json = JSONObject(rawError)
+            when {
+                json.has("detail") -> {
+                    val detail = json.get("detail")
+                    if (detail is JSONArray && detail.length() > 0) {
+                        val item = detail.get(0)
+                        if (item is JSONObject) {
+                            val msg = item.optString("msg", "")
+                            val locArray = item.optJSONArray("loc")
+                            val field = if (locArray != null && locArray.length() > 0) locArray.optString(locArray.length() - 1) else ""
+                            if (field.isNotBlank() && msg.isNotBlank()) "Error en '$field': $msg"
+                            else msg.ifBlank { rawError }
+                        } else {
+                            item.toString()
+                        }
+                    } else {
+                        detail.toString()
+                    }
+                }
+                json.has("message") -> json.getString("message")
+                json.has("error") -> json.getString("error")
+                else -> rawError
+            }
+        } catch (e: Exception) {
+            rawError
         }
     }
 
