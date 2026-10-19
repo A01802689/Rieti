@@ -2,15 +2,15 @@ import { useState, useMemo, useCallback, useEffect, useRef, type Dispatch, type 
 import { bbox, featureCollection } from "@turf/turf"
 import Map, { Source, Layer, type MapLayerMouseEvent, type MapRef } from "react-map-gl/maplibre"
 import type { Feature, FeatureCollection, Point } from "geojson"
+import type { CircleLayerSpecification, ExpressionSpecification } from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
 import "@/lib/map/worker"
 import { reports2GeoJSON, type Reporte, type ReportVisual, type FeatureReportProps } from "@/lib/types/Report"
 import { cases2GeoJSON, type Caso, type CaseVisual, type FeatureCaseProps } from "@/lib/types/Case"
-import { locations2Zones, type ZoneCollection } from "@/lib/types/Zone"
 import { isForbidden } from "@/lib/api/client"
 import { getReports } from "@/lib/api/reports"
 import type { Selected } from "@/lib/types/Selected"
-import { reportColor, caseColor, ZONE_FILL_COLOR, SELECTED_STROKE } from "@/lib/map/colors"
+import { reportColor, caseColor, HEAT_COLOR, HEAT_RADIUS, HEAT_INTENSITY, HEAT_OPACITY, POINT_OPACITY, SELECTED_STROKE } from "@/lib/map/colors"
 import { MAP_STYLE } from "@/lib/map/style"
 import { ColorLegend } from "@/components/ui/ColorLegend"
 import { Forbidden } from "@/components/ui/Forbidden"
@@ -18,24 +18,41 @@ import { Forbidden } from "@/components/ui/Forbidden"
 
 
 /**
- * Hexagon zones colored by the number of points inside
+ * Paint of the circles of the points: solid from the city level on, invisible (but still clickable) far away, where only the selected one keeps its ring
  *
- * @param data - Zones with their `count`
+ * @param color - Expression that colors each point
+ * @param selectedId - Id of the selected point, null when none
+ * @returns The paint of the circle layer
  */
-const ZonesLayer = ({ data }: { data: ZoneCollection }) => (
-  <Source id="zonas" type="geojson" data={data}>
+const pointPaint = (color: ExpressionSpecification, selectedId: string | null): NonNullable<CircleLayerSpecification['paint']> => {
+  const selected: ExpressionSpecification = ['==', ['get', 'id'], selectedId ?? '']
+  return {
+    'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, ['case', selected, 12, 10], 14, ['case', selected, 9, 6]],
+    'circle-color': color,
+    'circle-opacity': POINT_OPACITY,
+    'circle-stroke-width': 2,
+    'circle-stroke-color': ['case', selected, SELECTED_STROKE, '#ffffff'],
+    'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], 10.5, ['case', selected, 1, 0], 12.5, 1],
+  }
+}
+
+/**
+ * Density layer: the more points are close, the hotter the color (blue, green, yellow, orange, red)
+ *
+ * @param data - Every point shown, reports and cases together
+ */
+const DensityLayer = ({ data }: { data: FeatureCollection<Point> }) => (
+  <Source id="calor" type="geojson" data={data}>
     <Layer
-      id="zonas-fill"
-      type="fill"
+      id="calor"
+      type="heatmap"
       paint={{
-        'fill-color': ZONE_FILL_COLOR,
-        'fill-opacity': ['step', ['get', 'count'],0, 1, 0.35],
+        'heatmap-weight': 1,
+        'heatmap-intensity': HEAT_INTENSITY,
+        'heatmap-color': HEAT_COLOR,
+        'heatmap-radius': HEAT_RADIUS,
+        'heatmap-opacity': HEAT_OPACITY,
       }}
-    />
-    <Layer
-      id="zonas-line"
-      type="line"
-      paint={{ 'line-color': '#7f1d1d', 'line-width': 0.1}}
     />
   </Source>
 )
@@ -48,42 +65,24 @@ interface PointsLayerProps<P> {
 }
 
 /**
- * Circle layer of the reports
+ * Circles of the reports
  *
- * @param visual - Property used to color the circles
+ * @param visual - Property used to color the points
  */
 const ReportsLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureReportProps> & { visual: ReportVisual }) => (
   <Source id="reportes" type="geojson" data={data}>
-    <Layer
-      id="reportes"
-      type="circle"
-      paint={{
-        'circle-radius': ['case', ['==', ['get', 'id'], selectedId ?? ''], 10, 7],
-        'circle-color': reportColor(visual),
-        'circle-stroke-width': 2,
-        'circle-stroke-color': ['case', ['==', ['get', 'id'], selectedId ?? ''], SELECTED_STROKE, '#ffffff'],
-      }}
-    />
+    <Layer id="reportes" type="circle" paint={pointPaint(reportColor(visual), selectedId)} />
   </Source>
 )
 
 /**
- * Circle layer of the cases
+ * Circles of the cases
  *
- * @param visual - Property used to color the circles
+ * @param visual - Property used to color the points
  */
 const CasesLayer = ({ data, selectedId, visual }: PointsLayerProps<FeatureCaseProps> & { visual: CaseVisual }) => (
   <Source id="casos" type="geojson" data={data}>
-    <Layer
-      id="casos"
-      type="circle"
-      paint={{
-        'circle-radius': ['case', ['==', ['get', 'id'], selectedId ?? ''], 10, 7],
-        'circle-color': caseColor(visual),
-        'circle-stroke-width': 2,
-        'circle-stroke-color': ['case', ['==', ['get', 'id'], selectedId ?? ''], SELECTED_STROKE, '#ffffff'],
-      }}
-    />
+    <Layer id="casos" type="circle" paint={pointPaint(caseColor(visual), selectedId)} />
   </Source>
 )
 
@@ -103,10 +102,6 @@ interface HeatMapProps {
   reportVisual?: ReportVisual
   /** Property that colors the cases */
   caseVisual?: CaseVisual
-  /** Draw the density zones */
-  showZones?: boolean
-  /** Side of each zone hexagon, in km */
-  zoneCellKm?: number
   /** Draw the color legend */
   showLegend?: boolean
   /** Classes that position the legend */
@@ -118,10 +113,9 @@ interface HeatMapProps {
 }
 
 /**
- * Heat map of reports and cases with density zones
+ * Heat map of reports and cases: a density layer (blue to red) over the whole city, with the points on top of it from the city level on
  *
  * Without reportsArr and casesArr it loads and shows all the reports (default preview), or tells the user has no permission to see them
- * Zones count the reports, or the cases when there are no reports
  */
 const HeatMap = ({
   reportsArr,
@@ -130,8 +124,6 @@ const HeatMap = ({
   showCases = true,
   reportVisual = 'risk',
   caseVisual = 'urgency',
-  showZones = true,
-  zoneCellKm = 0.5,
   showLegend = true,
   legendClassName = 'bottom-4 left-4',
   selected = null,
@@ -165,14 +157,14 @@ const HeatMap = ({
 
   const mapReports = useMemo(() => (reports ? reports2GeoJSON(reports) : undefined), [reports])
   const mapCases = useMemo(() => (casesArr ? cases2GeoJSON(casesArr) : undefined), [casesArr])
-  // zones count every point, even the hidden layers
-  const mapZones = useMemo(() => {
-    const items = reports ?? casesArr
-    return showZones && items ? locations2Zones(items, zoneCellKm) : undefined
-  }, [reports, casesArr, showZones, zoneCellKm])
 
   const shownReports = showReports ? mapReports : undefined
   const shownCases = showCases ? mapCases : undefined
+
+  const density = useMemo(() => {
+    const features: Feature<Point>[] = [...(shownReports?.features ?? []), ...(shownCases?.features ?? [])]
+    return features.length > 0 ? featureCollection(features) : undefined
+  }, [shownReports, shownCases])
 
   // only the shown layers can be clicked
   const interactiveLayerIds = useMemo(
@@ -235,7 +227,7 @@ const HeatMap = ({
         onMouseLeave={() => setCursor('grab')}
         cursor={cursor}
       >
-        {mapZones && <ZonesLayer data={mapZones} />}
+        {density && <DensityLayer data={density} />}
         {shownReports && <ReportsLayer data={shownReports} selectedId={selected?.type === 'report' ? selected.id : null} visual={reportVisual} />}
         {shownCases && <CasesLayer data={shownCases} selectedId={selected?.type === 'case' ? selected.id : null} visual={caseVisual} />}
       </Map>
@@ -245,7 +237,6 @@ const HeatMap = ({
           <ColorLegend
             showReports={!!shownReports}
             showCases={!!shownCases}
-            showZones={!!mapZones}
             reportVisual={reportVisual}
             caseVisual={caseVisual}
           />

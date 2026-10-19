@@ -2,14 +2,14 @@ import type { ExpressionSpecification } from "maplibre-gl"
 import type { ReportVisual } from "@/lib/types/Report"
 import type { CaseVisual } from "@/lib/types/Case"
 
-/** Circle palette of the reports, low to high; blue and violet so they are not confused with the cases or with the yellow and red zones */
-const REPORT_RAMP = ['#2dd4bf', '#38bdf8', '#6366f1', '#7c3aed', '#4c1d95']
-/** Circle palette of the cases, low to high; pink for the same reason */
-const CASE_RAMP = ['#f9a8d4', '#f472b6', '#ec4899', '#be185d', '#831843']
-/** Color of a circle whose value is missing or unknown */
+/** Yellow to dark red scale, low to high, used only for the risk of the reports */
+const SEVERITY_RAMP = ['#f6c945', '#e8702a', '#8c1515']
+/** Blue to purple scale, low to high, used for every property but the risk, so a yellow to red color always means risk */
+const SCALE_RAMP = ['#4f8bc9', '#5b79c4', '#6a67b8', '#7a55aa', '#5a3a8c']
+/** Color of a point whose value is missing or unknown */
 const NO_DATA = '#9ca3af'
 
-/** Border color of the selected circle */
+/** Color of the ring around the selected point */
 export const SELECTED_STROKE = '#111827'
 
 /**
@@ -19,10 +19,10 @@ export const SELECTED_STROKE = '#111827'
  * @returns The expression for the circle layer
  */
 export const reportColor = (visual: ReportVisual): ExpressionSpecification => {
-  const c = REPORT_RAMP
+  const c = SCALE_RAMP
   switch (visual) {
     case 'risk':
-      return ['match', ['get', 'risk'], 'Bajo', c[0], 'Medio', c[2], 'Alto', c[4], NO_DATA]
+      return ['match', ['get', 'risk'], 'Bajo', SEVERITY_RAMP[0], 'Medio', SEVERITY_RAMP[1], 'Alto', SEVERITY_RAMP[2], NO_DATA]
     case 'nna':
       return ['match', ['to-string', ['get', 'nna']],
         '1', c[0], '2', c[1], '3', c[2], '4', c[3], '5 o más', c[4], NO_DATA]
@@ -41,7 +41,7 @@ export const reportColor = (visual: ReportVisual): ExpressionSpecification => {
  * @returns The expression for the circle layer
  */
 export const caseColor = (visual: CaseVisual): ExpressionSpecification => {
-  const c = CASE_RAMP
+  const c = SCALE_RAMP
   switch (visual) {
     case 'urgency':
       return ['match', ['get', 'urgency'], 'Baja', c[0], 'Media', c[2], 'Alta', c[4], NO_DATA]
@@ -70,10 +70,10 @@ export type Legend = {
  * @returns Title, colors and end labels of the legend
  */
 export const reportLegend = (visual: ReportVisual): Legend => {
-  const c = REPORT_RAMP
+  const c = SCALE_RAMP
   switch (visual) {
     case 'risk':
-      return { title: 'Nivel de riesgo', colors: [c[0], c[2], c[4]], from: 'Bajo', to: 'Alto' }
+      return { title: 'Nivel de riesgo', colors: SEVERITY_RAMP, from: 'Bajo', to: 'Alto' }
     case 'nna':
       return { title: 'Niños, niñas y adolescentes', colors: c, from: '1', to: '5 o más' }
     case 'approx_age':
@@ -90,7 +90,7 @@ export const reportLegend = (visual: ReportVisual): Legend => {
  * @returns Title, colors and end labels of the legend
  */
 export const caseLegend = (visual: CaseVisual): Legend => {
-  const c = CASE_RAMP
+  const c = SCALE_RAMP
   switch (visual) {
     case 'urgency':
       return { title: 'Urgencia', colors: [c[0], c[2], c[4]], from: 'Baja', to: 'Alta' }
@@ -101,18 +101,41 @@ export const caseLegend = (visual: CaseVisual): Legend => {
   }
 }
 
-/** Colors the zones by their number of points (0 is not colored) */
-export const ZONE_FILL_COLOR: ExpressionSpecification =
-  ['step', ['get', 'count'], '#ffffff', 1, '#fbbf24', 10, '#ff4626', 20, '#b00323']
+/** Colors of the density layer, from no points (transparent) to many: blue, green, yellow, orange and red */
+export const HEAT_COLOR: ExpressionSpecification = [
+  'interpolate', ['linear'], ['heatmap-density'],
+  0, 'rgba(79, 139, 201, 0)',
+  0.15, 'rgba(79, 139, 201, 0.75)',
+  0.4, '#5fbf62',
+  0.6, '#efe14d',
+  0.8, '#ee8a2f',
+  1, '#b3261e',
+]
+
+/** Radius in pixels of the influence of each point on the density layer */
+export const HEAT_RADIUS: ExpressionSpecification =
+  ['interpolate', ['linear'], ['zoom'], 6, 18, 10, 34, 13, 56, 15, 72]
+
+/** How strong each point weighs in the density layer: low, so a dense area does not turn red everywhere, and a bit higher when zoomed in */
+export const HEAT_INTENSITY: ExpressionSpecification =
+  ['interpolate', ['linear'], ['zoom'], 6, 0.3, 13, 0.55]
+
+/** Opacity of the density layer: solid at city level and gone when zoomed in, where the points are read one by one */
+export const HEAT_OPACITY: ExpressionSpecification =
+  ['interpolate', ['linear'], ['zoom'], 6, 0.85, 13, 0.85, 15.5, 0]
+
+/** Opacity of the points: hidden far away and solid from the city level on, over the density layer */
+export const POINT_OPACITY: ExpressionSpecification =
+  ['interpolate', ['linear'], ['zoom'], 10.5, 0, 12.5, 1]
 
 /**
- * Describes the scale of ZONE_FILL_COLOR
+ * Describes the scale of the density layer
  *
- * @returns Title, gradient colors and end labels of the zones
+ * @returns Title, gradient colors and end labels of the legend
  */
-export const zoneLegend = (): Legend => ({
+export const heatLegend = (): Legend => ({
   title: 'Concentración',
-  colors: ['#fbbf24', '#ff4626', '#b00323'],
-  from: '1',
-  to: '20 o más',
+  colors: ['#4f8bc9', '#5fbf62', '#efe14d', '#ee8a2f', '#b3261e'],
+  from: 'Baja',
+  to: 'Alta',
 })

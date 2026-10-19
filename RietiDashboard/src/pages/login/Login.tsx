@@ -1,8 +1,12 @@
 import { InfoCard } from "./components/InfoCard"
 import { LoginCard } from "./components/LoginCard"
+import { useLoginIndicators } from "./useLoginIndicators"
 
-/** Login page: presentation panel next to the sign-in card */
-const Login = () => (
+/** Login page: presentation panel with the totals of the system next to the sign-in card */
+const Login = () => {
+  const indicators = useLoginIndicators()
+
+  return (
     <div className="flex flex-col md:flex-row h-screen w-screen ">
       <div className="flex-2 flex flex-col bg-blue-600 dark:bg-[#1d4ed8] justify-between p-2">
         
@@ -19,9 +23,9 @@ const Login = () => (
         </div>
 
         <div className="flex flex-row justify-evenly">
-          <InfoCard digit={180} desc="Reportes registrados" />
-          <InfoCard digit={37} desc="Casos activos" />
-          <InfoCard digit={127} desc="Niños atendidos" />
+          <InfoCard digit={indicators?.reportes_registrados ?? null} desc="Reportes registrados" />
+          <InfoCard digit={indicators?.casos_activos ?? null} desc="Casos activos" />
+          <InfoCard digit={indicators?.ninos_atendidos ?? null} desc="Niños atendidos" />
         </div>
       </div>
 
@@ -30,5 +34,6 @@ const Login = () => (
     </div>
     </div>
   )
+}
 
 export default Login

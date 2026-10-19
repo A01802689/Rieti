@@ -5,14 +5,14 @@ import '@/lib/map/worker'
 import SearchInput from '@/components/ui/SearchInput'
 import type { GeocodedPlace } from '@/lib/api/geocoding'
 import { MAP_STYLE, MARKER_COLOR } from '@/lib/map/style'
-import { ZONE_BBOX } from '@/lib/types/Zone'
+import { AREA_BBOX } from '@/lib/map/style'
 import type { GeoPoint } from '@/lib/utilities/location'
 import { usePlaceSearch } from '@/lib/utilities/usePlaceSearch'
 import { cn } from '@/lib/utilities/utils'
 
-const [west, south, east, north] = ZONE_BBOX
-/** Area shown when there is no point yet: the zone of Atizapán */
-const ZONE_BOUNDS: [number, number, number, number] = [west, south, east, north]
+const [west, south, east, north] = AREA_BBOX
+/** Area shown when there is no point yet: the area of Atizapán */
+const AREA_BOUNDS: [number, number, number, number] = [west, south, east, north]
 
 /** Zoom used when the map goes to a point */
 const POINT_ZOOM = 16
@@ -42,7 +42,7 @@ interface LocationPickerProps {
 /**
  * Map to pick a point: a click places a draggable marker and a search box looks places up by the text typed
  *
- * The map starts on the point it receives, or on the zone of Atizapán when there is none, and no coordinates leave the dashboard
+ * The map starts on the point it receives, or on the area of Atizapán when there is none, and no coordinates leave the dashboard
  */
 export function LocationPicker({ point, onPointChange, onPlaceChosen, className = 'h-72 sm:h-80' }: LocationPickerProps) {
     const mapRef = useRef<MapRef>(null)
@@ -51,7 +51,7 @@ export function LocationPicker({ point, onPointChange, onPlaceChosen, className 
     const [initialView] = useState(() =>
         point
             ? { latitude: point.lat, longitude: point.lng, zoom: POINT_ZOOM }
-            : { bounds: ZONE_BOUNDS, fitBoundsOptions: { padding: 24 } },
+            : { bounds: AREA_BOUNDS, fitBoundsOptions: { padding: 24 } },
     )
 
     /**

@@ -1,4 +1,4 @@
-import { reportLegend, caseLegend, zoneLegend, type Legend } from "@/lib/map/colors"
+import { reportLegend, caseLegend, heatLegend, type Legend } from "@/lib/map/colors"
 import type { ReportVisual } from "@/lib/types/Report"
 import type { CaseVisual } from "@/lib/types/Case"
 
@@ -7,8 +7,6 @@ interface ColorLegendProps {
   showReports: boolean
   /** Show the case color scale */
   showCases: boolean
-  /** Show the zone color scale */
-  showZones: boolean
   /** Property the reports are colored by */
   reportVisual: ReportVisual
   /** Property the cases are colored by */
@@ -18,7 +16,7 @@ interface ColorLegendProps {
 /**
  * One color scale: title, gradient and both ends
  *
- * @param name - Layer name (reports, cases or zones)
+ * @param name - Layer name (density, reports or cases)
  * @param legend - Title, gradient colors and end labels
  */
 const LegendBlock = ({ name, legend }: { name: string; legend: Legend }) => (
@@ -36,14 +34,14 @@ const LegendBlock = ({ name, legend }: { name: string; legend: Legend }) => (
 )
 
 /** Legend that explains the colors of the map layers that are on */
-export const ColorLegend = ({ showReports, showCases, showZones, reportVisual, caseVisual }: ColorLegendProps) => {
-  if (!showReports && !showCases && !showZones) return null
+export const ColorLegend = ({ showReports, showCases, reportVisual, caseVisual }: ColorLegendProps) => {
+  if (!showReports && !showCases) return null
 
   return (
     <div className="pointer-events-none flex w-64 md:w-52 flex-col gap-3 rounded-xl bg-card p-3 shadow-lg">
+      <LegendBlock name="Mapa de calor" legend={heatLegend()} />
       {showReports && <LegendBlock name="Reportes" legend={reportLegend(reportVisual)} />}
       {showCases && <LegendBlock name="Casos" legend={caseLegend(caseVisual)} />}
-      {showZones && <LegendBlock name="Zonas" legend={zoneLegend()} />}
     </div>
   )
 }
