@@ -6,9 +6,10 @@ interface Props {
     log: Log;
 }
 
-const isEmpty = (data: Record<string, unknown>) => Object.keys(data).length === 0;
+// after_data is null when the log has no "after" state (e.g. a deletion)
+const isEmpty = (data: Record<string, unknown> | null) => !data || Object.keys(data).length === 0;
 
-function DataBlock({ title, data }: { title: string; data: Record<string, unknown> }) {
+function DataBlock({ title, data }: { title: string; data: Record<string, unknown> | null }) {
     return (
         <div className="min-w-0 flex-1 rounded-lg bg-component p-3">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wider font-diffuse">{title}</p>
