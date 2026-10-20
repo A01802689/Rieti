@@ -3,6 +3,11 @@ from app.db.base import Base #Base que creamos en app/db/base.py
 
 
 class Municipio(Base):
+    """Tabla municipio: catálogo de municipios del Estado de México
+
+    Attributes:
+        clave: clave interna de RIETI usada en los folios, no es la clave oficial de INEGI
+    """
     __tablename__ = "municipio"    #si debe llamarse  de forma tal cual 
     id_municipio = Column(Integer, primary_key=True)
     nombre = Column(String(100), nullable= False)

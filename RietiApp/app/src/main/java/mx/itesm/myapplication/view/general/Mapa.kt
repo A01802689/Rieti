@@ -24,16 +24,20 @@ import org.maplibre.spatialk.geojson.Position
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Mapa interactivo de Mapbox con esquinas redondeadas y altura fija de 250 dp.
+ * Mapa interactivo de MapLibre con esquinas redondeadas y altura fija de 250 dp
  *
  * Cuando el composable se renderiza en el modo de inspección de Android Studio
  * ([LocalInspectionMode], por ejemplo en `@Preview`), no se carga el mapa real: se muestra
  * en su lugar un recuadro con el texto "Mapa Interactivo (Vista Previa)". Esto evita los
- * problemas de renderizado que tiene [MapboxMap] en las vistas previas.
+ * problemas de renderizado que tiene [MaplibreMap] en las vistas previas
  *
- * @param modifier Modificador opcional de diseño.
+ * Cada vez que cambian las coordenadas, la cámara se acerca al punto con una animación de 1 s
+ *
+ * @param latitud Latitud del punto elegido, o `null` si no hay
+ * @param longitud Longitud del punto elegido, o `null` si no hay
+ * @param onUbicacionSeleccionada Se llama con latitud y longitud del punto que el usuario toca en el mapa
+ * @param modifier Modificador opcional de diseño
  */
-
 @Composable
 fun MapaInteractivo(
     latitud: Double?,
@@ -44,14 +48,14 @@ fun MapaInteractivo(
     val mapModifier = modifier.fillMaxWidth().height(250.dp).clip(RoundedCornerShape(12.dp))
 
     if (LocalInspectionMode.current) {
-        // Marcador de posición para la vista previa de Android Studio.
+        // Marcador de posición para la vista previa de Android Studio
         Box(
             modifier = mapModifier.background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Text(text = "Mapa Interactivo (Vista Previa)") }
     } else {
-        /** Estado de la cámara del mapa, con la posición y el zoom iniciales. */
+        // posición inicial centrada en Atizapán de Zaragoza
         val camara = rememberCameraState(
             firstPosition = CameraPosition(
                 target = Position(latitude = 19.5598, longitude = -99.2152),

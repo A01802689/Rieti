@@ -15,10 +15,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 /**
- * Barra de pestañas interactiva para alternar entre la pantalla de Inicio de Sesión y la de Registro.
+ * Barra de pestañas interactiva para alternar entre la pantalla de Inicio de Sesión y la de Registro
  *
- * @param navController Controlador [NavHostController] para consultar la ruta actual y navegar.
- * @param modifier Modificador opcional de diseño.
+ * @param navController Controlador [NavHostController] para consultar la ruta actual y navegar
+ * @param modifier Modificador opcional de diseño
  */
 @Composable
 fun AuthTabsBar(navController: NavHostController, modifier: Modifier = Modifier) {

@@ -54,7 +54,7 @@ private val EsquemaOscuro = darkColorScheme(
     errorContainer = Color(0xFF93000A), onErrorContainer = Color(0xFFFFDAD6)
 )
 
-// Esquinas con jerarquía: campos y chips más cerradas, tarjetas y paneles más redondeadas.
+// Esquinas con jerarquía: campos y chips más cerradas, tarjetas y paneles más redondeadas
 private val Formas = Shapes(
     extraSmall = RoundedCornerShape(12.dp), // campos de texto
     small = RoundedCornerShape(10.dp),      // chips
@@ -62,6 +62,12 @@ private val Formas = Shapes(
     large = RoundedCornerShape(24.dp)       // paneles y opciones grandes
 )
 
+/**
+ * Tema de la aplicación: esquema de colores claro u oscuro, tipografía y formas
+ *
+ * @param darkTheme Si es `true` usa el esquema oscuro; por defecto sigue el tema del sistema
+ * @param content Contenido al que se aplica el tema
+ */
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

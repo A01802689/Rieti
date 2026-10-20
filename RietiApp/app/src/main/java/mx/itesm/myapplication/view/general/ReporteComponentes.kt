@@ -52,12 +52,14 @@ import mx.itesm.myapplication.data.network.obtenerUbicacionActual
 import mx.itesm.myapplication.viewModel.MunicipiosUiState
 
 /**
- * Estructura común de un paso del reporte: fila de regreso, título, subtítulo opcional y contenido.
+ * Estructura común de un paso del reporte: fila de regreso, título, subtítulo opcional y contenido
  *
- * @param titulo Título en negritas.
- * @param onVolver Acción del botón de regreso.
- * @param subtitulo Texto opcional debajo del título.
- * @param contenido Contenido del paso. Puede usar `Modifier.weight(1f)` (es un [ColumnScope]).
+ * @param titulo Título del paso
+ * @param onVolver Acción del botón de regreso
+ * @param subtitulo Texto opcional debajo del título
+ * @param paso Número del paso actual; si es `null` no se muestra el avance
+ * @param totalPasos Total de pasos del flujo; si es `null` no se muestra el avance
+ * @param contenido Contenido del paso. Puede usar `Modifier.weight(1f)` (es un [ColumnScope])
  */
 @Composable
 fun PasoReporte(
@@ -109,6 +111,14 @@ fun PasoReporte(
     }
 }
 
+/**
+ * Botón de acción principal de un paso, a todo el ancho y con un máximo de 480 dp
+ *
+ * @param texto Texto del botón
+ * @param onClick Acción al tocar el botón
+ * @param enabled Si el botón está habilitado
+ * @param cargando Si es `true` muestra un indicador de progreso en lugar del texto
+ */
 @Composable
 fun BotonPrincipal(
     texto: String,
@@ -134,7 +144,15 @@ fun BotonPrincipal(
     }
 }
 
-/** Diálogo que muestra el folio devuelto por el backend. No se puede cerrar tocando fuera. */
+/**
+ * Diálogo que confirma el envío del reporte y muestra el folio devuelto por el backend
+ *
+ * No se puede cerrar tocando fuera
+ *
+ * @param folio Folio del reporte, o `null` si el reporte es anónimo
+ * @param mensaje Texto del diálogo; por defecto el folio o, sin folio, un agradecimiento
+ * @param onAceptar Acción del botón Aceptar
+ */
 @Composable
 fun DialogoReporteEnviado(
     folio: String?,
@@ -155,12 +173,13 @@ fun DialogoReporteEnviado(
 
 /**
  * Selector desplegable de municipio. Muestra el estado de carga o un botón para reintentar
- * si no se pudo obtener la lista.
+ * si no se pudo obtener la lista
  *
- * @param seleccionado Nombre del municipio elegido; vacío si no hay selección.
- * @param estado Estado de la carga de municipios.
- * @param onSeleccion Se llama con el nombre exacto del municipio elegido.
- * @param onReintentar Vuelve a pedir la lista al backend.
+ * @param seleccionado Nombre del municipio elegido; vacío si no hay selección
+ * @param estado Estado de la carga de municipios
+ * @param onSeleccion Se llama con el nombre exacto del municipio elegido
+ * @param onReintentar Vuelve a pedir la lista al backend
+ * @param modifier Modificador opcional de diseño
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -219,7 +238,14 @@ fun SelectorMunicipio(
     }
 }
 
-/** Botón "Usar mi ubicación actual": pide permiso, lee el GPS y entrega coordenadas y dirección sugerida. */
+/**
+ * Botón "Usar mi ubicación actual": pide el permiso de ubicación, lee el GPS y entrega las coordenadas
+ *
+ * Si no hay permiso o no se pudo leer la ubicación, muestra un mensaje debajo del botón
+ *
+ * @param onUbicacion Se llama con latitud y longitud de la ubicación obtenida
+ * @param modifier Modificador opcional de diseño
+ */
 @Composable
 fun BotonUbicacionActual(
     onUbicacion: (Double, Double) -> Unit,

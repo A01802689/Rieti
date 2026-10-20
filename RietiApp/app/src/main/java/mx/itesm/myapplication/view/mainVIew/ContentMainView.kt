@@ -38,16 +38,15 @@ import mx.itesm.myapplication.viewModel.ReportesUiState
 
 
 /**
- * Vista principal con la lista de reportes, mostrados como tarjetas de resumen.
+ * Contenido de la pantalla principal: los reportes con seguimiento del usuario como tarjetas de resumen
  *
- * Por ahora los datos son de ejemplo: las tres tarjetas están escritas a mano y tienen
- * exactamente los mismos valores (incluido el folio). No provienen del backend ni de un
- * ViewModel.
+ * Según el estado muestra un indicador de carga, un mensaje de error con botón para reintentar, un aviso de
+ * lista vacía o la lista. Se puede actualizar jalando hacia abajo
  *
- * @param modifier [Modifier] aplicado a la columna raíz. Se le añade internamente
- * `verticalScroll(rememberScrollState())`, por lo que el contenido se desplaza si no cabe
+ * @param estado Estado de la lista de reportes
+ * @param onReintentar Vuelve a pedir la lista, desde el botón de reintentar o al jalar para actualizar
+ * @param modifier [Modifier] aplicado al contenedor raíz
  */
-
 @Composable
 fun ContentMainView(
     estado: ReportesUiState,
@@ -92,7 +91,7 @@ fun ContentMainView(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Si falló una actualización pero ya había lista, se mantiene y se avisa arriba.
+                // Si falló una actualización pero ya había lista, se mantiene y se avisa arriba
                 if (estado.error != null) {
                     item { Text(estado.error, color = MaterialTheme.colorScheme.error) }
                 }
@@ -111,6 +110,18 @@ fun ContentMainView(
         }
     }
 }
+/**
+ * Tarjeta con el resumen de un reporte
+ *
+ * @param folio Folio del reporte
+ * @param city Municipio del reporte
+ * @param location Calle y colonia del reporte
+ * @param tags Etiquetas con la actividad, la cantidad y la edad
+ * @param status Estatus de seguimiento, que se muestra en un [StatusChip]
+ * @param hasRisk Si es `true` muestra un [RiskChip]
+ * @param dateText Fecha del reporte ya formateada
+ * @param modifier [Modifier] aplicado a la tarjeta
+ */
 @Composable
 fun ReportSummaryCard(
     folio: String,
@@ -174,6 +185,14 @@ fun ReportSummaryCard(
     }
 }
 
+/**
+ * Etiqueta con el estatus de un reporte, con un color según el estatus
+ *
+ * Un estatus que no se reconoce usa los colores primarios del tema
+ *
+ * @param status Estatus de seguimiento, por ejemplo "Recibido" o "En revisión"
+ * @param modifier [Modifier] aplicado a la etiqueta
+ */
 @Composable
 fun StatusChip(status: String, modifier: Modifier = Modifier) {
     val (bgColor, contentColor) = when (status.lowercase().trim()) {
@@ -204,6 +223,12 @@ fun StatusChip(status: String, modifier: Modifier = Modifier) {
     }
 }
 
+/**
+ * Etiqueta redondeada con un texto
+ *
+ * @param text Texto de la etiqueta
+ * @param modifier [Modifier] aplicado a la etiqueta
+ */
 @Composable
 fun TagChip(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -218,6 +243,11 @@ fun TagChip(text: String, modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Etiqueta que avisa que se reportó una situación de riesgo
+ *
+ * @param modifier [Modifier] aplicado a la etiqueta
+ */
 @Composable
 fun RiskChip(modifier: Modifier = Modifier) {
     Row(

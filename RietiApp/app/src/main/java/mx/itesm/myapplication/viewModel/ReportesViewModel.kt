@@ -20,7 +20,17 @@ import java.time.format.DateTimeParseException
 import java.util.Locale
 import kotlin.coroutines.cancellation.CancellationException
 
-/** Reporte listo para mostrarse en una tarjeta. */
+/**
+ * Reporte listo para mostrarse en una tarjeta
+ *
+ * @property idReporte Identificador del reporte
+ * @property folio Folio del reporte, vacío si no tiene
+ * @property ciudad Municipio, vacío si no se conoce
+ * @property ubicacion Calle y colonia separadas por coma, vacío si no se conocen
+ * @property etiquetas Dos textos: la actividad y la cantidad de NNA con su edad
+ * @property estatus Estatus de seguimiento del reporte, vacío si no se conoce
+ * @property fecha Fecha del reporte ya formateada, vacía si no se conoce
+ */
 data class ReporteResumen(
     val idReporte: Int,
     val folio: String,
@@ -31,12 +41,21 @@ data class ReporteResumen(
     val fecha: String
 )
 
+/** Formato con el que se muestra la fecha de un reporte */
 private val formatoFecha = DateTimeFormatter.ofPattern("d MMM yyyy · HH:mm 'hrs'",
     Locale("es", "MX")
 )
+/** Zona horaria en la que se muestran las fechas */
 private val zona_backend: ZoneId = ZoneId.of("America/Mexico_City")
 
-/** Convierte una fecha ISO-8601 del backend a la hora local del dispositivo. */
+/**
+ * Convierte una fecha ISO 8601 del backend a texto en la hora de la Ciudad de México
+ *
+ * Una fecha sin zona se toma como hora de la Ciudad de México
+ *
+ * @param iso Fecha en formato ISO 8601, con o sin zona
+ * @return La fecha formateada, o [iso] sin cambios si no se puede interpretar
+ */
 fun formatearFecha(iso: String): String {
     val instante = try {
         OffsetDateTime.parse(iso).toInstant()                           // "…Z" o "…-06:00"
@@ -50,6 +69,14 @@ fun formatearFecha(iso: String): String {
     return instante.atZone(zona_backend).format(formatoFecha)
 }
 
+/**
+ * Convierte un reporte del listado en el resumen que muestra la tarjeta
+ *
+ * Una actividad, cantidad o edad "No sé" o ausente se muestra como no especificada o se omite
+ *
+ * @receiver Reporte tal como lo devolvió el API
+ * @return El resumen listo para mostrarse
+ */
 fun ReporteListadoResponse.toResumen(): ReporteResumen {
     val actividad = tipoTrabajo?.takeIf { it.isNotBlank() && it != "No sé" } ?: "Actividad no especificada"
     val cantidad = cantidadNna?.takeIf { it != "No sé" }?.let { "$it NNA" } ?: "Cantidad no especificada"
@@ -68,24 +95,31 @@ fun ReporteListadoResponse.toResumen(): ReporteResumen {
     )
 }
 
-/** Estado de "Mis reportes". [reportes] es `null` mientras no se haya cargado nunca. */
+/**
+ * Estado de "Mis reportes"
+ *
+ * @property cargando `true` mientras se pide la lista
+ * @property reportes Reportes cargados; `null` mientras no se haya cargado nunca
+ * @property error Mensaje del último error al cargar, o `null` si no hubo
+ */
 data class ReportesUiState(
     val cargando: Boolean = false,
     val reportes: List<ReporteResumen>? = null,
     val error: String? = null
 )
 
-/** Carga desde el backend los reportes con seguimiento del usuario con sesión. */
+/** [ViewModel] que carga desde el backend los reportes con seguimiento del usuario con sesión */
 class ReportesViewModel : ViewModel() {
 
     private companion object { private const val TAG = "ReportesViewModel" }
 
     private val _uiState = MutableStateFlow(ReportesUiState())
+    /** Estado de la lista que observa la pantalla */
     val uiState: StateFlow<ReportesUiState> = _uiState.asStateFlow()
 
     private var trabajo: Job? = null
 
-    /** Pide la lista. Si ya había una, se conserva en pantalla mientras llega la nueva. */
+    /** Pide la lista con `GET /reportes/`; si ya había una, se conserva en pantalla mientras llega la nueva */
     fun cargar() {
         trabajo?.cancel() // evita que una respuesta vieja pise a una más reciente
         trabajo = viewModelScope.launch {

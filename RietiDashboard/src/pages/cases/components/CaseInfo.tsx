@@ -87,11 +87,11 @@ export function CaseDataCard({ caso, reports }: { caso: Caso; reports: Reporte[]
             <div className="flex flex-col gap-2">
                 <p className="section-label p-0">Fotografías</p>
                 {photos.length === 0 ? (
-                    <ReportImage src={null} alt="" className="h-24" />
+                    <ReportImage reportId={null} alt="" className="h-24" />
                 ) : (
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {photos.map((r) => (
-                            <ReportImage key={r.id_reporte} src={r.imagen} alt={`Foto del reporte ${r.folio_reporte}`} className="h-48" />
+                            <ReportImage key={r.id_reporte} reportId={r.id_reporte} alt={`Foto del reporte ${r.folio_reporte}`} className="h-48" />
                         ))}
                     </div>
                 )}

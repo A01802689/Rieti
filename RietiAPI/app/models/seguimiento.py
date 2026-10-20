@@ -4,6 +4,14 @@ from app.db.base import Base
 
 
 class Seguimiento(Base):
+    """Tabla seguimiento: nota de la línea de tiempo de un caso
+
+    Attributes:
+        consecutivo: número de la nota dentro de su caso, empieza en 1
+        folio: identificador único con formato SEG-año-caso-consecutivo
+        fecha: momento de la nota, con zona horaria
+        tipo: clasificación de la nota, uno de los valores de TipoSeguimiento
+    """
     __tablename__ = "seguimiento"
 
     id_seguimiento = Column(Integer, primary_key=True)

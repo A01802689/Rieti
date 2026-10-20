@@ -39,11 +39,13 @@ import mx.itesm.myapplication.ui.theme.VioletaSuave
 import mx.itesm.myapplication.view.Pantalla
 
 /**
- * Vista principal para elegir el tipo de reporte que se quiere enviar.
+ * Panel inferior de la pantalla principal para elegir el tipo de reporte que se quiere enviar
  *
+ * Muestra dos tarjetas [ReportCard], una de reporte anónimo y otra de reporte con seguimiento
  *
+ * @param navController Controlador de navegación para abrir el flujo elegido
+ * @param modifier [Modifier] aplicado al panel
  */
-
 @Composable
 fun GenerateReportMainView(navController: NavController, modifier: Modifier = Modifier) {
     Surface(
@@ -76,6 +78,13 @@ fun GenerateReportMainView(navController: NavController, modifier: Modifier = Mo
     }
 }
 
+/**
+ * Tarjeta que inicia el flujo de un tipo de reporte
+ *
+ * @param anonymous `true` para el flujo de reporte anónimo; `false` para el de reporte con seguimiento
+ * @param navController Controlador de navegación para abrir el flujo
+ * @param modifier [Modifier] aplicado a la tarjeta
+ */
 @Composable
 fun ReportCard(anonymous: Boolean, navController: NavController, modifier: Modifier = Modifier) {
     val acento = if (anonymous) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary

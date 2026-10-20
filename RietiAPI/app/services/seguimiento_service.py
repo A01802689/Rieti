@@ -13,6 +13,24 @@ def crear_seguimiento(
     datos: SeguimientoCreate,
     id_usuario_actual: int,
 ) -> SeguimientoResponse:
+    """Agrega una nota de seguimiento a un caso
+
+    Bloquea la fila del caso para que el consecutivo y el folio no se repitan
+
+    Args:
+        db: sesión de base de datos
+        id_caso: identificador del caso
+        datos: tipo y texto de la nota
+        id_usuario_actual: identificador del autor
+
+    Returns:
+        La nota creada con su folio y el nombre del autor
+
+    Raises:
+        HTTPException: 422 si la nota queda vacía
+        HTTPException: 401 si el autor ya no existe
+        HTTPException: 404 si el caso no existe
+    """
     nota = datos.nota.strip()
     if not nota:
         raise HTTPException(

@@ -33,20 +33,14 @@ import mx.itesm.myapplication.view.general.PasoReporte
 import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
- * Pantalla de datos de contacto para un reporte con seguimiento.
+ * Paso de datos de contacto del flujo de reporte con seguimiento, el primero del flujo
  *
- * Es el primer paso del flujo de reporte con seguimiento. Muestra:
- * - Una fila superior con un botón para regresar.
- * - El título "Reporte con Seguimiento" y un texto que indica que el folio se recibirá por
- *   correo o WhatsApp.
- * - Una tarjeta informativa que explica para qué se piden los datos.
- * - Tres campos de texto: nombre(s), apellidos y número de teléfono. Los tres están marcados
- *   como obligatorios con un asterisco en su etiqueta.
- * - Un botón "Continuar" anclado en la parte inferior mediante un [Spacer] con peso.
+ * Marca el reporte como con seguimiento y muestra una tarjeta que explica para qué se piden los datos,
+ * los campos de nombre(s), apellidos y teléfono, y un botón "Continuar" que se habilita cuando el contacto es válido
  *
- * @param navController Controlador de navegación para manejar la navegación entre pantallas.
+ * @param navController Controlador de navegación usado para regresar o avanzar al formulario
+ * @param vm ViewModel del flujo de reporte, compartido por todos los pasos
  */
-
 @Composable
 fun ReporteSeguimiento(navController: NavController, vm: ReporteViewModel)
 {

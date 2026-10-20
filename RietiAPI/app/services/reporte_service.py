@@ -42,6 +42,20 @@ def listar_reportes(
     id_caso: int | None = None,
     proyeccion: ProyeccionReporte = ProyeccionReporte.COMPLETA,
 ) -> list[ReporteListado]:
+    """Lista reportes con la proyección de campos que corresponda a quien consulta
+
+    La proyección reducida oculta descripción, usuario e imagen
+
+    Args:
+        db: sesión de base de datos
+        construir_url_imagen: función que arma la URL de visualización de la imagen a partir del id del reporte
+        id_usuario: si se indica, solo los reportes de ese usuario
+        id_caso: si se indica, solo los reportes de ese caso
+        proyeccion: nivel de detalle de cada reporte
+
+    Returns:
+        Los reportes del más reciente al más antiguo
+    """
     filas = reporte_repositorio.listar(
         db,
         id_usuario=id_usuario,
@@ -79,6 +93,18 @@ def listar_reportes(
 
 
 def obtener_detalle_reporte(*, db: Session, id_reporte: int) -> ReporteDetalle:
+    """Obtiene el detalle de un reporte
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+
+    Returns:
+        El reporte con referencia de ubicación e indicador de imagen
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+    """
     fila = reporte_repositorio.obtener_detalle(db, id_reporte)
     if fila is None:
         raise HTTPException(status_code=404, detail="El reporte no existe")
@@ -108,6 +134,18 @@ def obtener_detalle_reporte(*, db: Session, id_reporte: int) -> ReporteDetalle:
 
 
 def _obtener_reporte_para_actualizar(db: Session, id_reporte: int) -> Reporte:
+    """Obtiene un reporte bloqueando su fila hasta el fin de la transacción
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+
+    Returns:
+        El reporte bloqueado
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+    """
     reporte = reporte_repositorio.obtener_para_actualizar(db, id_reporte)
     if reporte is None:
         raise HTTPException(status_code=404, detail="El reporte no existe")
@@ -115,6 +153,15 @@ def _obtener_reporte_para_actualizar(db: Session, id_reporte: int) -> Reporte:
 
 
 def _exigir_puede_reabrir(reporte: Reporte, es_administrador: bool) -> None:
+    """Impide que alguien que no es administrador saque un reporte del estatus Rechazado
+
+    Args:
+        reporte: reporte ya leído y bloqueado
+        es_administrador: si quien actúa tiene rol Administrador
+
+    Raises:
+        HTTPException: 403 si el reporte está rechazado y quien actúa no es administrador
+    """
     if reporte.estatus_seguimiento == EstatusSeguimiento.RECHAZADO and not es_administrador:
         raise HTTPException(
             status_code=403,
@@ -130,6 +177,24 @@ def actualizar_reporte(
     id_usuario_actual: int,
     es_administrador: bool,
 ) -> ReporteDetalle:
+    """Actualiza el estatus de seguimiento de un reporte
+
+    Los campos omitidos o None se ignoran y cada cambio queda en la bitácora
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+        datos: campos a modificar
+        id_usuario_actual: identificador de quien modifica, se registra en la bitácora
+        es_administrador: si quien actúa tiene rol Administrador
+
+    Returns:
+        El detalle del reporte ya actualizado
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+        HTTPException: 403 si intenta reabrir un reporte rechazado sin ser administrador
+    """
     try:
         reporte = _obtener_reporte_para_actualizar(db, id_reporte)
         if datos.estatus_seguimiento not in (None, EstatusSeguimiento.RECHAZADO):
@@ -168,6 +233,22 @@ def cambiar_estatus_reporte(
     id_usuario_actual: int,
     es_administrador: bool,
 ) -> EstatusReporteResponse:
+    """Cambia el estatus de seguimiento de un reporte
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+        datos: estatus nuevo
+        id_usuario_actual: identificador de quien cambia el estatus, se registra en la bitácora
+        es_administrador: si quien actúa tiene rol Administrador
+
+    Returns:
+        El identificador del reporte y su estatus actual
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+        HTTPException: 403 si intenta reabrir un reporte rechazado sin ser administrador
+    """
     try:
         reporte = _obtener_reporte_para_actualizar(db, id_reporte)
         if datos.estatus_seguimiento != EstatusSeguimiento.RECHAZADO:
@@ -201,6 +282,20 @@ def cambiar_estatus_reporte(
 def rechazar_reporte(
     *, db: Session, id_reporte: int, id_usuario_actual: int
 ) -> ReporteEstatusCasoResponse:
+    """Marca como Rechazado un reporte que no pertenece a ningún caso
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+        id_usuario_actual: identificador de quien rechaza, se registra en la bitácora
+
+    Returns:
+        El reporte con su estatus Rechazado
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+        HTTPException: 409 si ya está rechazado o ya pertenece a un caso
+    """
     try:
         reporte = _obtener_reporte_para_actualizar(db, id_reporte)
         if reporte.estatus_seguimiento == EstatusSeguimiento.RECHAZADO:
@@ -236,6 +331,20 @@ def rechazar_reporte(
 def reabrir_reporte(
     *, db: Session, id_reporte: int, id_usuario_actual: int
 ) -> ReporteEstatusCasoResponse:
+    """Regresa a Recibido un reporte rechazado
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+        id_usuario_actual: identificador de quien reabre, se registra en la bitácora
+
+    Returns:
+        El reporte con su estatus Recibido
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+        HTTPException: 409 si el reporte no está rechazado
+    """
     try:
         reporte = _obtener_reporte_para_actualizar(db, id_reporte)
         if reporte.estatus_seguimiento != EstatusSeguimiento.RECHAZADO:
@@ -269,6 +378,22 @@ def reabrir_reporte(
 def desvincular_reporte(
     *, db: Session, id_reporte: int, id_usuario_actual: int, es_administrador: bool
 ) -> ReporteEstatusCasoResponse:
+    """Saca un reporte de su caso y lo deja En revisión
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+        id_usuario_actual: identificador de quien desvincula, se registra en la bitácora
+        es_administrador: si quien actúa tiene rol Administrador
+
+    Returns:
+        El reporte sin caso y con su estatus nuevo
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+        HTTPException: 409 si el reporte no pertenece a ningún caso
+        HTTPException: 403 si el reporte está rechazado y quien actúa no es administrador
+    """
     try:
         reporte = _obtener_reporte_para_actualizar(db, id_reporte)
         if reporte.id_caso is None:
@@ -310,6 +435,19 @@ def desvincular_reporte(
 def obtener_urls_imagen_reporte(
     *, db: Session, id_reporte: int
 ) -> ImagenReporteResponse:
+    """Genera las URL temporales de visualización y descarga de la imagen de un reporte
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+
+    Returns:
+        Las URL prefirmadas y los segundos que tardan en expirar
+
+    Raises:
+        HTTPException: 404 si el reporte no existe, no tiene imagen o la imagen aún no está en S3
+        HTTPException: 502 si falla la consulta a S3 o el tipo de contenido no es admitido
+    """
     fila = reporte_repositorio.obtener_imagen_key(db, id_reporte)
     if fila is None:
         raise HTTPException(status_code=404, detail="El reporte no existe")
@@ -352,6 +490,21 @@ def create_reporte(
     datos: ReporteCreate,
     id_usuario_actual: int,
 ):
+    """Crea un reporte con su ubicación, su folio y, si se pidió, la URL de subida de la imagen
+
+    El folio se asigna con el contador del municipio y año bloqueado, todo en una sola transacción
+
+    Args:
+        db: sesión de base de datos
+        datos: datos del reporte enviados por la persona usuaria
+        id_usuario_actual: identificador de quien reporta, se guarda solo si pidió seguimiento
+
+    Returns:
+        Diccionario con los datos del reporte creado y la URL de subida de la imagen cuando aplica
+
+    Raises:
+        HTTPException: 404 si el municipio no existe
+    """
     municipio = (
         db.query(Municipio)
         .filter(Municipio.nombre == datos.ubicacion.municipio)
@@ -451,6 +604,22 @@ def asociar_reporte_a_caso(
     id_usuario_actual: int,
     es_administrador: bool,
 ) -> ReporteCasoResponse:
+    """Asocia un reporte a un caso existente y lo deja Canalizado
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte
+        datos: caso destino
+        id_usuario_actual: identificador de quien asocia, se registra en la bitácora
+        es_administrador: si quien actúa tiene rol Administrador
+
+    Returns:
+        El reporte con el caso asignado y su estatus nuevo
+
+    Raises:
+        HTTPException: 404 si el reporte o el caso no existen
+        HTTPException: 403 si el reporte está rechazado y quien actúa no es administrador
+    """
     try:
         reporte = _obtener_reporte_para_actualizar(db, id_reporte)
         if not reporte_repositorio.existe_caso(db, datos.id_caso):
@@ -495,6 +664,21 @@ def eliminar_reportes(
     datos: EliminarReportes,
     id_usuario_actual: int,
 ) -> EliminarReportesResponse:
+    """Elimina en lote los reportes rechazados y omite los demás
+
+    Borra también su ubicación si nadie más la usa y sus imágenes en S3
+
+    Args:
+        db: sesión de base de datos
+        datos: identificadores de los reportes a eliminar
+        id_usuario_actual: identificador de quien elimina, se registra en la bitácora
+
+    Returns:
+        Los identificadores eliminados y los omitidos
+
+    Raises:
+        HTTPException: 502 si falla el borrado de una imagen en S3, en cuyo caso no se elimina nada
+    """
     ids = list(dict.fromkeys(datos.ids))
     eliminados: list[int] = []
     omitidos: list[int] = []

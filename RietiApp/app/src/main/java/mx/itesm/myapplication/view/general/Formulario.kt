@@ -19,6 +19,16 @@ import mx.itesm.myapplication.data.network.models.CantidadNna
 import mx.itesm.myapplication.data.network.models.RangoEdad
 import mx.itesm.myapplication.data.network.models.Riesgo
 
+/**
+ * Pregunta de opción única: un título y sus opciones como [FilterChip] que saltan de línea
+ *
+ * @param T Tipo de las opciones
+ * @param titulo Texto de la pregunta
+ * @param opciones Opciones que se pueden elegir
+ * @param seleccionada Opción elegida, o `null` si no se ha respondido
+ * @param etiqueta Convierte una opción en el texto que se muestra
+ * @param onSeleccionar Se llama con la opción que el usuario toca
+ */
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun <T> PreguntaOpcionUnica(
@@ -47,18 +57,25 @@ private fun <T> PreguntaOpcionUnica(
 
 
 /**
- * Formulario de preguntas de opción única para describir una situación observada.
+ * Formulario de preguntas de opción única para describir una situación observada
  *
  * Presenta cuatro preguntas, cada una con sus opciones como [FilterChip] dentro de un
  * [FlowRow], de modo que las opciones saltan de línea cuando no caben en el ancho disponible:
- * 1. Cantidad de niñas, niños o adolescentes observados.
- * 2. Edad aproximada.
- * 3. Actividad que estaban realizando.
- * 4. Si se observó alguna situación de riesgo.
+ * 1. Cantidad de niñas, niños o adolescentes observados
+ * 2. Edad aproximada
+ * 3. Actividad que estaban realizando
+ * 4. Nivel de riesgo de la situación
  *
- * @param modifier Modificador opcional de diseño.
+ * @param cantidad Cantidad elegida, o `null` si no se ha respondido
+ * @param edad Rango de edad elegido, o `null` si no se ha respondido
+ * @param actividad Actividad elegida, o `null` si no se ha respondido
+ * @param riesgo Nivel de riesgo elegido, o `null` si no se ha respondido
+ * @param onCantidadSeleccionada Se llama con la cantidad que el usuario elige
+ * @param onEdadSeleccionada Se llama con el rango de edad que el usuario elige
+ * @param onActividadSeleccionada Se llama con la actividad que el usuario elige
+ * @param onRiesgoSeleccionado Se llama con el nivel de riesgo que el usuario elige
+ * @param modifier Modificador opcional de diseño
  */
-
 @Composable
 fun Formulario(
     cantidad: CantidadNna?,

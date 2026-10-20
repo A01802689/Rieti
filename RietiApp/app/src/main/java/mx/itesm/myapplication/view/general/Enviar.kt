@@ -39,22 +39,26 @@ import mx.itesm.myapplication.data.network.procesarImagen
 import mx.itesm.myapplication.viewModel.EnvioUiState
 
 /**
- * Último paso del reporte: descripción, fotografía opcional y botón de envío.
+ * Último paso del reporte: descripción, fotografía opcional y botón de envío
  *
- * @param descripcion Texto de la descripción.
- * @param onDescripcionChange Se llama al editar la descripción.
- * @param foto Fotografía ya procesada, o `null` si no hay.
- * @param onFotoSeleccionada Se llama con la foto elegida, o con `null` al quitarla.
- * @param envio Estado del envío (carga, subida de imagen o error).
- * @param puedeEnviar Si el botón de enviar está habilitado.
- * @param onEnviar Acción del botón de enviar.
+ * Antes de abrir el selector de imágenes por primera vez muestra un aviso de que solo se deben
+ * adjuntar fotografías del lugar
+ *
+ * @param descripcion Texto de la descripción
+ * @param onDescripcionChange Se llama al editar la descripción
+ * @param foto Fotografía ya procesada, o `null` si no hay
+ * @param onFotoSeleccionada Se llama con la foto elegida, o con `null` al quitarla
+ * @param envio Estado del envío (carga, subida de imagen o error)
+ * @param puedeEnviar Si el botón de enviar está habilitado
+ * @param onEnviar Acción del botón de enviar
+ * @param modifier Modificador opcional de diseño
  */
 @Composable
 fun Enviar(
     descripcion: String,
     onDescripcionChange: (String) -> Unit,
-    foto: FotoReporte?,                              // nullable
-    onFotoSeleccionada: (FotoReporte?) -> Unit,      // nullable
+    foto: FotoReporte?,
+    onFotoSeleccionada: (FotoReporte?) -> Unit,
     envio: EnvioUiState,
     puedeEnviar: Boolean,
     onEnviar: () -> Unit,
@@ -138,7 +142,7 @@ fun Enviar(
             errorFoto?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         }
 
-        // Mensajes de estado y botón, fijos abajo.
+        // Mensajes de estado y botón, fijos abajo
         if (envio is EnvioUiState.Error) {
             Text(envio.message, color = MaterialTheme.colorScheme.error)
         }

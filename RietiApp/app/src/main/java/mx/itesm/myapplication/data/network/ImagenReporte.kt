@@ -21,14 +21,25 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.max
 import kotlin.math.min
 
-/** Foto lista para subir: JPEG ya reducido y sin metadatos. Se compara por referencia, no por contenido. */
+/**
+ * Foto lista para subir: JPEG ya reducido y sin metadatos
+ *
+ * Se compara por referencia, no por contenido
+ *
+ * @property bytes Contenido del JPEG
+ */
 class FotoReporte(val bytes: ByteArray)
 
 /**
- * Lee la imagen elegida, corrige su orientación, la reduce a [ladoMaximo] píxeles y la guarda
- * como JPEG. Al volver a codificarla se eliminan los metadatos EXIF (GPS, modelo, fecha).
+ * Lee la imagen elegida, corrige su orientación, la reduce a [ladoMaximo] píxeles y la guarda como JPEG
  *
- * @return Los bytes del JPEG, o `null` si no se pudo leer la imagen.
+ * Al volver a codificarla se eliminan los metadatos EXIF (GPS, modelo, fecha)
+ *
+ * @param context Contexto para abrir la imagen con su ContentResolver
+ * @param uri Imagen elegida por el usuario
+ * @param ladoMaximo Largo máximo en píxeles del lado mayor de la imagen final
+ * @param calidad Calidad de la compresión JPEG, de 0 a 100
+ * @return Los bytes del JPEG, o `null` si no se pudo leer la imagen
  */
 suspend fun procesarImagen(
     context: Context,
@@ -39,19 +50,19 @@ suspend fun procesarImagen(
     try {
         val resolver = context.contentResolver
 
-        // 1) Dimensiones, sin cargar la imagen completa.
+        // 1) Dimensiones, sin cargar la imagen completa
         val limites = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, limites) }
         if (limites.outWidth <= 0 || limites.outHeight <= 0) return@withContext null
 
-        // 2) Decodificación reducida (potencias de 2) para no gastar memoria.
+        // 2) Decodificación reducida (potencias de 2) para no gastar memoria
         var muestra = 1
         while (max(limites.outWidth, limites.outHeight) / (muestra * 2) >= ladoMaximo) muestra *= 2
         val original = resolver.openInputStream(uri)?.use {
             BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = muestra })
         } ?: return@withContext null
 
-        // 3) Rotación según EXIF + escala final al lado máximo.
+        // 3) Rotación según EXIF y escala final al lado máximo
         val orientacion = resolver.openInputStream(uri)?.use {
             ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
         } ?: ExifInterface.ORIENTATION_NORMAL
@@ -71,7 +82,7 @@ suspend fun procesarImagen(
 
         val final = Bitmap.createBitmap(original, 0, 0, original.width, original.height, matriz, true)
 
-        // 4) JPEG nuevo, sin metadatos.
+        // 4) JPEG nuevo, sin metadatos
         ByteArrayOutputStream().use { salida ->
             final.compress(Bitmap.CompressFormat.JPEG, calidad, salida)
             salida.toByteArray()
@@ -83,19 +94,32 @@ suspend fun procesarImagen(
     }
 }
 
-// Cliente aparte, sin cookies de sesión ni interceptor de logs (un log de BODY imprimiría la imagen).
+/** Cliente aparte, sin cookies de sesión ni interceptor de logs (un log de BODY imprimiría la imagen) */
 private val clienteSubida = OkHttpClient.Builder()
     .connectTimeout(30, TimeUnit.SECONDS)
     .writeTimeout(60, TimeUnit.SECONDS)
     .readTimeout(30, TimeUnit.SECONDS)
     .build()
 
+/** Resultado de un intento de subir la imagen a S3 */
 private sealed interface ResultadoSubida {
+    /** S3 aceptó la imagen */
     object Ok : ResultadoSubida
-    object Reintentable : ResultadoSubida   // corte de red o error 5xx
-    object Rechazada : ResultadoSubida      // 4xx: firma incorrecta o URL vencida
+    /** Corte de red o error 5xx */
+    object Reintentable : ResultadoSubida
+    /** Respuesta 4xx: firma incorrecta o URL vencida */
+    object Rechazada : ResultadoSubida
 }
 
+/**
+ * Hace un solo intento de subir [bytes] con un `PUT` a la URL prefirmada
+ *
+ * De un rechazo 4xx solo se registra el código de error de S3, nunca la URL
+ *
+ * @param url URL prefirmada de S3
+ * @param bytes Contenido del JPEG
+ * @return Si S3 aceptó la imagen, si conviene reintentar o si la rechazó
+ */
 private suspend fun intentarSubida(url: String, bytes: ByteArray): ResultadoSubida =
     withContext(Dispatchers.IO) {
         try {
@@ -107,7 +131,6 @@ private suspend fun intentarSubida(url: String, bytes: ByteArray): ResultadoSubi
                 when {
                     respuesta.isSuccessful -> ResultadoSubida.Ok
                     respuesta.code in 400..499 -> {
-                        // Solo se registra el código de error de S3 (por ejemplo SignatureDoesNotMatch), nunca la URL.
                         val codigo = Regex("<Code>(.*?)</Code>")
                             .find(respuesta.body?.string().orEmpty())?.groupValues?.get(1)
                         Log.w("Subida", "S3 rechazó la imagen: HTTP ${respuesta.code} $codigo")
@@ -127,11 +150,15 @@ private suspend fun intentarSubida(url: String, bytes: ByteArray): ResultadoSubi
     }
 
 /**
- * Sube [bytes] a la URL prefirmada del backend, con hasta [intentos] intentos si hay fallos de red.
- * La URL dura 5 minutos, así que los reintentos son cortos. No registres [url] en Logcat:
- * la firma funciona como una contraseña temporal.
+ * Sube [bytes] a la URL prefirmada del backend, con hasta [intentos] intentos si hay fallos de red
  *
- * @return `true` si S3 aceptó la imagen.
+ * La URL dura 5 minutos, así que los reintentos son cortos. No registres [url] en Logcat:
+ * la firma funciona como una contraseña temporal
+ *
+ * @param url URL prefirmada que devolvió el backend al crear el reporte
+ * @param bytes Contenido del JPEG
+ * @param intentos Número máximo de intentos; entre uno y otro se espera 1 s por intento transcurrido
+ * @return `true` si S3 aceptó la imagen
  */
 suspend fun subirImagen(url: String, bytes: ByteArray, intentos: Int = 3): Boolean {
     repeat(intentos) { n ->

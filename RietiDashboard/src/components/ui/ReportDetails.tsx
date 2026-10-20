@@ -64,7 +64,7 @@ export function ReportDetails({ report, withMap = true }: Props) {
 
                 <div className="flex flex-col gap-2">
                     <p className="section-label p-0">Fotografía</p>
-                    <ReportImage src={report.imagen} alt={`Foto del reporte ${report.folio_reporte}`} className="h-52" />
+                    <ReportImage reportId={report.imagen ? report.id_reporte : null} alt={`Foto del reporte ${report.folio_reporte}`} className="h-52" />
                 </div>
             </div>
 

@@ -21,9 +21,19 @@ import mx.itesm.myapplication.view.seguimiento.SeguimientoFormulario
 import mx.itesm.myapplication.view.seguimiento.SeguimientoUbicacion
 import mx.itesm.myapplication.viewModel.ReporteViewModel
 
+/** Ruta del grafo anidado del flujo de reporte anónimo */
 private const val FLUJO_ANONIMO = "flujo_anonimo"
+/** Ruta del grafo anidado del flujo de reporte con seguimiento */
 private const val FLUJO_SEGUIMIENTO = "flujo_seguimiento"
 
+/**
+ * Obtiene el [ReporteViewModel] de un flujo de reporte, compartido por todas sus pantallas
+ *
+ * @receiver Entrada de la pila de navegación de la pantalla que lo pide
+ * @param navController Controlador de navegación para buscar la entrada del flujo
+ * @param route Ruta del grafo del flujo (anónimo o seguimiento) al que pertenece el ViewModel
+ * @return El [ReporteViewModel] ligado al ciclo de vida de la entrada del flujo
+ */
 @Composable
 private fun NavBackStackEntry.reporteViewModel(
     navController: NavController,
@@ -34,12 +44,13 @@ private fun NavBackStackEntry.reporteViewModel(
 }
 
 /**
- * Grafo de navegación principal de la aplicación.
+ * Grafo de navegación principal de la aplicación
  *
- * Mapea cada constante de ruta definida en [Pantalla] con su respectivo componente Composable de pantalla.
+ * Mapea cada constante de ruta definida en [Pantalla] con su pantalla. Los pasos de cada tipo de reporte
+ * forman un grafo anidado que comparte un mismo [ReporteViewModel]
  *
- * @param navController Controlador [NavHostController] para manejar las transiciones entre pantallas.
- * @param modifier Modificador opcional de diseño para ajustar el contenedor [NavHost].
+ * @param navController Controlador [NavHostController] para manejar las transiciones entre pantallas
+ * @param modifier Modificador opcional de diseño para ajustar el contenedor [NavHost]
  */
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -57,7 +68,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(Pantalla.RUTA_MAIN) {
             MainView(navController, modifier)
         }
-        //Flujo anonimo
+        // Flujo anónimo
         navigation(startDestination = Pantalla.RUTA_ANONIMOUBICACION, route = FLUJO_ANONIMO) {
             composable(Pantalla.RUTA_ANONIMOUBICACION) { entry ->
                 AnonimoUbicacion(navController, entry.reporteViewModel(navController, FLUJO_ANONIMO))
@@ -70,7 +81,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
             }
         }
 
-        //Flujo de seguimiento
+        // Flujo de seguimiento
         navigation(startDestination = Pantalla.RUTA_SEGUIMIENTO, route = FLUJO_SEGUIMIENTO){
             composable(Pantalla.RUTA_SEGUIMIENTO) { entry ->
                 ReporteSeguimiento(navController, entry.reporteViewModel(navController, FLUJO_SEGUIMIENTO))

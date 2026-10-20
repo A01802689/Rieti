@@ -30,13 +30,28 @@ import mx.itesm.myapplication.viewModel.MunicipiosUiState
 
 
 /**
- * Paso de selección de ubicación de un reporte.
+ * Paso de selección de ubicación de un reporte
  *
  * Ofrece dos formas de indicar dónde se observó la situación:
- * 1. Un [MapaInteractivo] en la parte superior.
- * 2. Tres campos de texto para escribir la ubicación manualmente: municipio, colonia y calle.
+ * 1. Un [MapaInteractivo] en la parte superior
+ * 2. Tres campos de texto para escribir la ubicación manualmente: municipio, colonia y calle
  *
- *  @param modifier [Modifier] aplicado al contenedor raíz ([Column]) de la pantalla.
+ * Al elegir un punto, ya sea en el mapa o con el GPS, guarda las coordenadas y pide una dirección
+ * sugerida para rellenar los campos
+ *
+ * @param municipio Nombre del municipio elegido; vacío si no hay selección
+ * @param municipios Estado de la carga de municipios
+ * @param onReintentarMunicipios Vuelve a pedir la lista de municipios al backend
+ * @param colonia Colonia escrita
+ * @param calle Calle escrita
+ * @param longitud Longitud del punto elegido, o `null` si no hay
+ * @param latitud Latitud del punto elegido, o `null` si no hay
+ * @param onMunicipioSeleccionado Se llama con el nombre del municipio elegido
+ * @param onColoniaSeleccionada Se llama al editar la colonia
+ * @param onCalleSeleccionada Se llama al editar la calle
+ * @param onUbicacionSeleccionada Se llama con latitud y longitud del punto elegido
+ * @param onDireccionSugerida Se llama con la dirección obtenida del punto, o `null` si no se pudo obtener
+ * @param modifier [Modifier] aplicado al contenedor raíz ([Column]) de la pantalla
  */
 @Composable
 fun Ubicacion(
@@ -60,7 +75,7 @@ fun Ubicacion(
     var busqueda by remember { mutableStateOf<Job?>(null) }
     var buscando by remember { mutableStateOf(false) }
 
-    // Se usa tanto al tocar el mapa como con el botón de GPS.
+    // Se usa tanto al tocar el mapa como con el botón de GPS
     val alElegirPunto: (Double, Double) -> Unit = { lat, lng ->
         onUbicacionSeleccionada(lat, lng)          // guarda las coordenadas de inmediato
         busqueda?.cancel()                         // si el usuario toca otra vez, descarta la búsqueda anterior

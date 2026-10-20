@@ -5,6 +5,15 @@ from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 class Usuario(Base):
+    """Tabla usuario: ciudadanos, Alimentadores y Administradores
+
+    Attributes:
+        id_municipio: municipio del personal, NULL para ciudadanos
+        contrasena_hash: hash bcrypt de la contraseña
+        rol: NULL para ciudadanos, que no acceden al panel
+        ultimo_acceso: último inicio de sesión en UTC sin zona horaria
+        permisos: claves de permiso guardadas del Alimentador, vacío para Administradores y ciudadanos
+    """
     __tablename__ = "usuario"
     id_usuario = Column(Integer, primary_key=True)
     id_municipio = Column(Integer, ForeignKey("municipio.id_municipio"), nullable=True)

@@ -14,15 +14,17 @@ import androidx.navigation.NavController
 import mx.itesm.myapplication.viewModel.ReportesViewModel
 
 /**
- * Pantalla principal de la aplicación RIETI.
+ * Pantalla principal de la aplicación RIETI
  *
  * Organiza la interfaz con un [Scaffold] compuesto por tres secciones:
- * - **Barra superior:** [TopMainView], que muestra el logo y botón de navegación.
- * - **Contenido principal:** [ContentMainView], lista de tarjetas de resumen de reportes.
- * - **Barra inferior:** [GenerateReportMainView], panel para iniciar la creación de reportes.
+ * - **Barra superior:** [TopMainView], que muestra el logo y el botón para cerrar sesión
+ * - **Contenido principal:** [ContentMainView], lista de tarjetas de resumen de reportes
+ * - **Barra inferior:** [GenerateReportMainView], panel para iniciar la creación de reportes
  *
- * @param navController Controlador de navegación [NavController].
- * @param modifier Modificador opcional de diseño [Modifier].
+ * Los reportes se vuelven a cargar cada vez que la pantalla regresa al primer plano
+ *
+ * @param navController Controlador de navegación [NavController]
+ * @param modifier Modificador opcional de diseño [Modifier]
  */
 @Composable
 fun MainView(navController: NavController, modifier: Modifier = Modifier) {

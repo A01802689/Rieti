@@ -25,6 +25,8 @@ val Linea = Color(0xFFDCE2EC)
 val Alerta = Color(0xFFB3261E)
 val AlertaSuave = Color(0xFFFBE4E2)
 
+/** Degradado horizontal del encabezado de la pantalla principal en tema claro */
 val DegradadoEncabezado = Brush.horizontalGradient(listOf(TurquesaProfundo, Violeta))
 
+/** Degradado horizontal del encabezado de la pantalla principal en tema oscuro */
 val DegradadoEncabezadoOscuro = Brush.horizontalGradient(listOf(Color(0xFF006B7A), Color(0xFF3F2D6E)))

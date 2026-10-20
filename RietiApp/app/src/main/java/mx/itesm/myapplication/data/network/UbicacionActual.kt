@@ -18,17 +18,40 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-/** Resultado de pedir la ubicación del dispositivo. */
+/** Resultado de pedir la ubicación del dispositivo */
 sealed interface ResultadoUbicacion {
+    /**
+     * Se obtuvo la ubicación
+     *
+     * @property latitud Latitud en grados decimales
+     * @property longitud Longitud en grados decimales
+     */
     data class Ok(val latitud: Double, val longitud: Double) : ResultadoUbicacion
+
+    /** La app no tiene el permiso de ubicación */
     object SinPermiso : ResultadoUbicacion
+
+    /** No se pudo leer la ubicación: el GPS está apagado o falló la consulta */
     object NoDisponible : ResultadoUbicacion
 }
 
-/** Dirección sugerida a partir de unas coordenadas. Cualquier campo puede ser `null`. */
+/**
+ * Dirección sugerida a partir de unas coordenadas
+ *
+ * @property municipio Municipio (subAdminArea o, si falta, locality del [Geocoder]), o `null` si no se encontró
+ * @property colonia Colonia (subLocality), o `null` si no se encontró
+ * @property calle Calle (thoroughfare), o `null` si no se encontró
+ */
 data class DireccionSugerida(val municipio: String?, val colonia: String?, val calle: String?)
 
-/** Lee la ubicación actual del dispositivo una sola vez. Requiere que el permiso ya esté concedido. */
+/**
+ * Lee la ubicación actual del dispositivo una sola vez, con la mayor precisión disponible
+ *
+ * Requiere que el permiso ya esté concedido
+ *
+ * @param context Contexto para obtener el cliente de ubicación
+ * @return La ubicación, o [ResultadoUbicacion.SinPermiso] o [ResultadoUbicacion.NoDisponible] si no se pudo leer
+ */
 @SuppressLint("MissingPermission")
 suspend fun obtenerUbicacionActual(context: Context): ResultadoUbicacion = try {
     val cliente = LocationServices.getFusedLocationProviderClient(context)
@@ -52,8 +75,13 @@ suspend fun obtenerUbicacionActual(context: Context): ResultadoUbicacion = try {
 }
 
 /**
- * Convierte coordenadas en una dirección con el [Geocoder] del sistema.
- * Devuelve `null` si el dispositivo no tiene servicio de geocodificación o falla la consulta.
+ * Convierte coordenadas en una dirección con el [Geocoder] del sistema
+ *
+ * @param context Contexto para crear el [Geocoder]
+ * @param lat Latitud en grados decimales
+ * @param lng Longitud en grados decimales
+ * @return La dirección sugerida, o `null` si las coordenadas están fuera de rango, el dispositivo no tiene
+ * servicio de geocodificación o falla la consulta
  */
 suspend fun direccionDesdeCoordenadas(context: Context, lat: Double, lng: Double): DireccionSugerida? {
     if(lat !in -90.0..90.0 || lng !in -180.0..180.0)return null

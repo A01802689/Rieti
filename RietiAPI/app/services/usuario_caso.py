@@ -10,6 +10,20 @@ from app.repositories import caso_repository as caso_repo
 from app.repositories import usuario_caso_repository as usuario_caso_repo
 
 def create_usuario_caso(db: Session, data: UsuarioCasoCreate) -> UsuarioCaso:
+    """Asigna un usuario del panel a un caso
+
+    Args:
+        db: sesión de base de datos
+        data: usuario y caso a relacionar
+
+    Returns:
+        La asignación creada
+
+    Raises:
+        HTTPException: 404 si el usuario o el caso no existen
+        HTTPException: 400 si el usuario es ciudadano
+        HTTPException: 409 si el usuario ya está asignado al caso
+    """
     usuario = usuario_repo.get_by_id(db, data.id_usuario)
     if usuario is None:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")

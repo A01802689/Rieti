@@ -1,4 +1,4 @@
-import { parseCantidadNNA, type Reporte, type ReporteApi, type ReportState } from "../types/Report"
+import { parseCantidadNNA, type ReportImageLinks, type Reporte, type ReporteApi, type ReportState } from "../types/Report"
 import type { BatchDeleteResult } from "../types/BatchDelete"
 import { api } from "./client"
 import { logInvalidLocation } from "../utilities/location"
@@ -38,6 +38,15 @@ export const getReport = async (id: number) => {
   logInvalidLocation('Report', report.id_reporte, report.ubicacion)
   return report
 }
+
+/**
+ * Asks for the signed links of the photo of a report; the photo itself is then loaded from S3, which needs no session
+ *
+ * @param id - Id of the report
+ * @returns The link to see the photo, the link to download it and the seconds they last
+ * @throws ApiError 404 when the report has no photo or it is not uploaded yet, 502 when S3 cannot be reached
+ */
+export const getReportImage = (id: number) => api<ReportImageLinks>(`/reportes/${id}/imagen`)
 
 /**
  * Accepts a report, which opens its case with only the municipio of the report as location

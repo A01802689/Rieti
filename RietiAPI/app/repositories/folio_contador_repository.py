@@ -2,6 +2,18 @@ from sqlalchemy.orm import Session
 from app.models.folio_contador import FolioContador
 
 def obtener_siguiente_consecutivo(db:Session, id_municipio: int, anio: int) -> int:
+    """Obtiene el siguiente consecutivo de folio de un municipio y año
+
+    Bloquea la fila del contador para que dos reportes simultáneos no repitan folio y crea el contador si no existe
+
+    Args:
+        db: sesión de base de datos
+        id_municipio: identificador del municipio
+        anio: año del folio
+
+    Returns:
+        El consecutivo asignado, que empieza en 1
+    """
     contador = (
         db.query(FolioContador)
         .filter(

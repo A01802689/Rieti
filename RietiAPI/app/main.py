@@ -53,10 +53,20 @@ app.include_router(recovery_routes.router)
 
 @app.get("/")
 def read_root():
+    """Confirma que la API responde, es público
+
+    Returns:
+        Mensaje de que la API está funcionando
+    """
     return {"message": "Rieti API funcionando"}
 
 @app.get("/health")
 def health_check():
+    """Comprueba el estado del servicio para balanceadores y monitoreo, es público y no consulta la base de datos
+
+    Returns:
+        Estado ok
+    """
     return {"status": "ok"}
 
 

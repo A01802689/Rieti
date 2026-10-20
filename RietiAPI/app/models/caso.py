@@ -6,16 +6,30 @@ from app.db.base import Base
 from app.models.reporte import CantidadNNA, EdadAproximada, TipoTrabajo
 
 class Urgencia(str, Enum):
+    """Nivel de urgencia asignado a un caso"""
     BAJA = "Baja"
     MEDIA = "Media"
     ALTA = "Alta"
 
 class Estado(str, Enum):
+    """Etapa del ciclo de vida de un caso"""
     ABIERTO = "Abierto"
     EN_DESARROLLO = "En desarrollo"
     CERRADO = "Cerrado"
 
 class Caso(Base):
+    """Tabla caso: expediente que agrupa uno o más reportes de una misma situación
+
+    Attributes:
+        id_municipio: municipio responsable del caso, puede cambiar al transferirlo
+        id_ubicacion: ubicación propia del caso, independiente de la de sus reportes
+        estado: etapa del caso, NULL en filas antiguas sin estado
+        cantidad_nna: cantidad de niños confirmada por quien revisa el caso, No sé hasta que se confirme
+        edad_aproximada: edad confirmada por quien revisa el caso, No sé hasta que se confirme
+        tipo_trabajo: tipo de trabajo confirmado por quien revisa el caso, No sé hasta que se confirme
+        fecha_caso: fecha de apertura en UTC sin zona horaria
+        urgencia: NULL mientras no se le asigne urgencia
+    """
     __tablename__ = "caso"
 
     id_caso = Column(

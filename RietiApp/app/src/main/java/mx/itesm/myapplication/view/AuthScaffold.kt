@@ -12,13 +12,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 /**
- * ESTRUCTURA BASE (Scaffold) de interfaz reutilizable para las pantallas de autenticación (Login y Registro).
+ * Estructura base ([Scaffold]) reutilizable para las pantallas de autenticación (login y registro)
  *
- * Renderiza el encabezado corporativo [AppHeader] y las pestañas de selección [AuthTabsBar] en la barra superior.
+ * Renderiza el encabezado [AppHeader] y las pestañas [AuthTabsBar] en la barra superior
  *
- * @param navController Controlador [NavHostController] para manejar la conmutación entre Inicio de Sesión y Registro.
- * @param modifier Modificador opcional de diseño.
- * @param content Contenido Composable secundario que recibe los [PaddingValues] proporcionados por el [Scaffold].
+ * @param navController Controlador de navegación [NavHostController] para alternar entre login y registro
+ * @param modifier Modificador opcional de diseño
+ * @param content Contenido que recibe los [PaddingValues] proporcionados por el [Scaffold]
  */
 @Composable
 fun AuthScaffold(

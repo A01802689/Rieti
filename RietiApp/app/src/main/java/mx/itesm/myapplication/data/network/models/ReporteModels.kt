@@ -3,7 +3,9 @@ package mx.itesm.myapplication.data.network.models
 import com.google.gson.annotations.SerializedName
 
 /**
- * Opciones para la cantidad estimada de niñas, niños o adolescentes observados.
+ * Opciones para la cantidad estimada de niñas, niños o adolescentes observados
+ *
+ * @property etiqueta Texto que se muestra al usuario
  */
 enum class CantidadNna(val etiqueta: String) {
     UNO("1"),
@@ -15,7 +17,9 @@ enum class CantidadNna(val etiqueta: String) {
 }
 
 /**
- * Opciones para el rango de edad aproximado observado.
+ * Opciones para el rango de edad aproximado observado
+ *
+ * @property etiqueta Texto que se muestra al usuario
  */
 enum class RangoEdad(val etiqueta: String) {
     DE_0_A_5("0-5"),
@@ -26,7 +30,9 @@ enum class RangoEdad(val etiqueta: String) {
 }
 
 /**
- * Opciones para el tipo de actividad o trabajo observado.
+ * Opciones para el tipo de actividad o trabajo observado
+ *
+ * @property etiqueta Texto que se muestra al usuario
  */
 enum class Actividad(val etiqueta: String) {
     VENTA_AMBULANTE("Venta ambulante"),
@@ -43,7 +49,9 @@ enum class Actividad(val etiqueta: String) {
 }
 
 /**
- * Opciones para el nivel de riesgo observado en la situación.
+ * Opciones para el nivel de riesgo observado en la situación
+ *
+ * @property etiqueta Texto que se muestra al usuario
  */
 enum class Riesgo(val etiqueta: String) {
     ALTO("Alto"),
@@ -52,11 +60,14 @@ enum class Riesgo(val etiqueta: String) {
 }
 
 /**
- * Modelo DTO para enviar la información geográfica asociada a un reporte.
+ * Ubicación que se envía junto con un reporte
  *
- * @property latitud Coordenada de latitud en grados decimales.
- * @property longitud Coordenada de longitud en grados decimales.
- * @property direccion Dirección descriptiva opcional del lugar.
+ * @property municipio Nombre del municipio, tal como lo valida el backend
+ * @property colonia Colonia, opcional
+ * @property calle Calle, opcional
+ * @property longitud Coordenada de longitud en grados decimales
+ * @property latitud Coordenada de latitud en grados decimales
+ * @property referencia Referencia descriptiva del lugar, opcional
  */
 data class UbicacionCreateRequest(
     @SerializedName("municipio") val municipio: String? = null,
@@ -68,18 +79,16 @@ data class UbicacionCreateRequest(
 )
 
 /**
- * Modelo de petición DTO para crear y registrar un nuevo reporte en la plataforma.
+ * Petición para crear un reporte con `POST /reportes/`
  *
- * @property ubicacion Datos geográficos del reporte.
- * @property cantidadNna Código de [CantidadNna].
- * @property edadAproximada Código de [RangoEdad].
- * @property tipoTrabajo Código de [Actividad].
- * @property descripcion Descripción de la situación, opcional.
- * @property anonimo `true` si el reporte es anónimo.
- * @property nombre Nombre(s) de contacto (solo con seguimiento).
- * @property apellidos Apellidos de contacto (solo con seguimiento).
- * @property telefono Teléfono de contacto (solo con seguimiento).
- * @property imagen Imagen adjunta codificada, opcional (pendiente de implementar).
+ * @property ubicacion Datos geográficos del reporte
+ * @property cantidadNna Etiqueta de [CantidadNna]
+ * @property edadAproximada Etiqueta de [RangoEdad]
+ * @property tipoTrabajo Etiqueta de [Actividad]
+ * @property descripcion Descripción de la situación, opcional
+ * @property imagenContentType Tipo MIME de la imagen que se subirá después; `null` si no hay imagen
+ * @property conSeguimiento `true` si la persona quiere seguir el reporte con su cuenta; `false` si es anónimo
+ * @property riesgo Etiqueta de [Riesgo], opcional
  */
 data class ReporteCreateRequest(
     @SerializedName("ubicacion") val ubicacion: UbicacionCreateRequest,
@@ -93,12 +102,15 @@ data class ReporteCreateRequest(
 )
 
 /**
- * Modelo de respuesta DTO devuelto al registrar exitosamente un nuevo reporte.
+ * Respuesta de `POST /reportes/` al registrar un reporte
  *
- * @property idReporte Identificador único del reporte generado.
- * @property idUsuario Identificador del usuario asociado al reporte.
- * @property idCaso Identificador único del caso abierto en el sistema.
- * @property folio Folio generado por back, si lo devuelve
+ * @property idReporte Identificador único del reporte generado
+ * @property folioReporte Folio generado por el backend, si lo devuelve
+ * @property idUsuario Identificador del usuario asociado al reporte
+ * @property idCaso Identificador del caso asociado, si ya tiene
+ * @property idUbicacion Identificador de la ubicación guardada
+ * @property urlSubidaImagen URL prefirmada para subir la imagen; `null` si no se pidió subir imagen
+ * @property urlSubidaExpiraEn Fecha en que vence [urlSubidaImagen]
  */
 data class ReporteResponse(
     @SerializedName("id_reporte") val idReporte: Int,
@@ -111,10 +123,11 @@ data class ReporteResponse(
 )
 
 /**
- * Municipio devuelto por el backend.
+ * Municipio devuelto por `GET /municipios/`
  *
- * @property idMunicipio Identificador en la base de datos.
- * @property nombre Nombre exacto, tal como lo valida el backend al crear un reporte.
+ * @property idMunicipio Identificador en la base de datos
+ * @property nombre Nombre exacto, tal como lo valida el backend al crear un reporte
+ * @property clave Clave del municipio, opcional
  */
 data class MunicipioResponse(
     @SerializedName("id_municipio") val idMunicipio: Int,
@@ -122,7 +135,15 @@ data class MunicipioResponse(
     @SerializedName("clave") val clave: String? = null
 )
 
-/** Ubicación de un reporte en el listado. */
+/**
+ * Ubicación de un reporte en el listado
+ *
+ * @property municipio Nombre del municipio
+ * @property colonia Colonia
+ * @property calle Calle
+ * @property lat Latitud en grados decimales
+ * @property lng Longitud en grados decimales
+ */
 data class UbicacionResumenResponse(
     @SerializedName("municipio") val municipio: String? = null,
     @SerializedName("colonia") val colonia: String? = null,
@@ -131,7 +152,20 @@ data class UbicacionResumenResponse(
     @SerializedName("lng") val lng: Double? = null
 )
 
-/** Un reporte tal como lo devuelve `GET /reportes/`. */
+/**
+ * Un reporte tal como lo devuelve `GET /reportes/`
+ *
+ * @property idReporte Identificador único del reporte
+ * @property idCaso Identificador del caso asociado; `null` si el reporte aún no tiene caso
+ * @property folioReporte Folio del reporte
+ * @property fechaReporte Fecha de creación del reporte como la manda el API
+ * @property descripcion Descripción de la situación
+ * @property estatusSeguimiento Estatus con el que se da seguimiento al reporte
+ * @property cantidadNna Etiqueta de [CantidadNna]
+ * @property edadAproximada Etiqueta de [RangoEdad]
+ * @property tipoTrabajo Etiqueta de [Actividad]
+ * @property ubicacion Ubicación del reporte
+ */
 data class ReporteListadoResponse(
     @SerializedName("id_reporte") val idReporte: Int,
     @SerializedName("id_caso") val idCaso: Int? = null,

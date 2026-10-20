@@ -37,12 +37,13 @@ import mx.itesm.myapplication.viewModel.AuthUiState
 import mx.itesm.myapplication.viewModel.AuthViewModel
 
 /**
- * Formulario de inicio de sesión de usuario.
+ * Formulario de inicio de sesión de usuario
  *
- * Muestra los campos de texto para correo electrónico y contraseña con soporte de desplazamiento vertical.
+ * Muestra los campos de correo electrónico y contraseña con desplazamiento vertical. Al iniciar sesión con éxito
+ * va a la pantalla principal y quita el login de la pila de navegación
  *
- * @param navController Controlador de navegación [NavHostController].
- * @param authViewModel Instancia de [AuthViewModel] inyectada o proveída.
+ * @param navController Controlador de navegación [NavHostController]
+ * @param authViewModel [AuthViewModel] que hace el login y expone su estado
  */
 @Composable
 fun LoginForm(
@@ -149,13 +150,14 @@ fun LoginForm(
 }
 
 /**
- * Formulario para el registro de nuevos usuarios en la plataforma.
+ * Formulario para el registro de nuevos usuarios en la plataforma
  *
  * Incluye scroll vertical (`verticalScroll`) y espaciado compacto para garantizar que
- * todos los campos y el botón "Crear cuenta" sean visibles en cualquier pantalla.
+ * todos los campos y el botón "Crear cuenta" sean visibles en cualquier pantalla. Al registrarse con éxito
+ * va a la pantalla principal y quita el registro de la pila de navegación
  *
- * @param navController Controlador de navegación [NavHostController].
- * @param authViewModel Instancia de [AuthViewModel] inyectada o proveída.
+ * @param navController Controlador de navegación [NavHostController]
+ * @param authViewModel [AuthViewModel] que hace el registro y expone su estado
  */
 @Composable
 fun RegisterForm(

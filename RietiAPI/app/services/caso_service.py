@@ -22,6 +22,25 @@ def abrir_caso_desde_reporte(
     datos: AbrirCasoDesdeReporte | None,
     id_usuario_actual: int,
 ) -> CasoAbiertoResponse:
+    """Abre un caso a partir de un reporte y lo canaliza
+
+    Crea una ubicación propia del caso (solo con el municipio si no se envía una), el caso en estado Abierto
+    y deja el reporte en Canalizado con el bloqueo de fila activo hasta el commit
+
+    Args:
+        db: sesión de base de datos
+        id_reporte: identificador del reporte que origina el caso
+        datos: municipio, ubicación y urgencia opcionales del caso; None equivale a todo vacío
+        id_usuario_actual: identificador de quien abre el caso, se registra en la bitácora
+
+    Returns:
+        El caso abierto con el estatus de seguimiento del reporte
+
+    Raises:
+        HTTPException: 404 si el reporte no existe
+        HTTPException: 409 si el reporte ya pertenece a un caso o está rechazado
+        HTTPException: 404 si el municipio indicado no existe
+    """
     if datos is None:
         datos = AbrirCasoDesdeReporte()
     try:
@@ -114,6 +133,14 @@ def abrir_caso_desde_reporte(
 
 
 def _datos_publicos(fila):
+    """Convierte una fila de la consulta de casos en los campos comunes del listado y del detalle
+
+    Args:
+        fila: fila con el caso, los nombres de municipio, la ubicación, las coordenadas y el conteo de reportes
+
+    Returns:
+        Diccionario con los campos de CasoListado
+    """
     caso = fila.Caso
     return dict(
         id_caso=caso.id_caso,
@@ -129,10 +156,30 @@ def _datos_publicos(fila):
 
 
 def listar_casos(*, db: Session) -> list[CasoListado]:
+    """Lista todos los casos, del más reciente al más antiguo
+
+    Args:
+        db: sesión de base de datos
+
+    Returns:
+        Los casos sin notas ni seguimientos
+    """
     return [CasoListado(**_datos_publicos(fila)) for fila in caso_repository.listar(db)]
 
 
 def obtener_caso(*, db: Session, id_caso: int) -> CasoDetalle:
+    """Obtiene el detalle de un caso con sus seguimientos
+
+    Args:
+        db: sesión de base de datos
+        id_caso: identificador del caso
+
+    Returns:
+        El caso con seguimientos ordenados por consecutivo y la última nota (None si no hay seguimientos)
+
+    Raises:
+        HTTPException: 404 si el caso no existe
+    """
     fila = caso_repository.obtener_detalle(db, id_caso)
     if fila is None:
         raise HTTPException(status_code=404, detail="El caso no existe")
@@ -152,6 +199,15 @@ def obtener_caso(*, db: Session, id_caso: int) -> CasoDetalle:
 
 
 def _diferencias(antes: dict, despues: dict) -> tuple[dict, dict]:
+    """Calcula qué campos cambiaron para guardar solo esos valores en la bitácora
+
+    Args:
+        antes: valores anteriores
+        despues: valores nuevos
+
+    Returns:
+        Tupla con los valores anteriores y los nuevos de los campos que difieren
+    """
     campos = [campo for campo, valor in despues.items() if antes.get(campo) != valor]
     return (
         {campo: antes.get(campo) for campo in campos},
@@ -160,6 +216,16 @@ def _diferencias(antes: dict, despues: dict) -> tuple[dict, dict]:
 
 
 def _actualizar_ubicacion(db: Session, caso: Caso, valores: dict) -> tuple[dict, dict]:
+    """Aplica los cambios de ubicación a la ubicación propia del caso
+
+    Args:
+        db: sesión de base de datos
+        caso: caso cuya ubicación se modifica
+        valores: campos de ubicación a cambiar, con lat y lng siempre juntos
+
+    Returns:
+        Tupla con los valores anteriores y los nuevos de los campos que cambiaron
+    """
     actual = caso_repository.obtener_datos_ubicacion(db, caso.id_ubicacion)
     ubicacion = caso_repository.obtener_ubicacion(db, caso.id_ubicacion)
     for campo in ("colonia", "calle", "referencia"):
@@ -175,6 +241,22 @@ def _actualizar_ubicacion(db: Session, caso: Caso, valores: dict) -> tuple[dict,
 def actualizar_caso(
     *, db: Session, id_caso: int, datos: ActualizarCaso, id_usuario_actual: int
 ) -> CasoDetalle:
+    """Actualiza estado, urgencia, datos confirmados o ubicación de un caso
+
+    Los campos omitidos o None se ignoran y cada cambio queda en la bitácora
+
+    Args:
+        db: sesión de base de datos
+        id_caso: identificador del caso
+        datos: campos a modificar
+        id_usuario_actual: identificador de quien modifica, se registra en la bitácora
+
+    Returns:
+        El detalle del caso ya actualizado
+
+    Raises:
+        HTTPException: 404 si el caso no existe
+    """
     try:
         caso = caso_repository.obtener_para_actualizar(db, id_caso)
         if caso is None:
@@ -227,6 +309,21 @@ def actualizar_caso(
 def transferir_caso(
     *, db: Session, id_caso: int, datos: TransferirCaso, id_usuario_actual: int
 ) -> CasoDetalle:
+    """Cambia el municipio responsable de un caso sin crear seguimientos
+
+    Args:
+        db: sesión de base de datos
+        id_caso: identificador del caso
+        datos: municipio destino
+        id_usuario_actual: identificador de quien transfiere, se registra en la bitácora
+
+    Returns:
+        El detalle del caso con el municipio nuevo
+
+    Raises:
+        HTTPException: 404 si el caso no existe
+        HTTPException: 404 si el municipio destino no existe
+    """
     try:
         caso = caso_repository.obtener_para_actualizar(db, id_caso)
         if caso is None:
@@ -265,6 +362,18 @@ def transferir_caso(
 def eliminar_casos(
     *, db: Session, datos: EliminarCasos, id_usuario_actual: int
 ) -> EliminarCasosResponse:
+    """Elimina en lote los casos cerrados y omite los demás
+
+    Libera sus reportes, borra seguimientos y asignaciones, y elimina las ubicaciones que queden sin uso
+
+    Args:
+        db: sesión de base de datos
+        datos: identificadores de los casos a eliminar
+        id_usuario_actual: identificador de quien elimina, se registra en la bitácora
+
+    Returns:
+        Los identificadores eliminados y los omitidos
+    """
     ids = sorted(set(datos.ids))
     try:
         eliminables = [

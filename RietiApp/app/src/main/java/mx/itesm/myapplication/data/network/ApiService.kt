@@ -13,64 +13,74 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 /**
- * Interfaz de Retrofit que define las endpoints del API REST para la aplicación Rieti.
+ * Interfaz de Retrofit que define las endpoints del API REST para la aplicación Rieti
  */
 interface ApiService {
 
     /**
-     * Verifica la disponibilidad de la ruta raíz del servidor.
+     * Verifica la disponibilidad de la ruta raíz del servidor
      *
-     * @return [Response] conteniendo un mapa de mensaje devuelto por el servidor.
+     * @return [Response] conteniendo un mapa de mensaje devuelto por el servidor
      */
     @GET("/")
     suspend fun checkRoot(): Response<Map<String, String>>
 
     /**
-     * Verifica el estado de salud y funcionamiento del backend.
+     * Verifica el estado de salud y funcionamiento del backend
      *
-     * @return [Response] con la confirmación del estado del servicio.
+     * @return [Response] con la confirmación del estado del servicio
      */
     @GET("health")
     suspend fun healthCheck(): Response<Map<String, String>>
 
     /**
-     * Inicia sesión para un usuario registrado.
+     * Inicia sesión para un usuario registrado
      *
-     * @param datos Objeto [UsuarioLoginRequest] con el correo y contraseña.
-     * @return [Response] con la información del usuario autenticado [UsuarioResponse].
+     * @param datos Objeto [UsuarioLoginRequest] con el correo y contraseña
+     * @return [Response] con la información del usuario autenticado [UsuarioResponse]
      */
     @POST("usuarios/login")
     suspend fun login(@Body datos: UsuarioLoginRequest): Response<UsuarioResponse>
 
     /**
-     * Registra un nuevo usuario en la plataforma.
+     * Registra un nuevo usuario en la plataforma
      *
-     * @param datos Objeto [UsuarioCreateRequest] con los datos de registro del usuario.
-     * @return [Response] con la información del usuario creado [UsuarioResponse].
+     * @param datos Objeto [UsuarioCreateRequest] con los datos de registro del usuario
+     * @return [Response] con la información del usuario creado [UsuarioResponse]
      */
     @POST("usuarios")
     suspend fun crearUsuario(@Body datos: UsuarioCreateRequest): Response<UsuarioResponse>
 
     /**
-     * Cierra la sesión activa del usuario e invalida la cookie de sesión en el servidor.
+     * Cierra la sesión activa del usuario e invalida la cookie de sesión en el servidor
      *
-     * @return [Response] con el mensaje de confirmación de cierre de sesión.
+     * @return [Response] con el mensaje de confirmación de cierre de sesión
      */
     @POST("usuarios/logout")
     suspend fun logout(): Response<Map<String, String>>
 
     /**
-     * Registra un nuevo reporte en el sistema.
+     * Registra un nuevo reporte en el sistema
      *
-     * @param datos Objeto [ReporteCreateRequest] con los detalles del reporte y ubicación.
-     * @return [Response] con los identificadores del reporte creado [ReporteResponse].
+     * @param datos Objeto [ReporteCreateRequest] con los detalles del reporte y ubicación
+     * @return [Response] con los identificadores del reporte creado [ReporteResponse]
      */
     @POST("reportes/")
     suspend fun crearReporte(@Body datos: ReporteCreateRequest): Response<ReporteResponse>
 
+    /**
+     * Lista los municipios con `GET /municipios/`
+     *
+     * @return Respuesta con la lista de [MunicipioResponse]
+     */
     @GET("municipios/")
     suspend fun obtenerMunicipios(): Response<List<MunicipioResponse>>
 
+    /**
+     * Lista los reportes del usuario con sesión con `GET /reportes/`
+     *
+     * @return Respuesta con la lista de [ReporteListadoResponse]
+     */
     @GET("reportes/")
     suspend fun obtenerMisReportes(): Response<List<ReporteListadoResponse>>
 }

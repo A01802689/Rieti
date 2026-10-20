@@ -6,6 +6,7 @@ from enum import Enum
 
 
 class EntityType(str, Enum):
+    """Tipo de entidad a la que se refiere una entrada de la bitácora"""
     USUARIO = "usuario"
     MUNICIPIO = "municipio"
     REPORTE = "reporte"
@@ -14,6 +15,16 @@ class EntityType(str, Enum):
 
 
 class Log(Base):
+    """Tabla logs: bitácora de acciones de las personas usuarias del panel
+
+    Attributes:
+        action: descripción de la acción realizada
+        entity_type: tipo de registro afectado
+        id_registro_afectado: identificador del registro afectado dentro de su tabla
+        before_data: valores anteriores a la acción, objeto vacío si no había
+        after_data: valores posteriores a la acción, NULL si la acción no deja valores nuevos como en una baja
+        fecha: momento de la acción en UTC sin zona horaria
+    """
     __tablename__ = "logs"
 
     id_logs = Column(

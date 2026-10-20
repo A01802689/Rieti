@@ -27,58 +27,104 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.text.Normalizer
 
-/**
- * Representa los estados del envío del reporte a la API.
- */
+/** Estados del envío del reporte a la API */
 sealed interface EnvioUiState {
+    /** Todavía no se envía */
     object Idle : EnvioUiState
+
+    /** Se está creando el reporte en el backend */
     object Loading : EnvioUiState
+
+    /** El reporte ya se creó y se está subiendo la imagen */
     object SubiendoImagen : EnvioUiState
+
+    /**
+     * El reporte se creó
+     *
+     * @property folio Folio del reporte; `null` en reportes anónimos
+     * @property fotoPendiente `true` si había foto y no se pudo subir
+     */
     data class Success(val folio: String?, val fotoPendiente: Boolean = false) : EnvioUiState
+
+    /**
+     * El envío falló
+     *
+     * @property message Mensaje de error para mostrar al usuario
+     */
     data class Error(val message: String) : EnvioUiState
 }
 
-/** Estado de la carga de municipios desde el backend. */
+/** Estados de la carga de municipios desde el backend */
 sealed interface MunicipiosUiState {
+    /** Se está pidiendo la lista */
     object Loading : MunicipiosUiState
+
+    /**
+     * La lista llegó
+     *
+     * @property municipios Municipios ordenados por nombre
+     */
     data class Success(val municipios: List<MunicipioResponse>) : MunicipiosUiState
+
+    /**
+     * No se pudo obtener la lista
+     *
+     * @property message Mensaje de error para mostrar al usuario
+     */
     data class Error(val message: String) : MunicipiosUiState
 }
 
 /**
- * Estado UI reactivo que contiene la información completa recopilada en los pasos del reporte.
+ * Estado de la pantalla que reúne lo capturado en los pasos del reporte
+ *
+ * @property esAnonimo `true` si el reporte es anónimo; `false` si lleva seguimiento con la cuenta del usuario
+ * @property nombre Nombre de contacto, solo con seguimiento
+ * @property apellidos Apellidos de contacto, solo con seguimiento
+ * @property telefono Teléfono de contacto, solo con seguimiento; solo dígitos, hasta 10
+ * @property cantidad Cantidad de NNA elegida, o `null` si no se ha respondido
+ * @property edad Rango de edad elegido, o `null` si no se ha respondido
+ * @property actividad Actividad observada, o `null` si no se ha respondido
+ * @property riesgo Nivel de riesgo elegido, o `null` si no se ha respondido
+ * @property municipio Nombre del municipio, vacío si no se ha elegido
+ * @property colonia Colonia escrita, vacía si no se ha capturado
+ * @property calle Calle escrita, vacía si no se ha capturado
+ * @property latitud Latitud elegida en el mapa, o `null` si no se ha elegido un punto
+ * @property longitud Longitud elegida en el mapa, o `null` si no se ha elegido un punto
+ * @property descripcion Descripción opcional de la situación
+ * @property envio Estado del envío del reporte
+ * @property foto Foto adjunta ya procesada, o `null` si no hay
  */
 data class ReporteUiState(
     val esAnonimo: Boolean = true,
-    //Contacto (solo con seguimiento)
     val nombre: String = "",
     val apellidos: String = "",
     val telefono: String = "",
-    //Formulario
     val cantidad: CantidadNna? = null,
     val edad: RangoEdad? = null,
     val actividad: Actividad? = null,
     val riesgo: Riesgo? = null,
-    //Ubicacion
     val municipio: String = "",
     val colonia: String = "",
     val calle: String = "",
     val latitud: Double? = null,
     val longitud: Double? = null,
-    //Envío
     val descripcion: String = "",
     val envio: EnvioUiState = EnvioUiState.Idle,
     val foto: FotoReporte? = null
 ) {
-    /** Nombre, apellidos y teléfono de 10 dígitos capturados. */
+    /** Nombre, apellidos y teléfono de 10 dígitos capturados */
     val contactoValido: Boolean
         get() = nombre.isNotBlank() && apellidos.isNotBlank() && telefono.length == 10
 
-    /** Las cuatro preguntas del formulario respondidas. */
+    /** Las cuatro preguntas del formulario respondidas */
     val formularioValido: Boolean
         get() = cantidad != null && edad != null && actividad != null && riesgo != null
+
+    /** Punto del mapa elegido y municipio, colonia y calle capturados */
     val ubicacionValida: Boolean
         get() = latitud != null && longitud != null && municipio.isNotBlank() && colonia.isNotBlank() && calle.isNotBlank()
+
+    /** Formulario y ubicación completos, contacto válido si hay seguimiento y ningún envío en curso o terminado */
     val puedeEnviar: Boolean
         get() = formularioValido && ubicacionValida &&
             (esAnonimo || contactoValido)
@@ -86,9 +132,12 @@ data class ReporteUiState(
 }
 
 /**
- * Convierte el estado de la UI en la petición para el backend.
+ * Convierte el estado de la pantalla en la petición para el backend
  *
- * @return La petición, o `null` si faltan datos obligatorios.
+ * Los textos vacíos se mandan como `null`; los datos de contacto no forman parte de la petición
+ *
+ * @receiver Estado de la pantalla con lo capturado
+ * @return La petición, o `null` si faltan datos obligatorios
  */
 fun ReporteUiState.toRequest(): ReporteCreateRequest? {
     val cantidad = cantidad ?: return null
@@ -121,10 +170,7 @@ fun ReporteUiState.toRequest(): ReporteCreateRequest? {
     )
 }
 
-/**
- * [ViewModel] que administra el estado y la lógica de negocio para crear,
- * validar y enviar reportes al backend a través del [ApiClient].
- */
+/** [ViewModel] que guarda lo capturado en los pasos del reporte, carga los municipios y envía el reporte al backend */
 class ReporteViewModel : ViewModel() {
 
     private companion object {
@@ -133,18 +179,21 @@ class ReporteViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReporteUiState())
 
-    /** Estado UI reactivo expuesto a las vistas Composable. */
+    /** Estado del reporte que observan las pantallas */
     val uiState: StateFlow<ReporteUiState> = _uiState.asStateFlow()
 
     private val _municipios = MutableStateFlow<MunicipiosUiState>(MunicipiosUiState.Loading)
 
-    /** Municipios disponibles para el selector. */
+    /** Estado de la carga de municipios para el selector */
     val municipios: StateFlow<MunicipiosUiState> = _municipios.asStateFlow()
 
     /**
-     * Define el tipo de reporte. Con seguimiento, precarga nombre y apellidos desde la sesión
-     * (solo si están vacíos, para no pisar lo que el usuario haya editado). En anónimo, descarta
-     * cualquier dato de contacto.
+     * Define el tipo de reporte
+     *
+     * Con seguimiento, precarga nombre y apellidos desde la sesión solo si están vacíos, para no pisar
+     * lo que el usuario haya editado. En anónimo, descarta cualquier dato de contacto
+     *
+     * @param esAnonimo `true` para un reporte anónimo; `false` para uno con seguimiento
      */
     fun setEsAnonimo(esAnonimo: Boolean) = _uiState.update { estado ->
         if (esAnonimo) {
@@ -160,43 +209,103 @@ class ReporteViewModel : ViewModel() {
     }
 
     /**
-     * Actualiza los datos de contacto del usuario (en reportes con seguimiento).
+     * Guarda el nombre de contacto del reporte con seguimiento
+     *
+     * @param valor Nombre capturado
      */
     fun setNombre(valor: String) = _uiState.update { it.copy(nombre = valor) }
+
+    /**
+     * Guarda los apellidos de contacto del reporte con seguimiento
+     *
+     * @param valor Apellidos capturados
+     */
     fun setApellidos(valor: String) = _uiState.update { it.copy(apellidos = valor) }
 
-    /** Conserva solo dígitos y limita a 10. */
+    /**
+     * Guarda el teléfono de contacto; conserva solo dígitos y limita a 10
+     *
+     * @param valor Teléfono capturado
+     */
     fun setTelefono(valor: String) =
         _uiState.update { it.copy(telefono = valor.filter(Char::isDigit).take(10)) }
 
     /**
-     * Actualiza las selecciones de categoría del formulario de reporte.
+     * Guarda la cantidad de NNA elegida
+     *
+     * @param valor Opción elegida, o `null` para quitarla
      */
     fun setCantidad(valor: CantidadNna?) = _uiState.update { it.copy(cantidad = valor) }
+
+    /**
+     * Guarda el rango de edad elegido
+     *
+     * @param valor Opción elegida, o `null` para quitarla
+     */
     fun setEdad(valor: RangoEdad?) = _uiState.update { it.copy(edad = valor) }
+
+    /**
+     * Guarda la actividad observada
+     *
+     * @param valor Opción elegida, o `null` para quitarla
+     */
     fun setActividad(valor: Actividad?) = _uiState.update { it.copy(actividad = valor) }
+
+    /**
+     * Guarda el nivel de riesgo elegido
+     *
+     * @param valor Opción elegida, o `null` para quitarla
+     */
     fun setRiesgo(valor: Riesgo?) = _uiState.update { it.copy(riesgo = valor) }
 
     /**
-     * Actualiza los datos de ubicación geográfica o dirección.
+     * Guarda el municipio
+     *
+     * @param valor Nombre del municipio
      */
     fun setMunicipio(valor: String) = _uiState.update { it.copy(municipio = valor) }
+
+    /**
+     * Guarda la colonia
+     *
+     * @param valor Colonia capturada
+     */
     fun setColonia(valor: String) = _uiState.update { it.copy(colonia = valor) }
+
+    /**
+     * Guarda la calle
+     *
+     * @param valor Calle capturada
+     */
     fun setCalle(valor: String) = _uiState.update { it.copy(calle = valor) }
 
-    /** Guarda las coordenadas elegidas en el mapa sin tocar la dirección escrita. */
+    /**
+     * Guarda las coordenadas elegidas en el mapa sin tocar la dirección escrita
+     *
+     * @param latitud Latitud en grados decimales
+     * @param longitud Longitud en grados decimales
+     */
     fun setCoordenadas(latitud: Double, longitud: Double) =
         _uiState.update { it.copy(latitud = latitud, longitud = longitud) }
 
     /**
-     * Actualiza el texto descriptivo detallado del incidente.
+     * Guarda la descripción de la situación
+     *
+     * @param valor Texto capturado
      */
     fun setDescripcion(valor: String) = _uiState.update { it.copy(descripcion = valor) }
 
+    /**
+     * Guarda la foto adjunta
+     *
+     * @param foto Foto ya procesada, o `null` para quitarla
+     */
     fun setFoto(foto: FotoReporte?) = _uiState.update { it.copy(foto = foto) }
 
     /**
-     * Envía la información recopilada del reporte a la API REST backend.
+     * Crea el reporte con `POST /reportes/` y, si hay foto y el backend devolvió URL de subida, la sube
+     *
+     * No hace nada si [ReporteUiState.puedeEnviar] es `false`. En reportes anónimos no se guarda el folio
      */
     fun enviarReporte() {
         val state = _uiState.value
@@ -245,6 +354,15 @@ class ReporteViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Saca un mensaje legible de la respuesta de error del backend
+     *
+     * Entiende el `detail` de FastAPI (texto o lista de errores de validación) y los campos `message` y `error`
+     *
+     * @param rawError Cuerpo de la respuesta de error, si lo hay
+     * @param code Código HTTP de la respuesta
+     * @return El mensaje del backend, o uno genérico según [code] si el cuerpo viene vacío
+     */
     private fun parsearErrorBackend(rawError: String?, code: Int): String {
         if (rawError.isNullOrBlank()) {
             return when (code) {
@@ -287,7 +405,7 @@ class ReporteViewModel : ViewModel() {
         cargarMunicipios()
     }
 
-    /** Pide al backend la lista de municipios. También sirve como "Reintentar". */
+    /** Pide la lista de municipios con `GET /municipios/`; también sirve para reintentar */
     fun cargarMunicipios() {
         _municipios.value = MunicipiosUiState.Loading
         viewModelScope.launch {
@@ -321,9 +439,12 @@ class ReporteViewModel : ViewModel() {
     }
 
     /**
-     * Aplica la dirección sugerida para el punto elegido. Calle y colonia se reemplazan por la
-     * sugerencia (o quedan vacías si no hay), para no conservar datos del punto anterior.
-     * El municipio solo cambia si coincide con alguno de la lista cargada del backend.
+     * Aplica la dirección sugerida para el punto elegido
+     *
+     * Calle y colonia se reemplazan por la sugerencia (o quedan vacías si no hay), para no conservar datos
+     * del punto anterior. El municipio solo cambia si coincide con alguno de la lista cargada del backend
+     *
+     * @param sugerida Dirección obtenida de las coordenadas, o `null` si no se pudo obtener
      */
     fun aplicarDireccionSugerida(sugerida: DireccionSugerida?) {
         val lista = (municipios.value as? MunicipiosUiState.Success)?.municipios.orEmpty()
@@ -341,17 +462,13 @@ class ReporteViewModel : ViewModel() {
         }
     }
 
-    /** Minúsculas y sin acentos, para comparar nombres. */
+    /** Minúsculas y sin acentos, para comparar nombres */
     private fun String.normalizado(): String =
         Normalizer.normalize(lowercase().trim(), Normalizer.Form.NFD).replace("\\p{M}+".toRegex(), "")
 
-    /**
-     * Restablece el estado de envío a [EnvioUiState.Idle].
-     */
+    /** Regresa el estado del envío a [EnvioUiState.Idle] */
     fun resetEnvioState() = _uiState.update { it.copy(envio = EnvioUiState.Idle) }
 
-    /**
-     * Reinicia completamente el formulario para capturar un nuevo reporte.
-     */
+    /** Borra todo lo capturado para empezar otro reporte, conservando si es anónimo o con seguimiento */
     fun resetFormulario() = _uiState.update { ReporteUiState(esAnonimo = it.esAnonimo) }
 }

@@ -34,6 +34,7 @@ from app.services import reporte_service
 
 router = APIRouter(prefix="/reportes",tags=["Reportes"] )
 
+#: dependencia compartida por las tres rutas de imagen, acepta reports.view, reports.view_detail o cases.view
 exigir_lectura_imagen = exigir_permiso(
     PermisoEnum.reports_view,
     PermisoEnum.reports_view_detail,
@@ -42,6 +43,15 @@ exigir_lectura_imagen = exigir_permiso(
 
 
 def _agregar_urls_imagen(detalle: ReporteDetalle, request: Request) -> ReporteDetalle:
+    """Agrega al detalle las rutas estables de visualización y descarga de la imagen, si el reporte tiene una
+
+    Args:
+        detalle: detalle del reporte que se completa
+        request: petición HTTP con la que se construyen las URL absolutas
+
+    Returns:
+        El mismo detalle, con imagen y url_descarga_imagen cuando tiene imagen
+    """
     if detalle.tiene_imagen:
         detalle.imagen = str(
             request.url_for("ver_imagen_reporte", id_reporte=detalle.id_reporte)
@@ -60,6 +70,23 @@ def listar_reportes(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(get_current_user),
 ):
+    """Lista los reportes, los propios para un ciudadano y todos para el personal
+
+    El personal requiere reports.view, map.view o stats.view (con id_caso también vale cases.view)
+    y sin reports.view ni reports.view_detail recibe una versión reducida sin descripción, usuario ni imagen
+
+    Args:
+        request: petición HTTP con la que se construyen las URL de imagen
+        id_caso: filtra por caso, solo lo aplica el personal
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Reportes ordenados del más reciente al más antiguo
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 si el personal no tiene ninguno de los permisos
+    """
     es_personal = usuario_actual.rol is not None
     if es_personal:
         exigir_alguno(usuario_actual, *permisos_listado_reportes(id_caso))
@@ -85,6 +112,19 @@ def obtener_reporte(
     request: Request,
     db: Session = Depends(get_db),
 ):
+    """Obtiene el detalle de un reporte, requiere reports.view_detail
+
+    Args:
+        id_reporte: identificador del reporte
+        request: petición HTTP con la que se construyen las URL de imagen
+        db: sesión de base de datos
+
+    Returns:
+        Detalle del reporte con ubicación y rutas de imagen
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso, 404 si el reporte no existe
+    """
     detalle = reporte_service.obtener_detalle_reporte(db=db, id_reporte=id_reporte)
     return _agregar_urls_imagen(detalle, request)
 
@@ -97,6 +137,23 @@ def actualizar_reporte(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(exigir_personal),
 ):
+    """Actualiza el estatus y el riesgo de un reporte, requiere reports.edit o reports.close si el estatus lo cierra
+
+    Sacar un reporte de Rechazado solo lo puede hacer un administrador
+
+    Args:
+        id_reporte: identificador del reporte
+        datos: campos a cambiar, los omitidos no se tocan
+        request: petición HTTP con la que se construyen las URL de imagen
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Detalle del reporte actualizado
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso o si reabre un reporte rechazado sin ser administrador, 404 si el reporte no existe
+    """
     exigir_todos(usuario_actual, permisos_cambio_reporte(datos.estatus_seguimiento))
 
     detalle = reporte_service.actualizar_reporte(
@@ -116,6 +173,22 @@ def cambiar_estatus_reporte(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(exigir_personal),
 ):
+    """Cambia solo el estatus de un reporte, requiere reports.edit o reports.close si el estatus lo cierra
+
+    Sacar un reporte de Rechazado solo lo puede hacer un administrador
+
+    Args:
+        id_reporte: identificador del reporte
+        datos: nuevo estatus
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Identificador y estatus resultante del reporte
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso o si reabre un reporte rechazado sin ser administrador, 404 si el reporte no existe
+    """
     exigir_todos(usuario_actual, permisos_cambio_reporte(datos.estatus_seguimiento))
 
     return reporte_service.cambiar_estatus_reporte(
@@ -133,6 +206,19 @@ def rechazar_reporte(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(exigir_permiso(PermisoEnum.reports_close)),
 ):
+    """Rechaza un reporte que no pertenece a ningún caso, requiere reports.close
+
+    Args:
+        id_reporte: identificador del reporte
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Identificador, caso y estatus resultante del reporte
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso, 404 si el reporte no existe, 409 si ya está rechazado o ya pertenece a un caso
+    """
     return reporte_service.rechazar_reporte(
         db=db,
         id_reporte=id_reporte,
@@ -146,6 +232,19 @@ def reabrir_reporte(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(exigir_administrador),
 ):
+    """Reabre un reporte rechazado y lo regresa a Recibido, requiere rol Administrador
+
+    Args:
+        id_reporte: identificador del reporte
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Identificador, caso y estatus resultante del reporte
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 si no es administrador, 404 si el reporte no existe, 409 si no está rechazado
+    """
     return reporte_service.reabrir_reporte(
         db=db,
         id_reporte=id_reporte,
@@ -159,6 +258,19 @@ def desvincular_reporte(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(exigir_permiso(PermisoEnum.reports_edit)),
 ):
+    """Saca un reporte de su caso y lo deja En revisión, requiere reports.edit
+
+    Args:
+        id_reporte: identificador del reporte
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Identificador, caso y estatus resultante del reporte
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso o si el reporte está rechazado y no es administrador, 404 si el reporte no existe, 409 si no pertenece a ningún caso
+    """
     return reporte_service.desvincular_reporte(
         db=db,
         id_reporte=id_reporte,
@@ -177,6 +289,19 @@ def obtener_imagen_reporte(
     response: Response,
     db: Session = Depends(get_db),
 ):
+    """Obtiene URL prefirmadas de visualización y descarga de la imagen de un reporte, requiere reports.view, reports.view_detail o cases.view
+
+    Args:
+        id_reporte: identificador del reporte
+        response: respuesta HTTP a la que se agrega Cache-Control en no-store
+        db: sesión de base de datos
+
+    Returns:
+        URL temporales de visualización y descarga, con su tiempo de expiración
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso, 404 si el reporte no existe, no tiene imagen o la imagen aún no está en S3, 502 si falla S3
+    """
     resultado = reporte_service.obtener_urls_imagen_reporte(
         db=db, id_reporte=id_reporte
     )
@@ -194,6 +319,18 @@ def ver_imagen_reporte(
     id_reporte: int,
     db: Session = Depends(get_db),
 ):
+    """Redirige a una URL prefirmada nueva para ver la imagen de un reporte, requiere reports.view, reports.view_detail o cases.view
+
+    Args:
+        id_reporte: identificador del reporte
+        db: sesión de base de datos
+
+    Returns:
+        Redirección 302 a la imagen en S3
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso, 404 si el reporte no existe, no tiene imagen o la imagen aún no está en S3, 502 si falla S3
+    """
     enlaces = reporte_service.obtener_urls_imagen_reporte(
         db=db, id_reporte=id_reporte
     )
@@ -214,6 +351,18 @@ def descargar_imagen_reporte(
     id_reporte: int,
     db: Session = Depends(get_db),
 ):
+    """Redirige a una URL prefirmada nueva para descargar la imagen de un reporte, requiere reports.view, reports.view_detail o cases.view
+
+    Args:
+        id_reporte: identificador del reporte
+        db: sesión de base de datos
+
+    Returns:
+        Redirección 302 a la descarga en S3
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso, 404 si el reporte no existe, no tiene imagen o la imagen aún no está en S3, 502 si falla S3
+    """
     enlaces = reporte_service.obtener_urls_imagen_reporte(
         db=db, id_reporte=id_reporte
     )
@@ -240,6 +389,21 @@ def crear_reporte(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(get_current_user),
 ):
+    """Crea un reporte nuevo, solo para ciudadanos con sesión (usuarios sin rol)
+
+    Si se pide imagen, la respuesta incluye una URL prefirmada para subirla a S3
+
+    Args:
+        datos: datos del reporte y su ubicación
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Identificadores y folio del reporte creado, con la URL de subida de imagen si se pidió
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 si el usuario tiene rol, 404 si el municipio no existe
+    """
 
     if usuario_actual.rol is not None:
         raise HTTPException(
@@ -260,6 +424,20 @@ def asociar_reporte_a_caso(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(exigir_permiso(PermisoEnum.reports_edit)),
 ):
+    """Asocia un reporte a un caso existente y lo deja Canalizado, requiere reports.edit
+
+    Args:
+        id_reporte: identificador del reporte
+        datos: caso al que se asocia
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Identificador, caso y estatus resultante del reporte
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 sin el permiso o si el reporte está rechazado y no es administrador, 404 si el reporte o el caso no existen
+    """
     return reporte_service.asociar_reporte_a_caso(
         db=db,
         id_reporte=id_reporte,
@@ -275,6 +453,21 @@ def eliminar_reportes(
     db: Session = Depends(get_db),
     usuario_actual: Usuario = Depends(exigir_administrador),
 ):
+    """Elimina varios reportes, requiere rol Administrador
+
+    Solo se eliminan los reportes rechazados, los demás se devuelven como omitidos
+
+    Args:
+        datos: identificadores de los reportes a eliminar
+        db: sesión de base de datos
+        usuario_actual: usuario de la sesión
+
+    Returns:
+        Identificadores eliminados y omitidos
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 si no es administrador, 502 si falla el borrado de la imagen en S3
+    """
     return reporte_service.eliminar_reportes(
         db=db,
         datos=datos,

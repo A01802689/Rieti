@@ -38,13 +38,13 @@ import mx.itesm.myapplication.view.Pantalla
 import mx.itesm.myapplication.viewModel.AuthViewModel
 
 /**
- * Barra superior de la pantalla principal.
+ * Barra superior de la pantalla principal
  *
- * Muestra el logotipo institucional de RIETI junto con los títulos de la pantalla
- * y el botón para cerrar sesión / volver al inicio.
+ * Muestra el logotipo de SIPINNA junto con los títulos de la pantalla y el botón para cerrar sesión,
+ * que además regresa al login
  *
- * @param navController Controlador de navegación para manejar la navegación entre pantallas.
- * @param modifier [Modifier] opcional para personalizar el diseño.
+ * @param navController Controlador de navegación para ir al login al cerrar sesión
+ * @param modifier [Modifier] opcional para personalizar el diseño
  */
 @Composable
 fun TopMainView(navController: NavController, modifier: Modifier = Modifier) {

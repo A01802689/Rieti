@@ -9,5 +9,11 @@ from urllib.parse import quote_plus #esto porque agregue un # en el password y e
 
 password = quote_plus(settings.DB_PASSWORD)
 DATABASE_URL = f"postgresql+psycopg://{settings.DB_USER}:{password}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
-engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_recycle=300)
+#: Las sesiones usan UTC para que now() guarde siempre la misma hora, sin depender de la zona del servidor de la base
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    connect_args={"options": "-c timezone=UTC"},
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

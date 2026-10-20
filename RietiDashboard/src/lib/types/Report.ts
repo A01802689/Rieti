@@ -71,12 +71,20 @@ export interface Reporte {
   tipo_trabajo: TipoTrabajo
   descripcion: string | null
   fecha_reporte: string // ISO 8601 TIMESTAMP, UTC without zone
+  /** Address of the photo through the API, null when the report has none; the dashboard only uses it to know there is a photo and asks GET /reportes/{id}/imagen for the real link */
   imagen: string | null
   riesgo: Riesgo | null
   /** Only the detail endpoint sends it */
   tiene_imagen?: boolean
   /** Only the detail endpoint sends it */
   url_descarga_imagen?: string | null
+}
+
+/** Links of the photo of a report, as GET /reportes/{id}/imagen sends them; they are signed S3 addresses that need no session and stop working after `expira_en` seconds */
+export interface ReportImageLinks {
+  url_visualizacion: string
+  url_descarga: string
+  expira_en: number
 }
 
 /** Report as the API sends it: the number of minors is text */

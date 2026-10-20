@@ -15,35 +15,30 @@ import mx.itesm.myapplication.data.network.models.UsuarioResponse
 import retrofit2.HttpException
 import java.io.IOException
 
-/**
- * Representa los diferentes estados de la interfaz de usuario en el flujo de autenticación.
- */
+/** Estados de la interfaz en el flujo de autenticación */
 sealed interface AuthUiState {
-    /** Estado inactivo inicial o en espera. */
+    /** Estado inicial, sin ninguna operación en curso */
     object Idle : AuthUiState
 
-    /** Estado indicando que una operación asíncrona de autenticación está en progreso. */
+    /** Hay una operación de autenticación en curso */
     object Loading : AuthUiState
 
     /**
-     * Estado que indica que la operación fue exitosa.
+     * La operación terminó bien
      *
-     * @property usuario Objeto [UsuarioResponse] con los datos del usuario autenticado.
+     * @property usuario Datos del usuario autenticado o recién creado
      */
     data class Success(val usuario: UsuarioResponse) : AuthUiState
 
     /**
-     * Estado que representa un fallo en la autenticación o registro.
+     * La autenticación o el registro fallaron
      *
-     * @property message Descripción legible del mensaje de error.
+     * @property message Mensaje de error para mostrar al usuario
      */
     data class Error(val message: String) : AuthUiState
 }
 
-/**
- * [ViewModel] encargado de gestionar la lógica de negocio y el estado UI para
- * los flujos de inicio de sesión, registro de usuarios y cierre de sesión.
- */
+/** [ViewModel] del inicio de sesión, el registro de usuarios y el cierre de sesión */
 class AuthViewModel : ViewModel() {
 
     private companion object {
@@ -52,14 +47,14 @@ class AuthViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
 
-    /** Estado reactivo expuesto a la interfaz de usuario. */
+    /** Estado de la autenticación que observa la interfaz */
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
     /**
-     * Inicia sesión llamando al servicio REST del backend.
+     * Inicia sesión con `POST /usuarios/login` y guarda al usuario en [SesionUsuario]
      *
-     * @param correo Correo electrónico introducido por el usuario.
-     * @param contrasena Contraseña introducida por el usuario.
+     * @param correo Correo electrónico introducido por el usuario
+     * @param contrasena Contraseña introducida por el usuario
      */
     fun login(correo: String, contrasena: String) {
         viewModelScope.launch {
@@ -95,12 +90,12 @@ class AuthViewModel : ViewModel() {
     }
 
     /**
-     * Registra a un nuevo usuario en la plataforma.
+     * Registra a un usuario nuevo con `POST /usuarios`; no inicia sesión
      *
-     * @param nombre Nombre del nuevo usuario.
-     * @param apellido Apellido del nuevo usuario.
-     * @param correo Correo electrónico para la cuenta.
-     * @param contrasena Contraseña elegida.
+     * @param nombre Nombre del nuevo usuario
+     * @param apellido Apellido del nuevo usuario
+     * @param correo Correo electrónico para la cuenta
+     * @param contrasena Contraseña elegida
      */
     fun registrar(nombre: String, apellido: String, correo: String, contrasena: String) {
         viewModelScope.launch {
@@ -139,9 +134,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Cierra la sesión del usuario enviando la solicitud de logout y limpiando las cookies de la aplicación.
-     */
+    /** Cierra la sesión con `POST /usuarios/logout`; aunque falle, borra las cookies y la sesión local */
     fun logout() {
         viewModelScope.launch {
             try {
@@ -156,9 +149,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Restablece el estado de la interfaz de usuario a [AuthUiState.Idle].
-     */
+    /** Regresa el estado a [AuthUiState.Idle] */
     fun resetState() {
         _uiState.value = AuthUiState.Idle
     }

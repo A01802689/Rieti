@@ -13,11 +13,13 @@ import mx.itesm.myapplication.viewModel.EnvioUiState
 import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
- * Pantalla final del flujo de reporte con seguimiento, donde se redacta y se envía el reporte.
+ * Último paso del flujo de reporte con seguimiento: descripción, fotografía opcional y envío
  *
- * @param navController Controlador de navegación para manejar la navegación entre pantallas.
+ * Al enviarse el reporte muestra un diálogo con el folio y, al aceptarlo, vuelve a la pantalla principal
+ *
+ * @param navController Controlador de navegación usado para regresar a la pantalla anterior o a la principal
+ * @param vm ViewModel del flujo de reporte, compartido por todos los pasos
  */
-
 @Composable
 fun SeguimientoEnviar(navController: NavController, vm: ReporteViewModel){
     val state by vm.uiState.collectAsState()

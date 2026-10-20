@@ -21,6 +21,21 @@ def listar_logs(
     buscar: str | None = None,
     db: Session = Depends(get_db),
 ):
+    """Lista la bitácora de actividad, requiere rol Administrador
+
+    Args:
+        entity_type: tipo de registro por el que se filtra, todos si se omite
+        limite: máximo de entradas a devolver, de 1 al máximo del servicio
+        desplazamiento: entradas más recientes que se saltan, para paginar
+        buscar: texto que se busca en el nombre del usuario, la acción o el id del registro
+        db: sesión de base de datos
+
+    Returns:
+        Entradas de la bitácora de la más reciente a la más antigua
+
+    Raises:
+        HTTPException: 401 sin sesión, 403 si no es administrador, 422 si limite o desplazamiento no son válidos
+    """
     return logs_service.listar_logs(
         db=db,
         entity_type=entity_type,

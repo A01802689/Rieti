@@ -20,7 +20,7 @@ import mx.itesm.myapplication.R
 
 /**
  * Componente Composable que muestra el encabezado oficial de la aplicación RIETI,
- * incluyendo la imagen/logo arriba del título "RIETI" y el subtítulo representativo.
+ * incluyendo la imagen/logo arriba del título "RIETI" y el subtítulo representativo
  */
 @Composable
 fun AppHeader() {

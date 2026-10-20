@@ -3,8 +3,10 @@ from app.models.reporte import EstatusSeguimiento
 from app.schemas.caso import ActualizarCaso
 from app.schemas.usuario import PermisoEnum
 
+#: estatus que cierran un reporte y por eso exigen reports.close en lugar de reports.edit
 CIERRE_REPORTE = frozenset({EstatusSeguimiento.RECHAZADO, EstatusSeguimiento.CONCLUIDO})
 
+#: mensaje del 403 que se devuelve cuando falta cada permiso
 MENSAJES_PERMISO = {
     PermisoEnum.reports_view: "No tienes permiso para ver los reportes",
     PermisoEnum.reports_view_detail: "No tienes permiso para ver el detalle de los reportes",
@@ -21,6 +23,14 @@ MENSAJES_PERMISO = {
 
 
 def permisos_listado_reportes(id_caso: int | None) -> list[PermisoEnum]:
+    """Lista los permisos que dan acceso al listado de reportes, basta con tener uno
+
+    Args:
+        id_caso: caso por el que se filtra el listado, si lo hay y entonces también vale cases.view
+
+    Returns:
+        Permisos aceptados para listar reportes
+    """
     permisos = [PermisoEnum.reports_view, PermisoEnum.map_view, PermisoEnum.stats_view]
     if id_caso is not None:
         permisos.append(PermisoEnum.cases_view)
@@ -28,6 +38,14 @@ def permisos_listado_reportes(id_caso: int | None) -> list[PermisoEnum]:
 
 
 def permisos_cambio_reporte(estatus: EstatusSeguimiento | None) -> set[PermisoEnum]:
+    """Calcula el permiso que exige cambiar un reporte según el estatus pedido
+
+    Args:
+        estatus: estatus que se quiere asignar, o None si no se cambia
+
+    Returns:
+        reports.close si el estatus cierra el reporte, reports.edit en cualquier otro caso
+    """
     if estatus is None:
         return {PermisoEnum.reports_edit}
     if estatus in CIERRE_REPORTE:
@@ -36,6 +54,15 @@ def permisos_cambio_reporte(estatus: EstatusSeguimiento | None) -> set[PermisoEn
 
 
 def permisos_cambio_caso(datos: ActualizarCaso) -> set[PermisoEnum]:
+    """Calcula los permisos que exige actualizar un caso según los campos enviados
+
+    Args:
+        datos: campos que se quieren cambiar en el caso
+
+    Returns:
+        cases.close si el estado pasa a Cerrado, cases.edit para cualquier otro campo
+        y cases.edit también cuando no se envía ningún campo
+    """
     requeridos = set()
     if datos.estado is not None:
         requeridos.add(

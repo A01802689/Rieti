@@ -13,15 +13,14 @@ import mx.itesm.myapplication.view.general.PasoReporte
 import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
- * Pantalla del paso del formulario dentro del flujo de reporte anónimo.
+ * Paso del formulario dentro del flujo de reporte anónimo
  *
- * Muestra una fila superior con un botón para regresar, el título "Reporte Anónimo", el
- * formulario de preguntas [Formulario] y, al final, un botón "Continuar" que avanza al
- * siguiente paso del flujo.
+ * Muestra el título "Reporte Anónimo", el formulario de preguntas [Formulario] y un botón "Continuar"
+ * que se habilita cuando las cuatro preguntas están respondidas
  *
- * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ * @param navController Controlador de navegación usado para regresar o avanzar al envío
+ * @param vm ViewModel del flujo de reporte, compartido por todos los pasos
  */
-
 @Composable
 fun AnonimoFormulario(navController: NavController, vm: ReporteViewModel) {
 

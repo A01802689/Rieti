@@ -7,4 +7,12 @@ from app.repositories import municipio_repository
 #el modelo, construyo el oibjeto de esta clase apenas (construye), represneta una fila excta de la tablad
 # el repositorio (consulta o modfica la base de datos)
 def get_municipios(db: Session):
+    """Lista el catálogo de municipios ordenado por nombre
+
+    Args:
+        db: sesión de base de datos
+
+    Returns:
+        Todos los municipios
+    """
     return municipio_repository.get_all(db)

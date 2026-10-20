@@ -14,12 +14,12 @@ import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 
 /**
- * Pantalla para crear un reporte anónimo.
+ * Último paso del flujo de reporte anónimo: descripción, fotografía opcional y envío
  *
- * Muestra una barra superior simple con un botón para regresar a la pantalla anterior,
- * el título "Reporte Anónimo" y, debajo, el formulario de envío [Enviar].
+ * Al enviarse el reporte muestra un diálogo de agradecimiento y, al aceptarlo, vuelve a la pantalla principal
  *
- * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ * @param navController Controlador de navegación usado para regresar a la pantalla anterior o a la principal
+ * @param vm ViewModel del flujo de reporte, compartido por todos los pasos
  */
 @Composable
 fun AnonimoEnviar(navController: NavController, vm: ReporteViewModel){

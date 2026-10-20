@@ -12,15 +12,14 @@ import mx.itesm.myapplication.view.general.PasoReporte
 import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
- * Pantalla del paso del formulario dentro del flujo de reporte con seguimiento.
+ * Paso del formulario dentro del flujo de reporte con seguimiento
  *
- * Muestra una fila superior con un botón para regresar, el título "Reporte con Seguimiento",
- * un texto que indica que el folio se recibirá por correo o WhatsApp, el formulario de
- * preguntas [Formulario] y, al final, un botón "Continuar" que avanza al siguiente paso.
+ * Muestra el título "Reporte con Seguimiento", el formulario de preguntas [Formulario] y un botón "Continuar"
+ * que se habilita cuando las cuatro preguntas están respondidas
  *
- * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ * @param navController Controlador de navegación usado para regresar o avanzar a la ubicación
+ * @param vm ViewModel del flujo de reporte, compartido por todos los pasos
  */
-
 @Composable
 fun SeguimientoFormulario(navController: NavController, vm: ReporteViewModel) {
     val state by vm.uiState.collectAsState()

@@ -5,6 +5,7 @@ from app.db.base import Base
 from enum import Enum
 
 class TipoTrabajo(str, Enum):
+    """Actividad que realiza el menor según el reporte"""
     VENTA_AMBULANTE = "Venta ambulante"
     LIMPIEZA_DE_PARABRISAS = "Limpieza de parabrisas"
     MENDICIDAD = "Mendicidad"
@@ -19,6 +20,7 @@ class TipoTrabajo(str, Enum):
 
 
 class EdadAproximada(str, Enum):
+    """Rango de edad aproximada del menor, en años"""
     CERO_A_CINCO = "0-5"
     SEIS_A_ONCE = "6-11"
     DOCE_A_CATORCE = "12-14"
@@ -26,6 +28,7 @@ class EdadAproximada(str, Enum):
     NO_SE = "No sé"
 
 class EstatusSeguimiento(str, Enum):
+    """Etapa de atención de un reporte"""
     RECIBIDO = "Recibido"
     EN_REVISION = "En revisión"
     CANALIZADO = "Canalizado"
@@ -34,11 +37,13 @@ class EstatusSeguimiento(str, Enum):
     RECHAZADO = "Rechazado"
 
 class RiesgoReporte(str, Enum):
+    """Nivel de riesgo que el personal asigna a un reporte"""
     BAJO = "Bajo"
     MEDIO = "Medio"
     ALTO = "Alto"
 
 class CantidadNNA(str, Enum):
+    """Cantidad de niños, niñas y adolescentes observados"""
     UNO = "1"
     DOS = "2"
     TRES = "3"
@@ -47,6 +52,17 @@ class CantidadNNA(str, Enum):
     NO_SE = "No sé"
 
 class Reporte(Base):
+    """Tabla reporte: aviso ciudadano de una posible situación de trabajo infantil
+
+    Attributes:
+        id_usuario: quien reportó, NULL si no pidió seguimiento
+        id_caso: caso al que pertenece, NULL mientras no se canalice
+        folio_reporte: folio único con formato RIETI-clave-año-consecutivo
+        estatus_seguimiento: etapa de atención, NULL cuando el caso al que pertenecía se eliminó
+        fecha_reporte: fecha de registro en UTC sin zona horaria
+        imagen_key: clave del objeto en S3, NULL si no tiene imagen
+        riesgo: NULL mientras el personal no lo asigne
+    """
     __tablename__ = "reporte"
 
     id_reporte = Column(Integer, primary_key=True, index=True)

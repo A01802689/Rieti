@@ -14,11 +14,16 @@ import androidx.navigation.compose.rememberNavController
 import mx.itesm.myapplication.ui.theme.MyApplicationTheme
 
 /**
- * Actividad principal de la aplicación Android Rieti.
+ * Actividad principal de la aplicación Android Rieti
  *
- * Configura la experiencia Edge-to-Edge y establece el contenido declarativo mediante Jetpack Compose.
+ * Configura la experiencia Edge-to-Edge y establece el contenido declarativo mediante Jetpack Compose
  */
 class MainActivity : ComponentActivity() {
+    /**
+     * Activa el modo Edge-to-Edge y muestra [AppPrincipal] dentro del tema de la aplicación
+     *
+     * @param savedInstanceState Estado guardado de la actividad, si lo hay
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,9 +37,9 @@ class MainActivity : ComponentActivity() {
 
 /**
  * Composable raíz que inicializa el controlador de navegación [rememberNavController]
- * y renderiza el contenedor [Surface] principal con [AppNavHost].
+ * y renderiza el contenedor [Surface] principal con [AppNavHost]
  *
- * @param modifier Modificador opcional de diseño.
+ * @param modifier Modificador opcional de diseño
  */
 @Composable
 fun AppPrincipal(modifier: Modifier = Modifier) {

@@ -13,13 +13,13 @@ import mx.itesm.myapplication.view.general.Ubicacion
 import mx.itesm.myapplication.viewModel.ReporteViewModel
 
 /**
- * Pantalla del paso de ubicación dentro del flujo de reporte anónimo.
+ * Paso de ubicación dentro del flujo de reporte anónimo, el primero del flujo
  *
- * Muestra una fila superior con un botón para regresar, el título "Reporte Anónimo", el
- * componente [Ubicacion] (mapa y campos de texto para indicar dónde se observó la situación)
- * y, al final, un botón "Continuar" que avanza al siguiente paso del flujo.
+ * Marca el reporte como anónimo, muestra el componente [Ubicacion] y un botón "Continuar" que se habilita
+ * cuando la ubicación está completa
  *
- * @param navController Controlador de navegación usado para regresar a la pantalla anterior
+ * @param navController Controlador de navegación usado para regresar o avanzar al formulario
+ * @param vm ViewModel del flujo de reporte, compartido por todos los pasos
  */
 @Composable
 fun AnonimoUbicacion(navController: NavController, vm: ReporteViewModel) {
